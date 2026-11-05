@@ -389,12 +389,14 @@ SCENES.forest = {
 SCENES.library = {
   song: 'drab', walk: [40, 170, 250, 194],
   enter(o = {}) {
+    if (save.stage === 'done') save.lastRoom = 'library';
     this.alive = bgOf('libAlive', W, H, (g) => paintLibrary(g));
     this.drab = bgOf('libDrab', W, H, (g) => { g.drawImage(recolor(this.alive, drab), 0, 0); paintCobwebs(g); });
     const done = ['reward', 'done'].includes(save.stage);
-    this.reveal = done ? 999 : 0; this.fireK = done ? 1 : 0; this.wiggle = false; this.bookShown = !!(save.book && done);
-    this.flyBook = null; this.presents = null; this.preview = null; this.squash = 0; this.lightsK = save.item === 'lights' ? 1 : 0;
-    this.st = {}; this.storyIcon = null;
+    this.reveal = done ? 999 : 0; this.fireK = done ? 1 : 0; this.wiggle = false; this.bookShown = save.books.length > 0 && done;
+    this.flyBook = null; this.presents = null; this.preview = null; this.squash = 0; this.lightsK = save.items.library.includes('lights') ? 1 : 0;
+    this.st = {}; this.storyIcon = null; this.room = 'library'; this.host = 'greg'; this.hideTop = false; this.flare = 0;
+    this.hatchK = save.flags.hatch ? 1 : 0; this.shelfBookGone = false; this.dj = null; this.lounger = null; this.choosing = false;
     this.song = done ? 'warm' : 'drab';
     zoe.visible = true;
     if (o.arrive) { zoe.x = 31; zoe.y = 190; } else { zoe.x = 96; zoe.y = 186; }
@@ -404,20 +406,25 @@ SCENES.library = {
     const g0 = done ? 1 : 0.22;
     for (const s of [this.greg, ...this.sps]) { s.glow = g0; s.look = zoe; }
     if (done) this.sps.forEach((s, i) => { s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; });
-    if (save.item === 'headphones') { const s = this.sps[2]; s.x = 233; s.y = 136; s.acc = 'headphones'; s.mode = 'idle'; s.hop(true); this.dj = s; }
-    if (save.item === 'beanbag') { const s = this.sps[0]; s.x = LIB.beanbag[0]; s.y = LIB.beanbag[1] - 10; s.mode = 'idle'; s.sitting = true; this.lounger = s; }
+    if (save.items.library.includes('headphones')) { const s = this.sps[2]; s.x = 233; s.y = 136; s.acc = 'headphones'; s.mode = 'idle'; s.hop(true); this.dj = s; }
+    if (save.items.library.includes('beanbag')) { const s = this.sps[0]; s.x = LIB.beanbag[0]; s.y = LIB.beanbag[1] - 10; s.mode = 'idle'; s.sitting = true; this.lounger = s; }
     this.actors = [zoe, this.greg, ...this.sps];
     const self = this;
     const isDone = () => save.stage === 'done';
     hints = [
       { x: 98, y: 82, strong: true, when: () => save.stage === 'library' },
       { x: 180, y: 156, strong: true, when: () => save.stage === 'quest' },
-      { x: 142, y: 180, strong: true, when: () => save.stage === 'reward' && self.presents && !self.choosing },
+      { x: 142, y: 180, strong: true, when: () => !!self.presents && !self.choosing },
+      { x: 98, y: 82, strong: true, when: () => isDone() && !save.active.read && !self.presents && !save.pending && !self.shelfBookGone },
+      { x: 180, y: 156, when: () => isDone() && !!save.active.read && !self.presents },
+      { x: 118, y: 22, off: 0.6, when: () => isDone() && self.hatchK >= 1 && !save.flags.dotMet },
     ];
     this.hotspots = [
       { rect: [12, 176, 38, 22], stand: [44, 188], act: () => self.leave() },
       { rect: [16, 38, 104, 114], stand: [70, 184], face: 'front', act: () => self.shelf() },
-      { rect: [28, 44, 28, 26], when: () => self.bookShown, stand: [56, 184], face: 'front', act: () => openBookCard() },
+      { rect: [28, 44, 28, 26], when: () => self.bookShown, stand: [56, 184], face: 'front', act: () => openBookCard(save.books[save.books.length - 1]) },
+      { hit: (x, y) => self.spineAt(x, y) >= 0, stand: [70, 184], face: 'front', act: () => openBookCard(save.books[self.spineAt(self._tapX, self._tapY)] || save.books[0]) },
+      { rect: [100, 4, 30, 150], when: () => self.hatchK >= 1, stand: [114, 178], face: 'front', act: () => self.climb() },
       { rect: [142, 96, 72, 58], stand: [196, 178], act: async () => {
         if (self.fireK > 0) await say('n', cycle(['Crackle, crackle. The fire is showing off now.', 'Warm and cozy. Your story did that.'], 'fire', self.st));
         else await say('n', cycle(['The fireplace is cold. It looks bored.', 'A fire needs wood. This one also needs a story.'], 'fire0', self.st));
@@ -426,9 +433,10 @@ SCENES.library = {
       { rect: [218, 50, 32, 32], stand: [234, 184], act: async () => { await say('n', self.fireK > 0 ? 'The forest looks happier. Or it always looked like that. Hard to say.' : 'The forest outside is glowing. In here, not so much.'); } },
       { rect: [252, 80, 36, 72], stand: [250, 186], act: () => self.kitchen() },
       { rect: [170, 156, 20, 16], when: () => save.stage === 'quest', stand: [134, 186], face: 'front', act: () => self.tell() },
-      { rect: [170, 156, 20, 16], when: () => save.stage !== 'quest', stand: [160, 184], act: async () => { await say('n', cycle(['The storytelling stool. A little wobbly.', "The wobble is part of its charm. That's what Greg says."], 'stool', self.st)); } },
-      { rect: [112, 150, 34, 24], when: () => save.item === 'beanbag', stand: [104, 186], act: async () => { AU.sfx('squish'); self.squash = 3; await say('n', cycle(['The beanbag. Currently occupied.', 'Squish.'], 'bb', self.st)); } },
-      { rect: [10, 26, 268, 20], when: () => save.item === 'lights', act: async () => { AU.sfx('twinkle'); await say('n', cycle(['Twinkle, twinkle.', 'The Sparkees named every single light. They are all named Greg.'], 'lt', self.st)); } },
+      { rect: [170, 156, 20, 16], when: () => isDone() && !!save.active.read && !self.presents, stand: [134, 186], face: 'front', act: () => self.tellRead() },
+      { rect: [170, 156, 20, 16], when: () => save.stage !== 'quest' && !(isDone() && save.active.read), stand: [160, 184], act: async () => { await say('n', cycle(['The storytelling stool. A little wobbly.', "The wobble is part of its charm. That's what Greg says."], 'stool', self.st)); } },
+      { rect: [112, 150, 34, 24], when: () => save.items.library.includes('beanbag'), stand: [104, 186], act: async () => { AU.sfx('squish'); self.squash = 3; await say('n', cycle(['The beanbag. Currently occupied.', 'Squish.'], 'bb', self.st)); } },
+      { rect: [10, 26, 268, 20], when: () => save.items.library.includes('lights'), act: async () => { AU.sfx('twinkle'); await say('n', cycle(['Twinkle, twinkle.', 'The Sparkees named every single light. They are all named Greg.'], 'lt', self.st)); } },
       { hit: (x, y) => Math.hypot(self.greg.x - x, self.greg.y - 6 - y) < 11, when: () => !self.presents, stand: () => [self.greg.x - 22, clamp(self.greg.y, 170, 194)], act: () => self.talkGreg() },
       { hit: (x, y) => self.sps.some((s) => s.visible && Math.hypot(s.x - x, s.y - 5 - y) < 9), when: () => !self.presents, act: async () => {
         const s = self.sps.slice().sort((a, b) => Math.hypot(a.x - zoe.x, a.y - zoe.y) - Math.hypot(b.x - zoe.x, b.y - zoe.y))[0];
@@ -436,11 +444,8 @@ SCENES.library = {
         bubble(s, cycle(isDone() ? ['Hi!', 'Your book is my favorite book.', 'Is it tomorrow yet?', "I'm glowing! Look!", 'I love it here now.'] : ['Hi...', "It's chilly in here.", 'Do you like stories?', '*sniff*'], 'spk', self.st), 1600, true);
         await sleep(400);
       } },
-      { hit: (x, y) => !!self.presents && self.presents.some((p) => !p.gone && Math.abs(p.x - x) < 9 && y > p.y - 18 && y < p.y + 2), act: async () => {
-        const p = self.presents.find((pp) => !pp.gone);
-        const hitP = self.presents.filter((pp) => !pp.gone).sort((a, b) => Math.abs(a.x - self._tapX) - Math.abs(b.x - self._tapX))[0] || p;
-        await self.peek(hitP);
-      } },
+      ...libraryItemSpots(self),
+      Presents.hotspot(self),
     ];
   },
   onTapEmpty() { return false; },
@@ -449,7 +454,8 @@ SCENES.library = {
     G.expr = 'happy';
     if (save.stage === 'library') await say('greg', 'The bookshelf! Give it a tap. It knows what to do.');
     else if (save.stage === 'quest') { await say('greg', "Back already? Did you read your animal book?"); await say('greg', 'Sit on the storytelling stool and tell us everything!'); }
-    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', 'Come back tomorrow. The bookshelf will have a new quest.'], 'greg', this.st));
+    else if (save.active.read) { const q = readQuest(save.active.read); await say('greg', `Your quest is ${q.title}.`); await say('greg', 'When you are done, sit on the storytelling stool and tell us everything!'); }
+    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', 'The bookshelf has a new quest whenever you want one.', save.flags.hatch ? 'Dot is up the ladder. Tell her Greg says hi. She will pretend not to care.' : 'Greg has a good feeling about today.', `We have ${save.books.length} ${save.books.length === 1 ? 'story' : 'stories'} on the shelf now. Greg counts them every night.`], 'greg', this.st));
     G.expr = 'norm';
   },
   async kitchen() {
@@ -469,8 +475,16 @@ SCENES.library = {
   },
   async shelf() {
     if (save.stage === 'library') return this.giveQuest();
-    if (save.stage === 'quest') { await say('n', 'The bookshelf is waiting for your story.'); await openQuestPage(true); return; }
-    if (save.stage === 'done') { await say('n', cycle(['Lots of empty shelves. Plenty of room for more stories.', 'Shh. The bookshelf is dreaming up your next quest.', '(Your grown-ups are helping it. Come back tomorrow.)'], 'shelf', this.st)); return; }
+    if (save.stage === 'quest') { await say('n', 'The bookshelf is waiting for your story.'); await openQuestPage(READ_QUESTS[0], 'read', true); return; }
+    if (save.stage === 'done') {
+      if (this.presents || save.pending) { await say('n', 'Open your present first!'); return; }
+      if (save.active.read) {
+        const r = await openQuestPage(readQuest(save.active.read), 'read', true);
+        if (r === 'done') await this.tellRead(true);
+        return;
+      }
+      return this.giveReadQuest();
+    }
     await say('n', 'A big, empty bookshelf.');
   },
   async giveQuest() {
@@ -486,7 +500,7 @@ SCENES.library = {
     AU.sfx('page');
     this.flyBook = null;
     this.shelfBookGone = true;
-    await openQuestPage(false);
+    await openQuestPage(READ_QUESTS[0], 'read', false);
     AU.sfx('chime');
     save.stage = 'quest'; persist(); updateHud(true);
     const G = this.greg;
@@ -612,12 +626,14 @@ SCENES.library = {
     // the book appears and flies onto the shelf
     AU.sfx('sparkle');
     burst(zoe.x, zoe.y - 40, 16, { speed: 26, c: '#FFF6C8', extra: { layer: 'front' } });
-    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, to: [LIB.shelfBook[0] - 6, LIB.shelfBook[1] - 1], animal };
+    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, to: [LIB.shelfBook[0] - 6, LIB.shelfBook[1] - 1], book: { q: 'animal', animal } };
     await sleep(500);
     await tween(1300, (k) => { this.flyBook.t = k; });
     this.flyBook = null; this.bookShown = true; this.storyIcon = null;
     AU.sfx('pop'); burst(LIB.shelfBook[0] + 6, LIB.shelfBook[1] + 12, 14, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
-    save.book = { animal, feel }; save.stage = 'reward'; persist(); updateHud();
+    save.book = { animal, feel }; save.books.push({ q: 'animal', animal, feel, at: Date.now() });
+    if (!save.doneQ.read.includes('animal')) save.doneQ.read.push('animal');
+    save.counts.read = Math.max(save.counts.read, 1); save.stage = 'reward'; persist(); updateHud();
     AU.sfx('cheer');
     S.forEach((s) => { s.arms = 'up'; s.hop(true); s.expr = 'happy'; });
     bubble(S[0], 'It is WARM!', 1600, true); setTimeout(() => bubble(S[2], 'Look at the fire!', 1500), 400); setTimeout(() => bubble(S[5], 'Hooray!', 1300), 800);
@@ -637,55 +653,28 @@ SCENES.library = {
   },
   async reward() {
     const G = this.greg;
-    if (!this.presents) {
-      G.expr = 'happy';
-      await say('greg', 'The library wants to say thank you.');
-      const side = [[196, 184], [210, 192], [224, 182], [238, 192], [182, 194], [250, 180]];
-      this.sps.forEach((s, i) => { s.sitting = false; s.mode = 'goto'; s.goto(side[i][0], side[i][1], 55); });
-      await G.goto(176, 178, 45);
-      AU.sfx('poof');
-      this.presents = [
-        { x: 120, y: 192, wrap: '#DB95B5', ribbon: '#DCA438', item: 'beanbag', lid: 0 },
-        { x: 142, y: 196, wrap: '#A1AF7C', ribbon: '#612C48', item: 'lights', lid: 0 },
-        { x: 164, y: 192, wrap: '#7E93A3', ribbon: '#FE9B5B', item: 'headphones', lid: 0 },
-      ];
-      for (const p of this.presents) burst(p.x, p.y - 6, 10, { speed: 30, c: '#FFF6C8', extra: { layer: 'front' } });
-      await zoe.walkTo(96, 188); zoe.face(1);
-      await say('greg', 'Three presents! Pick one for the library.');
-      await say('greg', 'Tap a present to peek inside.');
-    }
-  },
-  async peek(p) {
-    if (this.choosing) return;
-    this.choosing = true;
-    const G = this.greg;
-    AU.sfx('pop');
-    await tween(300, (k) => { p.lid = Math.round(k * 8); });
-    this.preview = p.item;
-    p.peeked = true;
-    AU.sfx('sparkle');
-    const info = {
-      beanbag: ['A beanbag chair! For flopping.', 'Sparkees are excellent floppers.'],
-      lights: ['Fairy lights! They twinkle.', 'Twinkling is our favorite thing to watch.'],
-      headphones: ['Tiny headphones! Sparkee-sized.', 'For listening to very tiny music.'],
-    }[p.item];
+    if (this.presents) return;
+    const first = save.stage === 'reward';
     G.expr = 'happy';
-    await say('greg', info[0]);
-    const c = await ask('greg', info[1], ['Keep it!', 'Peek at another one.']);
-    if (c === 0) { await this.place(p); }
-    else { this.preview = null; await tween(250, (k) => { p.lid = Math.round((1 - k) * 8); }); }
-    this.choosing = false;
+    await say('greg', first ? 'The library wants to say thank you.' : cycle(['The library has something for you.', 'A present! The library is a big fan of yours.', 'Thank-you presents! The library insists.'], 'thanks', this.st));
+    const side = [[196, 184], [210, 192], [224, 182], [238, 192], [182, 194], [250, 180]];
+    this.sps.forEach((s, i) => { if (s === this.dj || s === this.lounger) return; s.sitting = false; s.mode = 'goto'; s.goto(side[i][0], side[i][1], 55); });
+    await G.goto(176, 178, 45);
+    const ok = Presents.offer(this, 'library', [[120, 192], [142, 196], [164, 192]], first ? { items: ['beanbag', 'lights', 'headphones'] } : {});
+    if (!ok) {
+      await say('greg', 'Hmm. The library already has every present it knows how to make.');
+      await say('greg', 'So instead, Greg will give you this: a very sincere thumbs up.');
+      await say('n', '(Greg does not have thumbs.)');
+      return this.afterPresent();
+    }
+    await zoe.walkTo(96, 188); zoe.face(1);
+    const n = this.presents.length;
+    await say('greg', n === 1 ? 'One present! Tap it to peek inside.' : `${n === 3 ? 'Three' : 'Two'} presents! Pick one for the library.`);
+    if (n > 1) await say('greg', 'Tap a present to peek inside.');
   },
-  async place(p) {
+  async onPlaced(item) {
     const G = this.greg, S = this.sps;
-    this.preview = null;
-    AU.sfx('poof');
-    for (const q of this.presents) { q.gone = true; burst(q.x, q.y - 6, 12, { speed: 30, c: '#FFF6C8', extra: { layer: 'front' } }); }
-    save.item = p.item; persist();
-    const target = { beanbag: LIB.beanbag, lights: [144, 36], headphones: LIB.table }[p.item];
-    burst(target[0], target[1] - 6, 22, { speed: 34, c: '#FFE38A', extra: { layer: 'front' } });
-    this.presents = null;
-    if (p.item === 'beanbag') {
+    if (item === 'beanbag') {
       const s = S[0]; s.sitting = false; s.mode = 'goto';
       await s.goto(LIB.beanbag[0] - 22, 184, 60);
       s.jump(120); await s.goto(LIB.beanbag[0], LIB.beanbag[1] - 10, 50);
@@ -693,7 +682,7 @@ SCENES.library = {
       bubble(s, 'I live here now.', 2000, true); this.lounger = s;
       await sleep(1800);
       await say('greg', 'Fair enough.');
-    } else if (p.item === 'lights') {
+    } else if (item === 'lights') {
       AU.sfx('twinkle');
       await tween(1600, (k) => { this.lightsK = k; });
       [G, ...S].forEach((s) => { s.expr = 'wide'; s.look = { x: s.x, y: 0 }; });
@@ -701,7 +690,7 @@ SCENES.library = {
       await sleep(1800);
       [G, ...S].forEach((s) => { s.expr = 'happy'; s.look = zoe; });
       await say('greg', 'Pretty. So pretty.');
-    } else {
+    } else if (item === 'headphones') {
       const s = S[2]; s.sitting = false; s.mode = 'goto';
       await s.goto(LIB.table[0] - 14, 168, 60);
       s.jump(150); await s.goto(LIB.table[0], LIB.table[1], 40);
@@ -709,72 +698,232 @@ SCENES.library = {
       await sleep(1600);
       await say('greg', 'He cannot hear us anymore.');
       await say('greg', 'He has never been happier.');
+    } else {
+      AU.sfx('twinkle');
+      await Presents.admire(this, item, ['Ooh!', 'I love it!', 'So fancy!', 'Can I touch it?', 'Best present ever.']);
     }
+    await this.afterPresent();
+  },
+  async afterPresent() {
+    const G = this.greg, S = this.sps;
     G.expr = 'happy';
     await say('greg', 'The library looks wonderful.');
-    await say('greg', 'Come back tomorrow, {name}. The bookshelf will have a new quest for you.');
+    if (save.stage === 'reward') {
+      await say('greg', 'And {name}, here is a secret: the bookshelf has more quests.');
+      await say('greg', 'Tap it whenever you want a new one. It is the bookshelf\'s job. It takes it very seriously.');
+      G.expr = 'norm';
+      save.stage = 'done'; save.doneAt = Date.now(); persist(); updateHud();
+      this.shelfBookGone = false;
+      this.wanderAll();
+      await openChapterCard();
+      await this.hatchIntro();
+    } else {
+      await say('greg', cycle(['Tap the bookshelf whenever you want another quest.', 'The bookshelf is already wiggling. It loves this.', 'More stories, more magic. That is the rule.'], 'after', this.st));
+      G.expr = 'norm';
+      this.wanderAll();
+    }
+  },
+  wanderAll() {
+    this.sps.forEach((s, i) => { if (s !== this.dj && s !== this.lounger) { s.sitting = false; s.expr = 'norm'; s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; } });
+  },
+  spineAt(x, y) {
+    const n = save.books.length - (this.hideTop ? 1 : 0) - 1;
+    for (let i = 0; i < Math.min(n, SPINE_SLOTS.length); i++) { const [sx, sy, h] = SPINE_SLOTS[i]; if (x >= sx - 1 && x < sx + 5 && y >= sy + 16 - h && y < sy + 16) return i; }
+    return -1;
+  },
+  async giveReadQuest() {
+    const q = pickNextQuest('read');
+    this.wiggle = true; AU.sfx('rattle');
+    await say('n', cycle(['A book is wiggling.', 'Another book is wiggling.', 'Wiggle, wiggle. A book wants out.'], 'wig', this.st));
+    AU.sfx('rattle'); this.wiggle = false;
+    AU.sfx('pop');
+    burst(98, 80, 10, { speed: 24, c: '#CBBCA3', ay: 40 });
+    this.shelfBookGone = true;
+    this.flyBook = { x: 96, y: 76, t: 0, to: [zoe.x, zoe.y - 34], quest: true };
+    await tween(700, (k) => { this.flyBook.t = k; });
+    AU.sfx('page'); this.flyBook = null;
+    const r = await openQuestPage(q, 'read', false);
+    this.shelfBookGone = false;
+    if (r !== 'ok') { await say('greg', 'No rush. The book will wait. Books are excellent at waiting.'); return; }
+    AU.sfx('chime');
+    save.active.read = q.id; persist(); updateHud(true);
+    const G = this.greg; G.expr = 'happy';
+    await say('greg', cycle(['A new quest!', 'Another quest! The bookshelf is on a roll.', 'Ooh, a good one.'], 'newq', this.st));
+    await say('greg', q.sendoff);
+    if ((save.counts.read || 0) < 3) await say('greg', 'When you are done, sit on the storytelling stool and tell us everything.');
     G.expr = 'norm';
-    await say('greg', 'It is the bookshelf\'s job. It takes it very seriously.');
-    save.stage = 'done'; save.doneAt = Date.now(); persist(); updateHud();
-    S.forEach((s, i) => { if (s !== this.dj && s !== this.lounger) { s.sitting = false; s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; } });
-    await openChapterCard();
+  },
+  async tellRead(skipAsk) {
+    const q = readQuest(save.active.read), G = this.greg, S = this.sps;
+    zoe.face('front');
+    const spots = [[96, 190], [84, 180], [196, 190], [208, 180], [110, 196], [222, 192]];
+    S.forEach((s, i) => { if (s === this.dj || s === this.lounger) return; s.mode = 'goto'; s.goto(spots[i][0], spots[i][1], 40); s.look = zoe; });
+    if (Math.hypot(zoe.x - 134, zoe.y - 186) > 6) { await zoe.walkTo(134, 186); zoe.face('front'); }
+    await G.goto(108, 182, 40);
+    G.look = zoe; G.expr = 'happy';
+    if (!skipAsk) {
+      await say('greg', cycle(['{name}! You are back!', 'Story time? Story time!', 'Is it a story? Greg can feel a story coming.'], 'back', this.st));
+      G.expr = 'norm';
+      const r = await ask('greg', q.ask, ['Yes! I did it!', 'Not yet.']);
+      if (r === 1) { await say('greg', 'No rush! The fire is not going anywhere.'); this.wanderAll(); return; }
+    }
+    AU.sfx('cheer');
+    S.forEach((s) => { s.expr = 'happy'; s.jump(70 + Math.random() * 30); });
+    bubble(S[0], 'Story time!', 1500, true); setTimeout(() => bubble(S[3], 'Yay!', 1200), 300);
+    await sleep(1200);
+    await say('greg', 'Everybody sit!');
+    S.forEach((s) => { s.sitting = true; s.expr = 'norm'; });
+    const book = { q: q.id, picks: {}, at: Date.now() };
+    for (const step of q.tell) await this.tellStep(step, book);
+    this.storyIcon = this.storyIcon || ('e_' + (q.cover.emblem || 'book'));
+    G.expr = 'wide';
+    await say('greg', 'Stand back, everyone...');
+    await this.magicAgain(book);
+  },
+  async tellStep(step, book) {
+    const G = this.greg, S = this.sps;
+    if (step.type === 'animal') {
+      const a = await openAnimalPicker(); book.animal = a; this.storyIcon = 'a_' + a; AU.sfx('sparkle'); await this.reactAnimal(a);
+    } else if (step.type === 'pick') {
+      await say('greg', step.q);
+      const k = await openPicker(step.q, step.options);
+      const opt = step.options.find((o) => o[0] === k);
+      book.picks[step.key] = k; this.storyIcon = opt[2]; AU.sfx('sparkle');
+      S.forEach((s) => (s.expr = 'happy')); G.expr = 'happy';
+      const lines = step.react[k] || ['Ooh!', 'Good answer.'];
+      await say('greg', lines[0]); await say('greg', lines[1]);
+    } else if (step.type === 'color') {
+      const k = await openColorPicker(step.q);
+      book.color = k; AU.sfx('sparkle');
+      S.forEach((s) => (s.expr = 'happy')); G.expr = 'happy';
+      const lines = COLOR_REACT[k] || ['What a color!', 'Greg approves.'];
+      await say('greg', lines[0]); await say('greg', lines[1]);
+    } else if (step.type === 'feel') {
+      const f = await openFeelingPicker(); book.feel = f; await this.reactFeeling(f);
+    } else if (step.type === 'outloud') {
+      G.expr = 'norm'; S.forEach((s) => { s.expr = 'wide'; });
+      await say('greg', 'Now the best part.');
+      await say('greg', step.say);
+      const [l1, l2] = FEEL_REACT_LINES.outloud[Math.floor(Math.random() * FEEL_REACT_LINES.outloud.length)];
+      await say('sp', l1, { actor: S[1] });
+      await say('sp2', l2, { actor: S[2] });
+      await ask('n', 'Tell the Sparkees. Then tap the button.', ['I told them!']);
+      S.forEach((s) => { s.expr = 'star'; });
+      const wow = STORY_WOW[Math.floor(Math.random() * STORY_WOW.length)];
+      bubble(S[0], wow[0], 1400, true); setTimeout(() => bubble(S[2], wow[1], 1400), 400); setTimeout(() => bubble(S[4], wow[2], 1500), 800);
+      await sleep(1700);
+      G.expr = 'happy';
+      await say('greg', GREG_WOW[Math.floor(Math.random() * GREG_WOW.length)]);
+    }
+  },
+  async magicAgain(book) {
+    const G = this.greg, S = this.sps;
+    zoe.mode = 'cheer';
+    AU.sfx('whoosh');
+    await streamMagic([zoe.x, zoe.y - 24], LIB.fire, 32);
+    AU.sfx('fwoomp');
+    FX.flashColor = '#FFE9A8';
+    tween(600, (k) => { FX.flash = 0.5 * (1 - k); });
+    burst(LIB.fire[0], LIB.fire[1], 36, { speed: 70, c: '#FFD84A', up: 30, life: 1.2, extra: { layer: 'front' } });
+    tween(1800, (k) => { this.flare = Math.sin(k * Math.PI); });
+    S.forEach((s) => { s.sitting = false; s.expr = 'happy'; s.jump(90 + Math.random() * 30); });
+    await sleep(900);
+    zoe.mode = 'front';
+    // the old book slides onto the shelf as a spine, the new one flies to the stand
+    if (save.books.length) { AU.sfx('page'); burst(42, 56, 10, { speed: 18, c: '#FFE38A', extra: { layer: 'front' } }); }
+    this.hideTop = true;
+    save.books.push(book);
+    AU.sfx('sparkle');
+    burst(zoe.x, zoe.y - 40, 16, { speed: 26, c: '#FFF6C8', extra: { layer: 'front' } });
+    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, to: [LIB.shelfBook[0] - 6, LIB.shelfBook[1] - 1], book };
+    await sleep(400);
+    await tween(1200, (k) => { this.flyBook.t = k; });
+    this.flyBook = null; this.hideTop = false; this.bookShown = true; this.storyIcon = null;
+    AU.sfx('pop'); burst(LIB.shelfBook[0] + 6, LIB.shelfBook[1] + 12, 14, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
+    save.doneQ.read.push(book.q); save.active.read = null; save.counts.read = (save.counts.read || 0) + 1;
+    persist(); updateHud();
+    AU.sfx('cheer');
+    S.forEach((s) => { s.arms = 'up'; s.hop(true); });
+    bubble(S[0], cycle(['Another one!', 'The fire LOVES it!', 'Hooray!'], 'yay', this.st), 1600, true);
+    await sleep(1800);
+    S.forEach((s) => { s.arms = 'down'; s.hop(false); });
+    G.expr = 'happy';
+    await say('greg', cycle(['Another story for the shelf!', 'The fire is so happy. Look at it showing off.', 'The library is getting cozier every time.'], 'shelfline', this.st));
+    if (save.books.length === 5) await say('greg', 'Five stories! Greg had to learn a new number for this.');
+    if (save.books.length === 10) await say('greg', 'TEN stories! Greg ran out of fingers. Greg did not have fingers to begin with.');
+    await this.reward();
+  },
+  async hatchIntro() {
+    if (save.flags.hatch) return;
+    const G = this.greg, S = this.sps;
+    await sleep(500);
+    AU.sfx('rattle');
+    const shake = (ms) => tween(ms, (k) => { cam.x = Math.round(Math.sin(k * 60) * 2 * (1 - k)); });
+    shake(900);
+    for (let i = 0; i < 14; i++) emit({ kind: 'mote', x: 100 + Math.random() * 40, y: 8 + Math.random() * 12, vy: 20 + Math.random() * 20, life: 2.5, c: '#CBBCA3', a: 1 });
+    [G, ...S].forEach((s) => { s.expr = 'wide'; s.look = { x: 118, y: 0 }; });
+    await say('n', 'Rumble. Rumble.');
+    await say('greg', 'What was that?');
+    AU.sfx('rattle'); shake(700);
+    await sleep(500);
+    AU.sfx('creak');
+    await tween(900, (k) => { this.hatchK = ease(k); });
+    AU.sfx('sparkle');
+    burst(118, 16, 20, { speed: 30, c: '#FFE38A', extra: { layer: 'front' } });
+    await say('sp', 'The ceiling has a door!', { actor: S[1] });
+    G.expr = 'happy'; [G, ...S].forEach((s) => (s.look = zoe));
+    await say('greg', 'The art studio! It has been stuck shut since the magic faded.');
+    await say('greg', 'All your stories must have shaken it loose.');
+    await say('greg', 'Dot lives up there. Dot is an artist. Dot has not painted anything in a very long time.');
+    await say('greg', 'Climb the ladder whenever you like, {name}.');
+    G.expr = 'norm';
+    save.flags.hatch = true; persist();
+  },
+  async climb() {
+    AU.sfx('climb');
+    save.lastRoom = 'studio';
+    await irisOut(118, 30, 600);
+    goScene('studio', { arrive: true });
+    await irisIn(30, 186, 600);
   },
   drawBg(g) {
-    if (this.reveal >= 340) g.drawImage(this.alive, 0, 0);
-    else {
-      g.drawImage(this.drab, 0, 0);
-      if (this.reveal > 0) {
-        const [cx, cy] = LIB.fire, r = this.reveal;
-        for (let y = 0; y < H; y++) {
-          const dy = y - cy; if (Math.abs(dy) >= r) continue;
-          const dx = Math.round(Math.sqrt(r * r - dy * dy));
-          const x0 = Math.max(0, cx - dx), x1 = Math.min(W, cx + dx);
-          if (x1 > x0) g.drawImage(this.alive, x0, y, x1 - x0, 1, x0, y, x1 - x0, 1);
-        }
-        for (let i = 0; i < 3; i++) { const a = Math.random() * Math.PI * 2; emit({ kind: 'spark', x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, vy: -10, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
-      }
-    }
-    // the dusty quest book
+    drawReveal(g, this.drab, this.alive, LIB.fire[0], LIB.fire[1], this.reveal);
+    // the hatch to the art studio, at the top of the rolling ladder
+    if (this.hatchK > 0) drawHatch(g, this.hatchK, save.arts.length > 0);
+    // the dusty quest book (chapter one) or a glowing new quest book
     if (!this.shelfBookGone && ['new', 'met', 'library'].includes(save.stage)) drawShelfBook(g, 96, 76, this.wiggle);
-    if (this.bookShown && save.book) drawBookCover(g, 30, 44, save.book.animal);
+    if (!this.shelfBookGone && save.stage === 'done' && !save.active.read && !save.pending && !this.presents && !this.flyBook) {
+      D.glow(g, 98, 84, 10, '#FFE38A', 0.25 + 0.1 * Math.sin(T * 3), 3);
+      drawShelfBook(g, 96, 76, this.wiggle || Math.sin(T * 1.7) > 0.86);
+    }
+    // finished books: the newest on the stand, older ones as spines
+    const shown = save.books.length - (this.hideTop ? 1 : 0);
+    if (this.bookShown) {
+      for (let i = 0; i < Math.min(shown - 1, SPINE_SLOTS.length); i++) { const [x, y, h] = SPINE_SLOTS[i]; drawSpine(g, x, y + 16 - h, h, bookColor(save.books[i])); }
+      if (shown > 0) drawBookCover(g, 30, 44, save.books[shown - 1]);
+    }
     // fire
-    drawFire(g, LIB.fire[0], 147, T, this.fireK);
+    drawFire(g, LIB.fire[0], 147, T, Math.min(1.25, this.fireK + this.flare * 0.3));
     if (this.fireK > 0 && this.reveal >= 340) {
       g.save(); g.globalCompositeOperation = 'lighter';
-      g.globalAlpha = 0.05 + 0.02 * Math.sin(T * 7); D.poly(g, [[222, 70], [246, 70], [196, 196], [150, 196]], '#FFE9A8');
+      g.globalAlpha = 0.05 + 0.02 * Math.sin(T * 7) + this.flare * 0.08; D.poly(g, [[222, 70], [246, 70], [196, 196], [150, 196]], '#FFE9A8');
       g.restore();
     }
-    // items
-    if (save.item === 'beanbag' || this.preview === 'beanbag') {
-      if (this.preview === 'beanbag') g.globalAlpha = 0.55 + 0.25 * Math.sin(T * 8);
-      drawBeanbag(g, LIB.beanbag[0], LIB.beanbag[1], Math.round(this.squash));
-      g.globalAlpha = 1;
-    }
-    if (save.item === 'headphones' && !this.dj) drawHeadphonesItem(g, LIB.table[0], LIB.table[1] - 2);
-    if (this.preview === 'headphones') { g.globalAlpha = 0.55 + 0.25 * Math.sin(T * 8); drawHeadphonesItem(g, LIB.table[0], LIB.table[1] - 3); g.globalAlpha = 1; }
-    // presents
-    if (this.presents) for (const p of this.presents) if (!p.gone) {
-      drawPresent(g, p.x, p.y, p.wrap, p.ribbon, p.lid);
-      if (p.peeked && !p.lid) { D.r(g, p.x + 5, p.y - 6, 4, 4, C.parch); D.p(g, p.x + 6, p.y - 5, C.ink); }
-    }
+    Presents.drawBg(this, g);
   },
   drawFg(g) {
-    if (save.item === 'lights' || this.preview === 'lights') {
-      if (this.preview === 'lights') g.globalAlpha = 0.5 + 0.3 * Math.sin(T * 8);
-      drawLights(g, T, this.preview === 'lights' ? 1 : this.lightsK);
-      g.globalAlpha = 1;
-    }
+    Presents.drawFg(this, g);
     if (this.storyIcon) {
-      const ic = ICONS['a_' + this.storyIcon];
+      const ic = ICONS[this.storyIcon] || ICONS['a_' + this.storyIcon];
       const y = Math.round(zoe.y - 56 + Math.sin(T * 2) * 1.5);
       D.glow(g, zoe.x, y + 11, 18, '#FFE38A', 0.3, 3);
-      g.drawImage(ic, Math.round(zoe.x - 11), y);
+      if (ic) g.drawImage(ic, Math.round(zoe.x - ic.width / 2), y);
     }
     if (this.flyBook) {
       const f = this.flyBook, t = ease(f.t);
       const x = lerp(f.x, f.to[0], t), y = lerp(f.y, f.to[1], t) - Math.sin(t * Math.PI) * (f.quest ? 20 : 40);
       if (f.quest) { drawShelfBook(g, x, y, false); }
-      else { D.glow(g, x + 12, y + 12, 22, '#FFE38A', 0.35, 3); drawBookCover(g, Math.round(x), Math.round(y), f.animal); if (Math.random() < 0.5) emit({ kind: 'spark', x: x + 12, y: y + 12, vy: 6, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
+      else { D.glow(g, x + 12, y + 12, 22, '#FFE38A', 0.35, 3); drawBookCover(g, Math.round(x), Math.round(y), f.book); if (Math.random() < 0.5) emit({ kind: 'spark', x: x + 12, y: y + 12, vy: 6, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
     }
   },
   update(dt) {
@@ -784,7 +933,7 @@ SCENES.library = {
     if (done && Math.random() < dt * 6) AU.sfx('crackle');
     if (!done && Math.random() < dt * 2) emit({ kind: 'mote', x: 20 + Math.random() * 250, y: 40 + Math.random() * 120, life: 5, c: '#B8B2C4', a: 0.6 });
     if (this.dj && Math.random() < dt * 1.5) emit({ kind: 'note', x: this.dj.x + (Math.random() - 0.5) * 8, y: this.dj.y - 14, vy: -10, vx: (Math.random() - 0.5) * 6, life: 1.4, c: ['#E8628A', '#FFD84A', '#9ACDE0'][Math.floor(Math.random() * 3)], layer: 'front' });
-    if (save.stage === 'quest' && !isBusy() && !Dlg.active && !Modal.open) {
+    if ((save.stage === 'quest' || save.active.read) && !isBusy() && !Dlg.active && !Modal.open && !this.presents) {
       this.waitT = (this.waitT || 8) - dt;
       if (this.waitT < 0) {
         this.waitT = 12 + Math.random() * 8;
@@ -822,8 +971,27 @@ SCENES.library = {
       });
     } else if (save.stage === 'reward') {
       cut(async () => { FX.fade = 1; await fadeIn(500); await this.reward(); });
+    } else if (save.stage === 'done' && (save.pending && save.pending.room === 'library' || !save.flags.hatch || o.tell)) {
+      cut(async () => {
+        if (!o.arrive) { FX.fade = 1; await fadeIn(500); }
+        if (save.pending && save.pending.room === 'library') { await say('greg', 'Your present is still here! Pick one.'); return this.reward(); }
+        if (!save.flags.hatch) { await say('greg', '{name}! Welcome back!'); await this.hatchIntro(); }
+        if (o.tell && save.active.read) await this.tellRead(true);
+      });
     } else if (!o.arrive) { FX.fade = 1; fadeIn(500); }
   },
 };
+function libraryItemSpots(S) {
+  const line = (key, lines) => async () => { await say('n', cycle(lines, key, S.st)); };
+  const has = (k) => () => save.items.library.includes(k);
+  return [
+    { rect: [0, 128, 18, 26], when: has('plant'), stand: [44, 186], act: line('plant', ['A big leafy plant. It is listening. Slowly.', 'You water it with your eyes. It seems to help.']) },
+    { rect: [86, 56, 16, 16], when: has('globe'), stand: [96, 184], face: 'front', act: async () => { AU.sfx('whoosh'); await say('n', cycle(['You spin the globe. Wheee.', 'You point at a random spot. Greg says that is where he is from. It is the ocean.'], 'globe', S.st)); } },
+    { rect: [186, 34, 30, 30], when: has('mobile'), stand: [196, 180], act: async () => { AU.sfx('twinkle'); await say('n', cycle(['The star mobile spins. Indoor stars!', 'One of the stars is a moon. It is trying its best.'], 'mob', S.st)); } },
+    { rect: [254, 138, 24, 36], when: has('telescope'), stand: [246, 186], act: line('tele', ['You look through the telescope. You see... the kitchen door. Very close up.', 'Through the telescope, a Sparkee waves at you from very far away. It is right there.']) },
+    { rect: [218, 84, 30, 32], when: has('portrait'), stand: [232, 184], face: 'front', act: line('port', ['A portrait of you! Very handsome. Very heroic.', 'The Sparkees say goodnight to it every night.']) },
+    { rect: [222, 176, 30, 18], when: has('cushions'), stand: [214, 190], act: async () => { AU.sfx('squish'); await say('n', cycle(['A pile of cushions. You sink in a little.', 'Somewhere in the cushions, a Sparkee is napping.'], 'cush', S.st)); } },
+  ];
+}
 // record tap x for present picking
-stage.addEventListener('pointerdown', (e) => { if (scene === SCENES.library) { const [x] = stageToWorld(e); SCENES.library._tapX = x; } }, true);
+stage.addEventListener('pointerdown', (e) => { if (scene) { const [x, y] = stageToWorld(e); scene._tapX = x; scene._tapY = y; } }, true);

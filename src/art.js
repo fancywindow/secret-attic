@@ -655,14 +655,6 @@ function drawShelfBook(g, x, y, wig) {
   D.p(g, x + dx + 2, y + 7, C.goldL);
 }
 
-function drawBookCover(g, x, y, animal) {
-  D.r(g, x, y, 24, 24, C.ink);
-  D.r(g, x + 1, y + 1, 21, 22, '#612C48'); D.r(g, x + 22, y + 1, 1, 22, C.parch); D.r(g, x + 1, y + 1, 21, 1, '#864C69');
-  D.r(g, x + 2, y + 2, 19, 1, C.gold); D.r(g, x + 2, y + 21, 19, 1, C.gold);
-  const ic = ICONS['a_' + animal];
-  if (ic) g.drawImage(ic, x + 1, y + 1);
-  D.r(g, x + 17, y + 20, 2, 5, '#C8323C');
-}
 // ===================== Icons =====================
 const ICONS = {};
 function icon(name, w, h, fn) { const [c, g] = mk(w, h); fn(g); ICONS[name] = c; return c; }

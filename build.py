@@ -3,7 +3,7 @@ import pathlib
 
 root = pathlib.Path(__file__).parent
 src = root / 'src'
-js = '\n'.join((src / f).read_text() for f in ['sprites.js', 'engine.js', 'world.js', 'art.js', 'scenes.js', 'main.js'])
+js = '\n'.join((src / f).read_text() for f in ['sprites.js', 'engine.js', 'world.js', 'art.js', 'art2.js', 'quests.js', 'flow.js', 'scenes.js', 'scenes2.js', 'main.js'])
 page = (src / 'template.html').read_text().replace('/*__JS__*/', js)
 icon = (src / 'icon.txt').read_text().strip()
 

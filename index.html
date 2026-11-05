@@ -36,10 +36,10 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
 
 /* ---------- dialog (Earthbound-style window) ---------- */
 #dlg { position: absolute; z-index: 10; left: calc(var(--u) * 30); right: calc(var(--u) * 30); top: calc(var(--u) * 6);
-  min-height: calc(var(--u) * 24); padding: calc(var(--u) * 5) calc(var(--u) * 8) calc(var(--u) * 5);
+  min-height: calc(var(--u) * 24); padding: calc(var(--u) * 5) calc(var(--u) * 8) calc(var(--u) * 7);
   background: var(--night); color: var(--cream); border-radius: calc(var(--u) * 2.5);
   box-shadow: inset 0 0 0 calc(var(--u) * 1) var(--plum), 0 0 0 calc(var(--u) * 1) var(--parch), 0 0 0 calc(var(--u) * 2) var(--ink), 0 calc(var(--u) * 2) 0 calc(var(--u) * 2) rgba(0,0,0,.35);
-  font-size: calc(var(--u) * 7.5); line-height: 1.32; letter-spacing: 0.01em; cursor: pointer; }
+  font-size: calc(var(--u) * 7.5); line-height: 1.32; letter-spacing: 0.01em; }
 #dlg.bottom { top: auto; bottom: calc(var(--u) * 6); }
 #dlgName { position: absolute; top: calc(var(--u) * -5); left: calc(var(--u) * 7); background: var(--pumpkin); color: var(--night);
   font-size: calc(var(--u) * 5.5); font-weight: 700; padding: 0 calc(var(--u) * 3); border-radius: calc(var(--u) * 1.5);
@@ -47,7 +47,12 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
 #dlgText .ghost { color: transparent; }
 #dlgText .bul { color: var(--pumpkin); margin-right: calc(var(--u) * 2.5); }
 #dlg.narr #dlgText { color: #F6E2C0; }
-#dlgMore { position: absolute; right: calc(var(--u) * 5); bottom: calc(var(--u) * 1.5); font-size: calc(var(--u) * 5); color: var(--pumpkin); animation: bob 0.8s steps(2) infinite; }
+#dlgNext { position: absolute; right: calc(var(--u) * 4); bottom: calc(var(--u) * -6); font-size: calc(var(--u) * 6.5); font-weight: 700; color: var(--night);
+  background: var(--pumpkin); border: 0; border-radius: calc(var(--u) * 2.5); padding: calc(var(--u) * 1.5) calc(var(--u) * 5);
+  box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--ink), 0 calc(var(--u) * 1.25) 0 calc(var(--u) * 0.75) var(--ink); animation: nextIn 0.25s ease-out; }
+#dlgNext span { display: inline-block; animation: bob 0.8s steps(2) infinite; }
+#dlgNext:active { transform: translateY(calc(var(--u) * 1)); box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--ink); }
+@keyframes nextIn { from { opacity: 0; transform: scale(0.8); } }
 #dlgOpts { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 3); margin-top: calc(var(--u) * 4); }
 .opt { font-size: calc(var(--u) * 6.5); color: var(--night); background: var(--cream); border: 0; text-align: left;
   padding: calc(var(--u) * 2) calc(var(--u) * 5) calc(var(--u) * 2) calc(var(--u) * 9); position: relative; border-radius: calc(var(--u) * 2);
@@ -147,6 +152,80 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
 .binfo .stars { color: var(--gold); letter-spacing: 0.1em; font-size: calc(var(--u) * 7); text-shadow: 0 calc(var(--u) * 0.5) 0 #96490D; }
 .binfo .big { margin-top: calc(var(--u) * 2); }
 
+/* quest pages for art */
+.card.quest.art { background: linear-gradient(#F4F0F8, #E8E0F0); }
+.card.quest.art .qkicker { color: #9A4AA0; }
+.qbtns .ghostbtn { margin-left: auto; }
+button[disabled] { opacity: 0.45; }
+/* generic pickers */
+.acell.big2 span { font-size: calc(var(--u) * 5.5); }
+.acell { position: relative; }
+.acell .tick { position: absolute; top: calc(var(--u) * 1); right: calc(var(--u) * 1.5); font-size: calc(var(--u) * 6); color: #fff; background: var(--pumpkin); border-radius: 50%;
+  width: calc(var(--u) * 8); height: calc(var(--u) * 8); display: none; place-items: center; line-height: 1; box-shadow: 0 0 0 calc(var(--u) * 0.6) var(--ink); }
+.acell.on { background: #FFE2B8; box-shadow: 0 0 0 calc(var(--u) * 1.2) var(--pumpkin), 0 calc(var(--u) * 1) 0 calc(var(--u) * 1.2) #8C4113; }
+.acell.on .tick { display: grid; }
+.agrid.people { grid-template-columns: repeat(5, calc(var(--u) * 36)); }
+.psub { margin: calc(var(--u) * -1.5) 0 calc(var(--u) * 3); text-align: center; font-size: calc(var(--u) * 5); color: #6E5A62; }
+.pfoot { display: flex; justify-content: center; margin-top: calc(var(--u) * 4); }
+.cgrid { display: grid; grid-template-columns: repeat(5, calc(var(--u) * 34)); gap: calc(var(--u) * 2.5); justify-content: center; }
+.cswatch { display: block; width: calc(var(--u) * 18); height: calc(var(--u) * 18); border-radius: calc(var(--u) * 2); box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--ink); }
+.ccell span { font-size: calc(var(--u) * 5.5); font-weight: 700; }
+/* which quest */
+.card.chooser { display: grid; justify-items: center; gap: calc(var(--u) * 2); }
+.chrow { display: flex; gap: calc(var(--u) * 5); }
+.chbtn { display: grid; justify-items: center; gap: calc(var(--u) * 1); width: calc(var(--u) * 82); padding: calc(var(--u) * 4); background: #FFF9EC; border: 0; border-radius: calc(var(--u) * 3);
+  box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--parch-edge), 0 calc(var(--u) * 1.2) 0 calc(var(--u) * 0.75) var(--parch-edge); color: var(--ink); }
+.chbtn:active { transform: translateY(calc(var(--u) * 1)); }
+.chk { font-size: calc(var(--u) * 4.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: var(--pumpkin); }
+.cht { font-size: calc(var(--u) * 7); font-weight: 700; color: var(--plum); text-align: center; line-height: 1.1; }
+/* photo */
+.card.photo { width: calc(var(--u) * 210); text-align: center; }
+.card.photo .qbtns { justify-content: center; }
+.card.photo .qbtns .ghostbtn { margin-left: 0; }
+.hiddenfile { display: none; }
+.pharea { min-height: calc(var(--u) * 80); display: grid; place-items: center; margin: calc(var(--u) * 2) 0; }
+.phempty p, .phwait { font-size: calc(var(--u) * 6); color: #6E5A62; margin: calc(var(--u) * 2) 0 0; }
+.phpair { display: flex; align-items: center; gap: calc(var(--u) * 4); }
+.phpair figure { margin: 0; display: grid; gap: calc(var(--u) * 1.5); justify-items: center; }
+.phpair figcaption { font-size: calc(var(--u) * 5); font-weight: 700; color: #6E5A62; }
+.phreal, .phpix { width: calc(var(--u) * 84); height: calc(var(--u) * 63); object-fit: cover; border-radius: calc(var(--u) * 1); box-shadow: 0 0 0 calc(var(--u) * 1) #4A3A30; }
+.phpix { image-rendering: pixelated; }
+.pharrow { font-size: calc(var(--u) * 10); color: var(--pumpkin); font-weight: 700; }
+.big .inl { vertical-align: middle; width: calc(var(--u) * 10) !important; height: calc(var(--u) * 10) !important; }
+/* sink */
+.card.sink { width: calc(var(--u) * 230); }
+.srow { display: flex; align-items: center; gap: calc(var(--u) * 4); background: #FFF9EC; border-radius: calc(var(--u) * 3); padding: calc(var(--u) * 3) calc(var(--u) * 4); margin: calc(var(--u) * 2.5) 0;
+  box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--parch-edge); }
+.sinfo { flex: 1; display: grid; gap: calc(var(--u) * 1); }
+.sname { font-size: calc(var(--u) * 7.5); font-weight: 700; color: var(--plum); }
+.sstat { display: flex; gap: calc(var(--u) * 4); font-size: calc(var(--u) * 5.5); color: #6E5A62; font-weight: 600; }
+.sstat .now { color: var(--ink); }
+.sstat b.yes { color: #5E8A3A; } .sstat b.no { color: #B8A898; }
+.sbtns { display: grid; gap: calc(var(--u) * 1.5); justify-items: end; }
+.sbtns .big { font-size: calc(var(--u) * 6.5); padding: calc(var(--u) * 2) calc(var(--u) * 5); }
+.ghost2 { font-size: calc(var(--u) * 5); font-weight: 700; color: var(--plum); background: #F2E4F0; border: 0; border-radius: calc(var(--u) * 2); padding: calc(var(--u) * 1.5) calc(var(--u) * 3);
+  box-shadow: 0 0 0 calc(var(--u) * 0.6) var(--plum); }
+.card.sink > .ghostbtn { display: block; margin: 0 auto; }
+/* art card */
+.card.artcard { display: flex; gap: calc(var(--u) * 8); align-items: center; }
+.aframe { flex: none; padding: calc(var(--u) * 3); background: #96490D; border-radius: calc(var(--u) * 1); box-shadow: inset 0 0 0 calc(var(--u) * 1.5) var(--gold), 0 0 0 calc(var(--u) * 0.75) var(--ink); }
+.aphoto { display: block; width: calc(var(--u) * 120); height: calc(var(--u) * 90); object-fit: cover; }
+.aframe .apix { display: block; }
+/* brush-along timer */
+.brushbar { position: absolute; left: 50%; top: calc(var(--u) * 6); transform: translateX(-50%); z-index: 15; width: calc(var(--u) * 190); background: var(--parch); border-radius: calc(var(--u) * 3);
+  padding: calc(var(--u) * 3) calc(var(--u) * 5) calc(var(--u) * 4); color: var(--ink);
+  box-shadow: inset 0 0 0 calc(var(--u) * 1) var(--parch-edge), 0 0 0 calc(var(--u) * 1) var(--plum), 0 0 0 calc(var(--u) * 2) var(--ink); animation: cardin 0.28s; }
+.btop { display: flex; align-items: center; gap: calc(var(--u) * 3); }
+.bpart { flex: 1; font-size: calc(var(--u) * 7.5); font-weight: 700; color: var(--plum); }
+.bdots { display: flex; gap: calc(var(--u) * 1.5); }
+.bdots i { width: calc(var(--u) * 4); height: calc(var(--u) * 4); border-radius: 50%; background: #E2D6C0; box-shadow: 0 0 0 calc(var(--u) * 0.5) var(--ink); }
+.bdots i.on { background: #5ACDE0; }
+.btime { font-size: calc(var(--u) * 9); font-weight: 700; color: var(--pumpkin); min-width: calc(var(--u) * 16); text-align: right; font-variant-numeric: tabular-nums; }
+.btrack { height: calc(var(--u) * 4); background: #E2D6C0; border-radius: calc(var(--u) * 2); margin-top: calc(var(--u) * 2.5); overflow: hidden; box-shadow: 0 0 0 calc(var(--u) * 0.5) var(--ink); }
+.bfill { height: 100%; width: 0; background: linear-gradient(90deg, #5ACDE0, #9AE8F0); }
+.bstop { position: absolute; right: calc(var(--u) * 3); bottom: calc(var(--u) * -7); font-size: calc(var(--u) * 5); font-weight: 700; color: var(--cream); background: var(--plum); border: 0; border-radius: calc(var(--u) * 2);
+  padding: calc(var(--u) * 1) calc(var(--u) * 4); box-shadow: 0 0 0 calc(var(--u) * 0.6) var(--ink); }
+
 /* ---------- title ---------- */
 #title { position: absolute; inset: 0; z-index: 30; display: grid; grid-template-rows: 1fr auto auto; justify-items: center; padding: calc(var(--u) * 9) 0 calc(var(--u) * 6); }
 .logo { text-align: center; line-height: 0.92; align-self: start; }
@@ -179,7 +258,7 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
   <div id="stage">
     <canvas id="game" aria-label="The Secret Attic game scene" role="img"></canvas>
     <div id="bubs"></div>
-    <div id="dlg" hidden role="dialog" aria-live="polite"><div id="dlgName"></div><div id="dlgText"></div><div id="dlgOpts" hidden></div><div id="dlgMore" hidden>▼</div></div>
+    <div id="dlg" hidden role="dialog" aria-live="polite"><div id="dlgName"></div><div id="dlgText"></div><div id="dlgOpts" hidden></div><button id="dlgNext" type="button" hidden>Next <span aria-hidden="true">▶</span></button></div>
     <div id="hud" class="ui" hidden>
       <button id="hQuest" class="hbtn" type="button" hidden aria-label="Your quest"></button>
       <button id="hMusic" class="hbtn" type="button" aria-label="Music on or off"></button>
@@ -589,9 +668,17 @@ const save = { stage: 'new', look: { skin: 0, hair: 0, hairColor: 0, shirt: 0 },
 function loadSave() {
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s && typeof s === 'object') Object.assign(save, s); } catch (e) { /* storage unavailable */ }
 }
-function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* storage unavailable */ } }
+function persist() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
+  catch (e) {
+    // out of room: drop the full-size photos (oldest first) but keep the pixel art
+    const arts = (save.arts || []).filter((a) => a.photo);
+    for (const a of arts) { delete a.photo; try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); return; } catch (e2) { /* keep trimming */ } }
+  }
+}
 function wipeSave() {
   try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* storage unavailable */ }
+  for (const k of Object.keys(save)) delete save[k];
   Object.assign(save, { stage: 'new', look: { skin: 0, hair: 0, hairColor: 0, shirt: 0 }, name: null, book: null, item: null, seenMirror: false });
 }
 const callName = () => (save.name === 'Visitor' ? 'Visitor' : 'Zoe');
@@ -1037,7 +1124,21 @@ class Sparkee {
       D.p(g, left + B.cx - this.r - 1, ay + 1, ac); D.p(g, left + B.cx + this.r + 1, ay + 1, ac);
     }
     this.drawFace(g, left + B.cx, top + B.cy);
-    if (this.acc === 'headphones') {
+    const acc = (this.acc || '').split(' ');
+    const hx0 = left + B.cx, hy0 = top + B.cy, R = this.r;
+    if (acc.includes('paint')) { D.p(g, hx0 - R + 2, hy0 + 2, '#E8628A'); D.p(g, hx0 - R + 3, hy0 + 2, '#E8628A'); D.p(g, hx0 + R - 2, hy0 + 3, '#3E5AA8'); D.p(g, hx0 + 1, hy0 + R - 1, '#6F9A45'); D.p(g, hx0 + 2, hy0 + R - 1, '#6F9A45'); }
+    if (acc.includes('beret')) {
+      D.ell(g, hx0 + 1, hy0 - R + 1, R, 2, '#2C1A1E'); D.ell(g, hx0 + 1, hy0 - R + 1, R - 1, 1, '#C8323C'); D.r(g, hx0 + 1, hy0 - R - 2, 1, 2, '#2C1A1E');
+    }
+    if (acc.includes('cap')) {
+      D.ell(g, hx0, hy0 - R + 2, R + 1, 3, '#2C1A1E'); D.ell(g, hx0, hy0 - R + 2, R, 2, '#F2A0B0');
+      for (let k = -R + 1; k < R; k += 2) D.p(g, hx0 + k, hy0 - R + 4, '#FFFFFF');
+      D.p(g, hx0 - 2, hy0 - R + 1, '#FFFFFF'); D.p(g, hx0 + 2, hy0 - R, '#FFFFFF');
+    }
+    if (acc.includes('foam')) { for (const [dx, dy] of [[-2, 3], [0, 4], [2, 3], [-1, 5], [1, 5], [3, 4]]) D.p(g, hx0 + dx, hy0 + dy, '#FFFFFF'); }
+    if (acc.includes('brush')) { const s = Math.round(Math.sin(this.t * 22) * 1.5); D.line(g, hx0 + R + 1, hy0 + 3 + s, hx0 + 2, hy0 + 3 + s, '#5ACDE0'); D.r(g, hx0 + 1, hy0 + 2 + s, 2, 2, '#FFFFFF'); }
+    if (acc.includes('floss')) { const s = Math.round(Math.sin(this.t * 10) * 2); D.line(g, hx0 - R - 2, hy0 + s, hx0 + R + 2, hy0 - s, '#FFFFFF'); }
+    if (acc.includes('headphones')) {
       const hx = left + B.cx, hy = top + B.cy;
       D.line(g, hx - this.r, hy - 1, hx - this.r + 2, hy - this.r - 1, C.ink);
       D.line(g, hx - this.r + 2, hy - this.r - 1, hx + this.r - 2, hy - this.r - 1, C.ink);
@@ -1136,6 +1237,10 @@ function drawParticles(g, layer) {
     else if (p.kind === 'leaf') { g.globalAlpha = Math.min(1, k * 4); const f = Math.floor(p.age * 4 + p.ph) % 2; D.r(g, x, y, f ? 2 : 1, f ? 1 : 2, p.c); g.globalAlpha = 1; }
     else if (p.kind === 'smoke') { g.globalAlpha = k * 0.35; D.disc(g, x, y, Math.round(1 + (1 - k) * 3), p.c); g.globalAlpha = 1; }
     else if (p.kind === 'note') { g.globalAlpha = Math.min(1, k * 2); D.r(g, x, y - 3, 1, 4, p.c); D.r(g, x - 2, y, 2, 2, p.c); D.p(g, x + 1, y - 3, p.c); g.globalAlpha = 1; }
+    else if (p.kind === 'glyph' && p.blob) {
+      D.glow(g, x + 1, y + 1, 4, p.blob, 0.3, 2);
+      D.r(g, x, y, 3, 2, p.blob); D.r(g, x + 1, y - 1, 1, 4, p.blob); D.p(g, x, y, '#FFFFFF');
+    }
     else if (p.kind === 'glyph') {
       D.glow(g, x + 1, y + 2, 5, '#FFC93A', 0.35, 2);
       const gl = GLYPHS[p.gi];
@@ -1148,10 +1253,11 @@ function drawParticles(g, layer) {
 const SPEAKERS = {
   n: { name: '', v: 'n' }, greg: { name: 'Greg', v: 'greg' }, sp: { name: 'A Sparkee', v: 'sp' },
   sp2: { name: 'Another Sparkee', v: 'sp' }, sp3: { name: 'A small Sparkee', v: 'sp' }, all: { name: 'The Sparkees', v: 'all' },
+  dot: { name: 'Dot', v: 'sp' }, bubbles: { name: 'Bubbles', v: 'sp' },
 };
 const Dlg = {
-  active: false, typing: false, talker: null, res: null, full: '', shown: 0, acc: 0, opts: null, hold: 0,
-  el: $('#dlg'), nm: $('#dlgName'), tx: $('#dlgText'), op: $('#dlgOpts'), more: $('#dlgMore'),
+  active: false, typing: false, talker: null, res: null, full: '', shown: 0, acc: 0, opts: null, hold: 0, lineId: 0, readyAt: 0,
+  el: $('#dlg'), nm: $('#dlgName'), tx: $('#dlgText'), op: $('#dlgOpts'), next: $('#dlgNext'),
   open(who, text, o, res) {
     text = text.replace(/\{name\}/g, callName());
     const sp = SPEAKERS[who] || { name: who, v: 'sp' };
@@ -1160,9 +1266,9 @@ const Dlg = {
     this.el.classList.toggle('narr', this.narr);
     this.el.classList.toggle('bottom', o.pos === 'bottom' || (o.pos !== 'top' && scene && scene.dlgPos === 'bottom'));
     this.nm.textContent = sp.name; this.nm.hidden = !sp.name;
-    this.op.innerHTML = ''; this.op.hidden = true; this.more.hidden = true;
+    this.op.innerHTML = ''; this.op.hidden = true; this.next.hidden = true; this.lineId++;
     this.el.hidden = false; this.active = true;
-    this.talker = o.actor || (who === 'greg' ? scene && scene.greg : null) || null;
+    this.talker = o.actor || (['greg', 'dot', 'bubbles'].includes(who) && scene ? scene[who] : null) || null;
     this.render();
     Voice.say(text, sp.v);
   },
@@ -1190,19 +1296,26 @@ const Dlg = {
   },
   finish() {
     this.shown = this.full.length; this.typing = false; this.render();
-    if (this.opts) {
-      this.op.hidden = false; this.op.innerHTML = '';
-      this.opts.forEach((t, i) => {
-        const b = document.createElement('button');
-        b.className = 'opt'; b.type = 'button'; b.textContent = t;
-        b.addEventListener('click', (e) => { e.stopPropagation(); AU.sfx('tap'); this.close(i); });
-        this.op.appendChild(b);
-      });
-    } else this.more.hidden = false;
+    // a short pause before anything can be tapped, so a quick double-tap never skips a line
+    const myId = ++this.lineId;
+    this.readyAt = performance.now() + 550;
+    setTimeout(() => {
+      if (!this.active || this.lineId !== myId) return;
+      if (this.opts) {
+        this.op.hidden = false; this.op.innerHTML = '';
+        this.opts.forEach((t, i) => {
+          const b = document.createElement('button');
+          b.className = 'opt'; b.type = 'button'; b.textContent = t;
+          b.addEventListener('click', (e) => { e.stopPropagation(); if (performance.now() < this.readyAt) return; AU.sfx('tap'); this.close(i); });
+          this.op.appendChild(b);
+        });
+      } else this.next.hidden = false;
+    }, 550);
   },
-  tap() {
-    if (this.typing) { this.finish(); return; }
-    if (this.opts) return;
+  // tapping the scene or the text only finishes typing; it never advances
+  tap() { if (this.typing) this.finish(); },
+  advance() {
+    if (!this.active || this.typing || this.opts || this.next.hidden || performance.now() < this.readyAt) return;
     AU.sfx('tap');
     this.close();
   },
@@ -1211,7 +1324,9 @@ const Dlg = {
     const r = this.res; this.res = null; if (r) r(v);
   },
 };
-$('#dlg').addEventListener('pointerdown', (e) => { e.stopPropagation(); if (!e.target.closest('.opt')) Dlg.tap(); });
+$('#dlg').addEventListener('pointerdown', (e) => { e.stopPropagation(); if (!e.target.closest('.opt') && !e.target.closest('#dlgNext')) Dlg.tap(); });
+$('#dlgNext').addEventListener('click', (e) => { e.stopPropagation(); Dlg.advance(); });
+document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && Dlg.active && !Dlg.opts) { e.preventDefault(); if (Dlg.typing) Dlg.finish(); else Dlg.advance(); } });
 function say(who, text, o = {}) { return new Promise((res) => Dlg.open(who, text, o, res)); }
 function ask(who, text, options, o = {}) { return new Promise((res) => Dlg.open(who, text, Object.assign({}, o, { options }), res)); }
 async function narrate(...lines) { for (const l of lines) await say('n', l); }
@@ -2078,14 +2193,6 @@ function drawShelfBook(g, x, y, wig) {
   D.p(g, x + dx + 2, y + 7, C.goldL);
 }
 
-function drawBookCover(g, x, y, animal) {
-  D.r(g, x, y, 24, 24, C.ink);
-  D.r(g, x + 1, y + 1, 21, 22, '#612C48'); D.r(g, x + 22, y + 1, 1, 22, C.parch); D.r(g, x + 1, y + 1, 21, 1, '#864C69');
-  D.r(g, x + 2, y + 2, 19, 1, C.gold); D.r(g, x + 2, y + 21, 19, 1, C.gold);
-  const ic = ICONS['a_' + animal];
-  if (ic) g.drawImage(ic, x + 1, y + 1);
-  D.r(g, x + 17, y + 20, 2, 5, '#C8323C');
-}
 // ===================== Icons =====================
 const ICONS = {};
 function icon(name, w, h, fn) { const [c, g] = mk(w, h); fn(g); ICONS[name] = c; return c; }
@@ -2189,6 +2296,896 @@ function makeIcons() {
     D.disc(g, 11, 11, 8, '#C8323C'); D.disc(g, 11, 11, 6, '#A82A36'); D.disc(g, 11, 11, 5, '#C8323C');
     D.twinkle(g, 11, 11, 2, '#FFD0B0'); D.p(g, 8, 7, '#E8606A');
   });
+}
+
+// ===================== Icons for answers & family =====================
+function emblemIcon(kind) {
+  const [c, g] = mk(20, 20);
+  const face = (col, mouth) => { D.disc(g, 10, 10, 8, col); D.r(g, 7, 7, 1, 2, C.ink); D.r(g, 12, 7, 1, 2, C.ink); if (mouth) mouth(); };
+  switch (kind) {
+    case 'heart': D.disc(g, 6, 7, 4, '#E8628A'); D.disc(g, 13, 7, 4, '#E8628A'); D.poly(g, [[2, 8], [17, 8], [10, 17]], '#E8628A'); D.p(g, 5, 5, '#FFD0DC'); D.p(g, 6, 5, '#FFD0DC'); break;
+    case 'tent': D.poly(g, [[1, 17], [10, 2], [19, 17]], '#E8893F'); D.poly(g, [[7, 17], [10, 9], [13, 17]], '#5A2E10'); D.line(g, 10, 2, 10, 0, C.ink); D.poly(g, [[10, 0], [15, 1], [10, 3]], '#DB95B5'); D.r(g, 0, 17, 20, 2, '#5D6A3E'); break;
+    case 'bed': D.r(g, 1, 10, 18, 6, '#5A84C4'); D.r(g, 1, 7, 6, 4, C.white); D.r(g, 1, 6, 2, 12, '#7A4E33'); D.r(g, 17, 9, 2, 9, '#7A4E33'); D.r(g, 7, 10, 10, 2, '#7A9AD8'); break;
+    case 'pillow': D.ell(g, 10, 13, 9, 4, '#9A6AB0'); D.ell(g, 9, 9, 8, 4, '#F2C94C'); D.ell(g, 11, 5, 6, 3, '#E98AA2'); D.p(g, 7, 4, C.white); break;
+    case 'table': D.r(g, 1, 6, 18, 3, '#9C6B45'); D.r(g, 2, 9, 2, 10, '#7A4E33'); D.r(g, 16, 9, 2, 10, '#7A4E33'); D.disc(g, 10, 15, 3, '#FFD84A'); D.p(g, 9, 14, C.ink); D.p(g, 11, 14, C.ink); break;
+    case 'sun': for (let a = 0; a < 8; a++) { const r = a * Math.PI / 4; D.line(g, 10 + Math.cos(r) * 6, 10 + Math.sin(r) * 6, 10 + Math.cos(r) * 9, 10 + Math.sin(r) * 9, '#F2B030'); } D.disc(g, 10, 10, 5, '#FFD84A'); break;
+    case 'star': D.poly(g, [[10, 1], [12.5, 7], [19, 7.5], [14, 11.5], [16, 18], [10, 14.5], [4, 18], [6, 11.5], [1, 7.5], [7.5, 7]], '#FFD84A'); D.p(g, 9, 5, C.white); break;
+    case 'splash': for (const [x, y, r, col] of [[7, 8, 5, '#E98AA2'], [13, 7, 4, '#3E5AA8'], [11, 13, 5, '#F2C94C'], [5, 14, 3, '#6F8A45'], [16, 14, 2, '#E8893F']]) D.disc(g, x, y, r, col); break;
+    case 'yes': D.disc(g, 10, 10, 9, '#6F9A45'); D.line(g, 5, 10, 8, 14, C.white); D.line(g, 5, 11, 8, 15, C.white); D.line(g, 8, 14, 15, 5, C.white); D.line(g, 8, 15, 15, 6, C.white); break;
+    case 'maybe': D.disc(g, 10, 10, 9, '#E8A832'); for (let x = 4; x < 16; x++) { D.p(g, x, 10 + Math.round(Math.sin(x) * 1.5), C.white); D.p(g, x, 11 + Math.round(Math.sin(x) * 1.5), C.white); } break;
+    case 'no': D.disc(g, 10, 10, 9, '#C8323C'); D.line(g, 6, 6, 14, 14, C.white); D.line(g, 7, 6, 15, 14, C.white); D.line(g, 14, 6, 6, 14, C.white); D.line(g, 15, 6, 7, 14, C.white); break;
+    case 'shield': D.poly(g, [[3, 2], [17, 2], [17, 10], [10, 19], [3, 10]], '#3E5AA8'); D.poly(g, [[5, 4], [15, 4], [15, 10], [10, 16], [5, 10]], '#5A84C4'); D.poly(g, [[10, 5], [11.5, 9], [15, 9], [12, 11], [13, 15], [10, 12.5], [7, 15], [8, 11], [5, 9], [8.5, 9]], '#FFD84A'); break;
+    case 'bulb': D.disc(g, 10, 8, 6, '#FFE38A'); D.r(g, 7, 13, 6, 3, '#FFE38A'); D.r(g, 7, 16, 6, 3, '#8A8494'); D.r(g, 7, 17, 6, 1, '#6A6474'); D.p(g, 8, 5, C.white); D.p(g, 7, 6, C.white); break;
+    case 'smile': face('#FFD84A', () => { D.p(g, 6, 12, C.ink); D.r(g, 7, 13, 6, 1, C.ink); D.p(g, 13, 12, C.ink); }); break;
+    case 'laugh': D.disc(g, 10, 10, 8, '#FFD84A'); D.line(g, 5, 7, 7, 6, C.ink); D.line(g, 7, 6, 9, 7, C.ink); D.line(g, 11, 7, 13, 6, C.ink); D.line(g, 13, 6, 15, 7, C.ink); D.ell(g, 10, 13, 4, 2, '#9A3A14'); D.r(g, 8, 14, 4, 1, '#E86A6A'); D.p(g, 3, 8, '#8FD0F0'); D.p(g, 16, 8, '#8FD0F0'); break;
+    case 'floor': D.disc(g, 10, 10, 8, '#FFD84A'); D.line(g, 6, 12, 8, 13, C.ink); D.line(g, 12, 13, 14, 12, C.ink); D.ell(g, 10, 7, 3, 2, '#9A3A14'); D.r(g, 0, 18, 20, 2, '#9C6B45'); D.p(g, 3, 3, '#8FD0F0'); D.p(g, 17, 4, '#8FD0F0'); break;
+    case 'friends': D.disc(g, 6, 9, 5, '#FFD84A'); D.disc(g, 14, 10, 5, '#F2A0B0'); D.p(g, 4, 8, C.ink); D.p(g, 7, 8, C.ink); D.p(g, 12, 9, C.ink); D.p(g, 15, 9, C.ink); D.r(g, 5, 11, 2, 1, C.ink); D.r(g, 13, 12, 2, 1, C.ink); D.r(g, 9, 15, 3, 2, '#E8628A'); break;
+    case 'robot': D.r(g, 4, 5, 12, 11, '#9AAABE'); D.r(g, 9, 1, 2, 4, '#6A7A8E'); D.disc(g, 10, 1, 1, '#C8323C'); D.r(g, 6, 8, 3, 3, '#5ACDE0'); D.r(g, 11, 8, 3, 3, '#5ACDE0'); D.r(g, 7, 13, 6, 1, C.ink); D.r(g, 2, 9, 2, 4, '#6A7A8E'); D.r(g, 16, 9, 2, 4, '#6A7A8E'); break;
+    case 'moon': D.disc(g, 10, 10, 8, '#F6E4B8'); D.disc(g, 14, 7, 7, 'rgba(0,0,0,0)'); g.globalCompositeOperation = 'destination-out'; D.disc(g, 14, 7, 7, '#000'); g.globalCompositeOperation = 'source-over'; D.p(g, 5, 9, '#E0C890'); break;
+    case 'dark': D.disc(g, 10, 10, 9, '#2E2A50'); for (const [x, y] of [[6, 6], [13, 5], [10, 12], [15, 13], [5, 14]]) D.p(g, x, y, '#FFF1C8'); D.twinkle(g, 13, 5, 1, '#FFF1C8'); break;
+    case 'cloud': D.disc(g, 7, 11, 5, '#E8E2F2'); D.disc(g, 12, 8, 6, '#F2EEF8'); D.disc(g, 15, 12, 4, '#E8E2F2'); D.r(g, 4, 12, 14, 4, '#F2EEF8'); D.p(g, 9, 12, '#9A90B0'); D.p(g, 13, 11, '#9A90B0'); break;
+    case 'note': D.r(g, 6, 4, 1, 11, '#5A3A6A'); D.r(g, 14, 3, 1, 11, '#5A3A6A'); D.line(g, 6, 4, 14, 2, '#5A3A6A'); D.line(g, 6, 5, 14, 3, '#5A3A6A'); D.line(g, 6, 6, 14, 4, '#5A3A6A'); D.ell(g, 4, 15, 3, 2, '#9A6AB0'); D.ell(g, 12, 14, 3, 2, '#9A6AB0'); D.p(g, 3, 14, '#C8A0D8'); D.p(g, 11, 13, '#C8A0D8'); break;
+    case 'book': D.poly(g, [[1, 4], [9, 3], [10, 5], [11, 3], [19, 4], [19, 16], [11, 15], [10, 17], [9, 15], [1, 16]], C.ink); D.poly(g, [[2, 5], [9, 4], [9, 15], [2, 15]], C.white); D.poly(g, [[11, 4], [18, 5], [18, 15], [11, 15]], C.white); for (const y of [7, 9, 11]) { D.r(g, 3, y, 5, 1, '#B0A090'); D.r(g, 12, y, 5, 1, '#B0A090'); } break;
+    case 'eyes': D.ell(g, 6, 10, 4, 5, C.white); D.ell(g, 14, 10, 4, 5, C.white); D.disc(g, 7, 11, 2, C.ink); D.disc(g, 15, 11, 2, C.ink); D.p(g, 6, 10, C.white); D.p(g, 14, 10, C.white); break;
+    case 'brush': D.r(g, 2, 12, 14, 3, '#5ACDE0'); D.r(g, 2, 12, 14, 1, '#9AE8F0'); D.r(g, 12, 7, 6, 5, C.white); for (let x = 12; x < 18; x += 2) D.r(g, x, 7, 1, 5, '#C8E8F0'); D.disc(g, 15, 5, 2, '#FFFFFF'); D.disc(g, 12, 4, 1, '#E8F6FA'); break;
+    case 'floss': D.r(g, 3, 9, 10, 8, '#9ACDE0'); D.r(g, 3, 9, 10, 2, '#E8F6FA'); D.line(g, 12, 9, 18, 2, '#FFFFFF'); D.line(g, 13, 9, 19, 3, '#C8D8E0'); D.r(g, 5, 13, 6, 1, '#5A8AA0'); break;
+    case 'tree': D.r(g, 9, 11, 3, 8, '#7A4E33'); D.r(g, 6, 18, 9, 1, '#6F9A45'); D.disc(g, 10, 8, 7, '#6F9A45'); D.disc(g, 8, 6, 3, '#8EB05A'); for (const [x, y, c] of [[6, 8, '#E8628A'], [13, 6, '#F2C94C'], [11, 11, '#5A84C4']]) { D.disc(g, x, y, 1, c); } break;
+    case 'camera': D.r(g, 1, 6, 18, 12, '#3A3442'); D.r(g, 6, 3, 8, 3, '#3A3442'); D.disc(g, 10, 12, 5, '#9ACDE0'); D.disc(g, 10, 12, 3, '#2E3D4A'); D.p(g, 9, 11, C.white); D.r(g, 15, 8, 2, 2, '#E8628A'); break;
+  }
+  return outlined(c, C.ink);
+}
+function personIcon(kind, skin) {
+  if (kind === 'me') {
+    const F = zoeFrames(save.look); const [c, g] = mk(22, 22); g.drawImage(F.front, -1, 0); return c;
+  }
+  const [c, g] = mk(20, 20);
+  const sk = skin.s, sh = skin.S;
+  const hair = { mom: '#5A3220', dad: '#3A2A22', brother: '#8C5A34', sister: '#5A3220', baby: '#B88A5A', grandma: '#C8C2CC', grandpa: '#C8C2CC', aunt: '#B4502A', uncle: '#2A2230', cousin: '#D9A848' }[kind];
+  const shirt = { mom: '#E98AA2', dad: '#5A84C4', brother: '#7D9A4C', sister: '#F0903E', baby: '#F2C94C', grandma: '#9A6AB0', grandpa: '#7A6E6E', aunt: '#DCA438', uncle: '#B4502A', cousin: '#5ACDE0' }[kind];
+  const small = kind === 'baby';
+  const r = small ? 5 : 6, cy = small ? 11 : 9;
+  if (kind === 'mom' || kind === 'aunt') D.ell(g, 10, cy + 3, r + 2, r + 3, hair);
+  if (kind === 'sister') { D.disc(g, 3, cy + 2, 3, hair); D.disc(g, 17, cy + 2, 3, hair); }
+  if (kind === 'cousin') D.ell(g, 16, cy + 4, 2, 5, hair);
+  D.r(g, small ? 6 : 4, 17, small ? 8 : 12, 3, shirt);
+  D.disc(g, 10, cy, r, sk);
+  D.p(g, 10 + r - 1, cy + 1, sh);
+  // hair on top
+  if (kind === 'mom' || kind === 'sister' || kind === 'cousin') { D.ell(g, 10, cy - r + 2, r, 2, hair); D.r(g, 10 - r + 1, cy - r + 1, 2 * r - 1, 2, hair); }
+  if (kind === 'dad' || kind === 'uncle') { D.ell(g, 10, cy - r + 2, r, 2, hair); }
+  if (kind === 'brother') { for (let x = 5; x <= 15; x += 2) D.r(g, x, cy - r - 1, 1, 3, hair); D.ell(g, 10, cy - r + 2, r, 2, hair); }
+  if (kind === 'aunt') { for (let a = 0; a < 7; a++) D.disc(g, 4 + a * 2, cy - r + 1 + (a % 2), 2, hair); }
+  if (kind === 'grandma') { D.disc(g, 10, cy - r - 1, 3, hair); D.ell(g, 10, cy - r + 2, r, 2, hair); }
+  if (kind === 'grandpa') { D.r(g, 10 - r, cy - 2, 2, 4, hair); D.r(g, 10 + r - 1, cy - 2, 2, 4, hair); D.r(g, 8, cy + 3, 5, 1, hair); }
+  if (kind === 'baby') { D.p(g, 10, cy - r - 1, hair); D.p(g, 11, cy - r - 2, hair); D.p(g, 9, cy - r, hair); }
+  if (kind === 'uncle') { D.ell(g, 10, cy + 4, 4, 2, hair); }
+  // face
+  D.r(g, 8, cy - 1, 1, 2, C.ink); D.r(g, 12, cy - 1, 1, 2, C.ink);
+  if (kind !== 'uncle') { D.p(g, 9, cy + 3, C.ink); D.p(g, 10, cy + 3, C.ink); D.p(g, 11, cy + 3, C.ink); D.p(g, 8, cy + 2, C.ink); D.p(g, 12, cy + 2, C.ink); }
+  if (kind === 'grandma' || kind === 'grandpa') { D.ring(g, 8, cy, 2, '#6A5E66'); D.ring(g, 12, cy, 2, '#6A5E66'); D.p(g, 10, cy, '#6A5E66'); }
+  if (!small) { D.p(g, 6, cy + 2, '#EFA196'); D.p(g, 14, cy + 2, '#EFA196'); } else { D.p(g, 7, cy + 2, '#EFA196'); D.p(g, 13, cy + 2, '#EFA196'); }
+  return outlined(c, C.ink);
+}
+const EMBLEMS = ['tree', 'heart', 'tent', 'bed', 'pillow', 'table', 'sun', 'star', 'splash', 'yes', 'maybe', 'no', 'shield', 'bulb', 'smile', 'laugh', 'floor', 'friends', 'robot', 'moon', 'dark', 'cloud', 'note', 'book', 'eyes', 'brush', 'floss', 'camera'];
+const PEOPLE = ['me', 'mom', 'dad', 'brother', 'sister', 'baby', 'grandma', 'grandpa', 'aunt', 'uncle', 'cousin'];
+function makeIcons2() {
+  for (const e of EMBLEMS) ICONS['e_' + e] = emblemIcon(e);
+  rebuildPeopleIcons();
+}
+function rebuildPeopleIcons() { const sk = SKINS[save.look.skin] || SKINS[0]; for (const p of PEOPLE) ICONS['p_' + p] = personIcon(p, sk); }
+
+// ===================== Books =====================
+function readQuest(id) { return READ_QUESTS.find((q) => q.id === id) || READ_QUESTS[0]; }
+function bookColor(b) {
+  const q = readQuest(b.q || 'animal');
+  if (q.cover.fromColor && b.color) { const c = COVER_COLORS.find((x) => x[0] === b.color); if (c) return c[2]; }
+  return q.cover.color;
+}
+function bookIcon(b) { if (b.animal) return ICONS['a_' + b.animal]; return ICONS['e_' + readQuest(b.q).cover.emblem]; }
+// book can be a book record or (legacy) an animal key
+function drawBookCover(g, x, y, b) {
+  if (typeof b === 'string') b = { q: 'animal', animal: b };
+  const col = bookColor(b), light = mix(col, '#FFFFFF', 0.25);
+  D.r(g, x, y, 24, 24, C.ink);
+  D.r(g, x + 1, y + 1, 21, 22, col); D.r(g, x + 22, y + 1, 1, 22, C.parch); D.r(g, x + 1, y + 1, 21, 1, light);
+  D.r(g, x + 2, y + 2, 19, 1, C.gold); D.r(g, x + 2, y + 21, 19, 1, C.gold);
+  const ic = bookIcon(b);
+  if (ic) g.drawImage(ic, x + 1, y + 1);
+  D.r(g, x + 17, y + 20, 2, 5, '#C8323C');
+}
+function drawSpine(g, x, y, h, col) {
+  D.r(g, x, y, 4, h, C.ink); D.r(g, x, y + 1, 3, h - 1, col); D.r(g, x, y + 1, 1, h - 1, mix(col, '#FFFFFF', 0.25));
+  D.r(g, x, y + 3, 3, 1, C.gold); D.r(g, x, y + h - 4, 3, 1, C.gold);
+}
+// spine slots in the library bookshelf, oldest first
+const SPINE_SLOTS = (() => {
+  const s = [];
+  for (const [x0, y, h, n] of [[22, 76, 16, 8], [22, 98, 14, 8], [66, 76, 16, 5], [22, 118, 14, 8], [86, 118, 14, 5], [44, 138, 8, 4]]) for (let i = 0; i < n; i++) s.push([x0 + i * 5, y, h]);
+  return s;
+})();
+
+// ===================== Library items =====================
+// the hatch in the library ceiling, with the rolling ladder reaching up to it
+function drawHatch(g, k, bright) {
+  const x = 106, y = 9, w = 24, h = 11;
+  const open = Math.round(h * k);
+  D.r(g, x - 2, y - 2, w + 4, h + 4, C.wood1);
+  D.r(g, x, y, w, h, bright ? '#FFE9B8' : '#B8AE9C');
+  if (bright) D.glow(g, x + w / 2, y + h, 26, '#FFE38A', 0.18 + 0.05 * Math.sin(T * 2), 3);
+  else D.dith(g, x, y, w, h, '#8A8070', 2);
+  // the trapdoor swings down
+  D.r(g, x, y + h - (h - open), w, Math.max(1, h - open), C.wood3);
+  D.r(g, x + w - 3, y + h, 3, Math.round(12 * k), C.wood3); D.r(g, x + w - 3, y + h, 1, Math.round(12 * k), C.wood5);
+  // ladder extension, above the collar beam
+  if (k > 0.5) {
+    const top = y + h - 1;
+    D.line(g, 112, 40, 114, top, C.wood4); D.line(g, 118, 40, 120, top, C.wood4);
+    for (let yy = top + 3; yy < 38; yy += 8) { D.r(g, 113, yy, 7, 2, C.wood3); D.r(g, 113, yy, 7, 1, C.wood5); }
+  }
+}
+function drawPlant(g, x, y) {
+  D.poly(g, [[x - 6, y - 12], [x + 6, y - 12], [x + 4, y], [x - 4, y]], '#B8562A'); D.r(g, x - 7, y - 13, 14, 2, '#D87444'); D.r(g, x - 4, y - 1, 8, 1, '#7E3218');
+  for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + (i - 4) * 0.32, len = 12 + (i % 3) * 4; for (let k = 2; k < len; k++) { const px = x + Math.cos(a) * k, py = y - 13 + Math.sin(a) * k + (k * k) / 40; D.p(g, px, py, k % 3 ? '#4A6A2E' : '#6E9A44'); if (k % 2 === 0) D.p(g, px + 1, py, '#5D7A3A'); } }
+}
+function drawGlobe(g, x, y) {
+  D.r(g, x - 3, y - 1, 7, 2, '#B8862E'); D.r(g, x, y - 4, 1, 3, '#9A6A20');
+  D.disc(g, x, y - 10, 6, '#3E7AB8'); D.ell(g, x - 2, y - 12, 2, 2, '#6F9A45'); D.ell(g, x + 2, y - 8, 3, 2, '#6F9A45'); D.p(g, x - 2, y - 14, '#BFE0EE');
+  D.ring(g, x, y - 10, 7, '#B8862E');
+}
+function drawMobile(g, x, y, t) {
+  D.r(g, x - 12, y + 6, 25, 1, '#7A4E33');
+  D.r(g, x, y, 1, 6, '#3A2A20');
+  [[-10, 14, 'star'], [-3, 20, 'moon'], [4, 12, 'star'], [11, 18, 'star']].forEach(([dx, len, k], i) => {
+    const sw = Math.round(Math.sin(t * 1.2 + i) * 1.5);
+    D.r(g, x + dx, y + 7, 1, len - 4, '#5A4A40');
+    const sx = x + dx + sw, sy = y + 6 + len;
+    if (k === 'star') { D.twinkle(g, sx, sy, 2, '#FFD84A'); D.p(g, sx, sy, '#FFF6C8'); }
+    else { D.disc(g, sx, sy, 3, '#F6E4B8'); D.disc(g, sx + 2, sy - 1, 2, mix('#7A4E33', '#9C6B45', 0.5)); }
+    D.glow(g, sx, sy, 6, '#FFD84A', 0.15, 2);
+  });
+}
+function drawTelescope(g, x, y) {
+  D.line(g, x, y - 18, x - 7, y, '#5A3826'); D.line(g, x, y - 18, x + 7, y, '#5A3826'); D.line(g, x, y - 18, x, y, '#3B2418');
+  D.poly(g, [[x - 14, y - 30], [x - 12, y - 33], [x + 6, y - 18], [x + 4, y - 15]], '#B8862E');
+  D.line(g, x - 13, y - 31, x + 4, y - 17, '#F2CF7C'); D.disc(g, x - 13, y - 32, 2, '#9A6A20'); D.p(g, x - 13, y - 32, '#9ACDE0');
+}
+function drawPortraitItem(g, x, y) {
+  D.r(g, x, y, 28, 30, '#96490D'); D.r(g, x, y, 27, 29, C.gold); D.r(g, x, y, 28, 1, C.goldL);
+  D.r(g, x + 2, y + 2, 24, 26, '#E8C8D0'); D.dith(g, x + 2, y + 2, 24, 26, '#DB95B5', 1);
+  if (zoe.F) g.drawImage(zoe.F.front, 0, 0, 24, 25, x + 2, y + 3, 24, 25);
+}
+function drawCushions(g, x, y) {
+  D.ell(g, x, y - 3, 12, 4, '#7A2E48'); D.ell(g, x, y - 3, 11, 3, '#9A6AB0');
+  D.ell(g, x - 2, y - 8, 9, 3, '#2C1A1E'); D.ell(g, x - 2, y - 8, 8, 3, '#F2C94C'); D.p(g, x - 6, y - 10, '#FFF1C8');
+  D.ell(g, x + 3, y - 12, 7, 3, '#2C1A1E'); D.ell(g, x + 3, y - 12, 6, 2, '#5ACDE0');
+}
+// where each library item draws; 'fg' items draw over actors
+const LIB_ITEMS = {
+  beanbag: { draw: (g, s) => drawBeanbag(g, LIB.beanbag[0], LIB.beanbag[1], Math.round(s.squash || 0)), at: [128, 162] },
+  headphones: { draw: (g, s) => { if (!s.dj) drawHeadphonesItem(g, LIB.table[0], LIB.table[1] - 2); }, at: [233, 132] },
+  lights: { fg: true, draw: (g, s) => drawLights(g, T, s.lightsK ?? 1), at: [144, 36] },
+  plant: { draw: (g) => drawPlant(g, 8, 152), at: [8, 136] },
+  globe: { draw: (g) => drawGlobe(g, 94, 70), at: [94, 60] },
+  mobile: { fg: true, draw: (g) => drawMobile(g, 200, 34, T), at: [200, 50] },
+  telescope: { draw: (g) => drawTelescope(g, 270, 172), at: [262, 150] },
+  portrait: { draw: (g) => drawPortraitItem(g, 220, 86), at: [234, 100] },
+  cushions: { draw: (g) => drawCushions(g, 236, 192), at: [236, 184] },
+};
+
+// ===================== Studio =====================
+const STU = { easel: [170, 111], frame: [28, 80], line: [64, 224], hatch: [14, 182], door: [246, 96], dotHome: [200, 182] };
+const CLOTHES = [[70, 62], [102, 62], [170, 62], [202, 62]];
+function paintStudio(g) {
+  const rnd = rand(31);
+  D.r(g, 0, 0, W, H, '#24140E');
+  planksV(g, 0, 0, W, 152, 8, ['#E2CFA8', '#D8C29A', '#E8D8B6', '#DCC8A0', '#E0CCA4'], rnd);
+  D.poly(g, [[0, 0], [144, 0], [144, 6], [0, 92]], '#24140E');
+  D.poly(g, [[288, 0], [144, 0], [144, 6], [288, 92]], '#24140E');
+  D.poly(g, [[0, 86], [144, 0], [144, 8], [0, 94]], C.wood2); D.line(g, 0, 86, 144, 0, C.wood4);
+  D.poly(g, [[288, 86], [144, 0], [144, 8], [288, 94]], C.wood2); D.line(g, 288, 86, 144, 0, C.wood4);
+  D.dith(g, 0, 140, W, 12, '#B8A07A', 1);
+  // round window
+  D.disc(g, 144, 38, 17, C.wood1); D.disc(g, 144, 38, 15, C.wood2);
+  skyClipEll(g, 144, 38, 13, 13, ['#F2C89A', '#F2D8A8', '#BFE0EE', '#A8D0E8', '#9AC4E0']);
+  D.r(g, 143, 25, 2, 27, C.wood2); D.r(g, 131, 37, 27, 2, C.wood2);
+  // gallery frame (family tree goes here)
+  D.r(g, 22, 74, 56, 44, C.wood1); D.r(g, 23, 75, 54, 42, C.wood4); D.r(g, 23, 75, 54, 1, C.wood5); D.r(g, 26, 78, 48, 36, '#EFE4CC');
+  // shelves with paint jars
+  for (const y of [112, 132]) { D.r(g, 196, y, 42, 3, C.wood3); D.r(g, 196, y, 42, 1, C.wood5); D.r(g, 198, y + 3, 2, 4, C.wood2); D.r(g, 234, y + 3, 2, 4, C.wood2); }
+  ['#E8628A', '#E8893F', '#F2C94C', '#6F9A45', '#3E5AA8', '#9A6AB0'].forEach((c, i) => { const x = 199 + i * 6; D.r(g, x, 104, 5, 8, '#C8D8E0'); D.r(g, x, 106, 5, 6, c); D.r(g, x, 103, 5, 1, C.wood2); });
+  D.r(g, 200, 126, 18, 6, '#F4EBD9'); D.ell(g, 200, 129, 1, 3, '#CBBCA3'); D.ell(g, 218, 129, 1, 3, '#CBBCA3'); D.r(g, 222, 124, 10, 8, '#7A9AD8'); D.r(g, 222, 124, 10, 1, '#9ACDE0');
+  // bathroom door
+  D.r(g, 244, 94, 36, 58, C.wood1); planksV(g, 247, 98, 30, 54, 6, ['#7AA8A0', '#6A9890', '#82B0A8'], rnd, false);
+  D.disc(g, 272, 126, 1, C.gold); D.r(g, 248, 86, 28, 8, C.wood1); D.r(g, 249, 87, 26, 6, '#E8F4F0');
+  text3(g, 'BATH', 249 + (26 - text3w('BATH')) / 2, 88, '#2E5A54');
+  // work table with supplies
+  D.r(g, 12, 136, 62, 4, C.wood4); D.r(g, 12, 136, 62, 1, C.wood5); D.r(g, 14, 140, 3, 18, C.wood2); D.r(g, 69, 140, 3, 18, C.wood2);
+  ['#E8628A', '#3E5AA8', '#F2C94C'].forEach((c, i) => { const x = 16 + i * 7; D.r(g, x, 130, 6, 6, '#C8D8E0'); D.r(g, x, 131, 6, 4, c); D.r(g, x, 130, 6, 1, '#E8F0F4'); });
+  D.r(g, 40, 128, 6, 8, '#9ACDE0'); for (const [dx, c] of [[0, '#E8893F'], [2, '#6F9A45'], [4, '#9A6AB0']]) { D.r(g, 41 + dx, 121, 1, 8, C.wood3); D.p(g, 41 + dx, 120, c); }
+  D.r(g, 52, 131, 14, 5, '#E8893F'); for (let i = 0; i < 6; i++) D.r(g, 53 + i * 2, 128, 1, 3, ['#C8323C', '#3E5AA8', '#F2C94C', '#6F9A45', '#9A6AB0', '#E98AA2'][i]);
+  // floor + splatters
+  planksH(g, 0, 152, W, [4, 5, 5, 6, 7, 8, 7, 6], ['#B8946A', '#C8A47A', '#AA8660', '#BC9A70'], rnd);
+  for (let i = 0; i < 26; i++) { const c = ['#E8628A', '#3E5AA8', '#F2C94C', '#6F9A45', '#9A6AB0', '#E8893F'][i % 6]; const x = 20 + rnd() * 250, y = 156 + rnd() * 40; D.ell(g, x, y, 1 + rnd() * 2, 1, c); if (rnd() < 0.5) D.p(g, x + 3, y + 1, c); }
+  // hatch down
+  D.r(g, 14, 182, 28, 13, C.wood1); D.r(g, 15, 183, 26, 11, C.wood3); for (let x = 21; x < 41; x += 7) D.r(g, x, 183, 1, 11, C.wood2); D.ring(g, 28, 188, 2, '#6A5E66');
+  // easel
+  D.line(g, 156, 168, 168, 92, C.wood3); D.line(g, 157, 168, 169, 92, C.wood2); D.line(g, 184, 168, 172, 92, C.wood3); D.line(g, 185, 168, 173, 92, C.wood2);
+  D.line(g, 170, 96, 170, 160, C.wood2); D.r(g, 150, 126, 40, 3, C.wood4); D.r(g, 150, 126, 40, 1, C.wood5);
+  D.r(g, 153, 97, 34, 29, C.wood1); D.r(g, 154, 98, 32, 27, '#F6EEDC');
+  // stool
+  D.r(g, 128, 160, 14, 3, C.wood4); D.line(g, 130, 163, 128, 172, C.wood2); D.line(g, 140, 163, 142, 172, C.wood2);
+}
+function drawClothesline(g) {
+  for (let x = STU.line[0]; x <= STU.line[1]; x++) { const k = (x - STU.line[0]) / (STU.line[1] - STU.line[0]); D.p(g, x, 58 + Math.round(Math.sin(k * Math.PI) * 4), '#B89060'); }
+  D.r(g, STU.line[0] - 2, 54, 3, 6, C.wood2); D.r(g, STU.line[1], 54, 3, 6, C.wood2);
+}
+// art pieces: pix is a 48x36 canvas
+function drawArtPiece(g, pix, x, y, w, h, pin = true) {
+  D.r(g, x - 1, y - 1, w + 2, h + 2, '#4A3A30'); D.r(g, x, y, w, h, '#F6EEDC');
+  if (pix) g.drawImage(pix, 0, 0, pix.width, pix.height, x, y, w, h);
+  if (pin) { D.r(g, x + 3, y - 3, 2, 4, '#C8A06A'); D.r(g, x + w - 5, y - 3, 2, 4, '#C8A06A'); }
+}
+function drawCanvasGlow(g, k) {
+  if (k <= 0) return;
+  g.save(); g.globalAlpha = k; D.r(g, 154, 98, 32, 27, '#FFF8E8'); g.restore();
+  D.glow(g, 170, 111, 28, '#FFE38A', 0.25 * k, 3);
+}
+function drawRainbowRug(g) { const cols = ['#C8323C', '#E8893F', '#F2C94C', '#6F9A45', '#3E5AA8', '#9A6AB0']; cols.forEach((c, i) => D.ell(g, 132, 184, 40 - i * 6, 10 - i * 1.5, c)); D.ell(g, 132, 184, 4, 1, '#F4EBD9'); }
+function drawSunflower(g, x, y) {
+  D.poly(g, [[x - 5, y - 10], [x + 5, y - 10], [x + 4, y], [x - 4, y]], '#B8562A'); D.r(g, x - 6, y - 11, 12, 2, '#D87444');
+  D.r(g, x, y - 46, 1, 36, '#4A6A2E'); D.ell(g, x - 4, y - 26, 4, 2, '#6E9A44'); D.ell(g, x + 4, y - 34, 4, 2, '#6E9A44');
+  for (let a = 0; a < 12; a++) { const r = (a / 12) * Math.PI * 2; D.ell(g, x + Math.cos(r) * 6, y - 50 + Math.sin(r) * 6, 2, 2, '#F2C94C'); }
+  D.disc(g, x, y - 50, 4, '#7A4E33'); D.p(g, x - 1, y - 51, '#9C6B45');
+}
+function drawPaperStars(g, t) {
+  const cols = ['#E98AA2', '#F2C94C', '#9ACDE0', '#A1AF7C', '#FE9B5B'];
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < 7; i++) {
+      const d = 18 + i * 17, x = side < 0 ? d : W - d, roof = 86 - d * (86 / 144);
+      const y = Math.round(roof + 8 + Math.round(Math.sin(t * 1.5 + i + side) * 0.7));
+      D.line(g, x, roof + 2, x, y - 2, '#8A7A60');
+      const c = cols[(i + (side > 0 ? 2 : 0)) % 5]; D.twinkle(g, x, y, 2, c); D.p(g, x, y, '#FFFFFF');
+    }
+  }
+}
+function drawCrayonJar(g, x, y) {
+  D.r(g, x - 6, y - 14, 12, 14, '#BFE0EE'); D.r(g, x - 6, y - 14, 12, 1, '#E8F6FA'); D.r(g, x - 7, y - 1, 14, 1, '#7E93A3');
+  ['#C8323C', '#E8893F', '#F2C94C', '#6F9A45', '#3E5AA8', '#9A6AB0', '#E98AA2'].forEach((c, i) => { const cx = x - 5 + i * 1.6; D.r(g, cx, y - 20 + (i % 3), 1.6, 12, c); D.p(g, cx, y - 21 + (i % 3), mix(c, '#000', 0.3)); });
+}
+const STU_ITEMS = {
+  rug: { draw: (g) => drawRainbowRug(g), at: [132, 180] },
+  sunflower: { draw: (g) => drawSunflower(g, 112, 152), at: [112, 110] },
+  stars: { fg: true, draw: (g) => drawPaperStars(g, T), at: [60, 60] },
+  beret: {
+    draw: () => {},
+    preview: (g, S) => { const d = S.dot; if (!d) return; const x = Math.round(d.x) + 1, y = Math.round(d.y - 30 + Math.sin(T * 3) * 1.5); D.ell(g, x, y, 7, 3, '#2C1A1E'); D.ell(g, x, y, 6, 2, '#C8323C'); D.r(g, x, y - 4, 1, 2, '#2C1A1E'); },
+    get at() { const d = SCENES.studio && SCENES.studio.dot; return d ? [d.x, d.y - 10] : [200, 170]; },
+  },
+  crayons: { draw: (g) => drawCrayonJar(g, 92, 158), at: [92, 146] },
+};
+// fallback picture when there is no photo
+function makeFallbackArt(kind, people = [], seed = 7) {
+  const [c, g] = mk(48, 36);
+  D.r(g, 0, 0, 48, 36, '#F6EEDC');
+  if (kind === 'family') {
+    D.r(g, 22, 20, 5, 14, '#7A4E33'); D.r(g, 16, 33, 17, 2, '#6F9A45');
+    D.ell(g, 24, 13, 18, 11, '#6F9A45'); D.ell(g, 20, 10, 9, 6, '#8EB05A');
+    const n = Math.max(1, Math.min(12, people.length));
+    const cols = ['#F2C94C', '#E98AA2', '#5A84C4', '#E8893F', '#9A6AB0', '#5ACDE0'];
+    for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2, x = 24 + Math.cos(a) * 12, y = 13 + Math.sin(a) * 6; D.disc(g, x, y, 2, cols[i % cols.length]); D.p(g, x - 1, y, C.ink); D.p(g, x + 1, y, C.ink); }
+  } else {
+    const rnd = rand(seed);
+    for (let k = 0; k < 4; k++) { const col = ['#E8628A', '#3E5AA8', '#F2C94C', '#6F9A45', '#9A6AB0'][k]; let x = 6 + rnd() * 36, y = 6 + rnd() * 24; for (let i = 0; i < 40; i++) { x = clamp(x + (rnd() - 0.5) * 6, 2, 45); y = clamp(y + (rnd() - 0.5) * 5, 2, 33); D.r(g, x, y, 2, 1, col); } }
+    D.twinkle(g, 38, 8, 2, '#E8A832');
+  }
+  return c;
+}
+// photo -> pixel art
+const PIXPAL = ['#2C1A1E', '#4A3A30', '#6E5A50', '#9A8A80', '#C8BCB0', '#F6EEDC', '#FFFFFF', '#C8323C', '#E8628A', '#F2A0B0', '#E8893F', '#F2B060', '#F2C94C', '#F8E08A',
+  '#6F8A45', '#9AB860', '#2E6A3A', '#3E5AA8', '#5A84C4', '#9ACDE0', '#7C5B85', '#B08AC0', '#7A4E33', '#B8865A', '#E8C8A0', '#2A2A3A'].map(hex2rgb);
+function quantize(canvas) {
+  const g = canvas.getContext('2d'), id = g.getImageData(0, 0, canvas.width, canvas.height), d = id.data;
+  for (let i = 0; i < d.length; i += 4) {
+    // lift paper toward white a little, then snap to the nearest palette color
+    let r = d[i], gg = d[i + 1], b = d[i + 2];
+    const l = (r + gg + b) / 3; if (l > 150) { r = lerp(r, 255, 0.35); gg = lerp(gg, 255, 0.35); b = lerp(b, 255, 0.35); }
+    let best = 0, bd = 1e9;
+    for (let k = 0; k < PIXPAL.length; k++) { const p = PIXPAL[k]; const dd = (p[0] - r) ** 2 * 0.3 + (p[1] - gg) ** 2 * 0.59 + (p[2] - b) ** 2 * 0.11; if (dd < bd) { bd = dd; best = k; } }
+    d[i] = PIXPAL[best][0]; d[i + 1] = PIXPAL[best][1]; d[i + 2] = PIXPAL[best][2]; d[i + 3] = 255;
+  }
+  g.putImageData(id, 0, 0);
+  return canvas;
+}
+function photoToArt(img) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const target = 4 / 3;
+  let sw = iw, sh = ih;
+  if (iw / ih > target) sw = ih * target; else sh = iw / target;
+  const sx = (iw - sw) / 2, sy = (ih - sh) / 2;
+  const big = document.createElement('canvas'); big.width = 400; big.height = 300;
+  const bg = big.getContext('2d'); bg.imageSmoothingQuality = 'high'; bg.drawImage(img, sx, sy, sw, sh, 0, 0, 400, 300);
+  // crayon on paper photographs pale: lift contrast and color before shrinking
+  try { const id = bg.getImageData(0, 0, 400, 300), d = id.data; for (let i = 0; i < d.length; i += 4) { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; for (let k = 0; k < 3; k++) d[i + k] = clamp((l + (d[i + k] - l) * 1.6 - 128) * 1.25 + 140, 0, 255); } bg.putImageData(id, 0, 0); } catch (e) { /* tainted canvas: skip */ }
+  const small = document.createElement('canvas'); small.width = 48; small.height = 36;
+  const sg = small.getContext('2d'); sg.imageSmoothingQuality = 'high'; sg.drawImage(big, 0, 0, 48, 36);
+  quantize(small);
+  return { pix: small.toDataURL('image/png'), photo: big.toDataURL('image/jpeg', 0.72) };
+}
+const PIX_CACHE = {};
+function artCanvas(a) {
+  if (!a) return null;
+  const k = a.pix || (a.q + ':' + (a.people || []).join(',') + ':' + (a.at || 0));
+  if (PIX_CACHE[k]) return PIX_CACHE[k];
+  if (a.pix) {
+    const img = new Image();
+    const [c, g] = mk(48, 36);
+    img.onload = () => { g.drawImage(img, 0, 0); };
+    img.src = a.pix;
+    PIX_CACHE[k] = c;
+    return c;
+  }
+  let seed = (a.at || 0) % 9973; for (const ch of a.q) seed = (seed * 31 + ch.charCodeAt(0)) % 99991;
+  return (PIX_CACHE[k] = makeFallbackArt(a.q === 'family' ? 'family' : 'scribble', a.people || [], seed + 1));
+}
+
+// ===================== Bathroom =====================
+const BATH = { sink: [176, 120], cup: [189, 112], jar: [222, 96], tub: [60, 146], door: [252, 92], toilet: [124, 150], mirror: [176, 84] };
+function paintBath(g) {
+  const rnd = rand(13);
+  D.r(g, 0, 0, W, 112, '#CFE6DE');
+  for (let x = 0; x < W; x += 12) D.r(g, x, 0, 6, 112, '#C6DFD6');
+  D.r(g, 0, 0, W, 8, '#8FB8AC'); D.r(g, 0, 7, W, 1, '#6E9A8E');
+  // tiles
+  D.r(g, 0, 112, W, 40, '#9CC4B8');
+  for (let y = 113; y < 152; y += 7) for (let x = (y % 2) * 3; x < W; x += 7) { D.r(g, x, y, 6, 6, (x + y) % 3 ? '#F2F8F4' : '#DCEEE8'); D.p(g, x, y, '#FFFFFF'); }
+  D.r(g, 0, 110, W, 3, '#7AA89A'); D.r(g, 0, 110, W, 1, '#B8DCD0');
+  // floor
+  for (let y = 152, r = 0; y < H; r++) { const hh = 5 + r; for (let x = -(r % 2) * 6, i = 0; x < W; x += 12, i++) D.r(g, x, y, 12, hh, (i + r) % 2 ? '#F4EBD9' : '#EDBBC4'); y += hh; }
+  D.r(g, 0, 152, W, 1, '#7AA89A');
+  // window above tub
+  D.r(g, 36, 30, 44, 40, '#E8F4F0'); D.r(g, 38, 32, 40, 36, '#BFE0EE'); D.dith(g, 38, 32, 40, 36, '#F4FAF8', 2);
+  D.r(g, 57, 32, 2, 36, '#E8F4F0'); D.r(g, 38, 49, 40, 2, '#E8F4F0'); D.r(g, 64, 64, 6, 6, '#B8562A'); D.disc(g, 67, 61, 3, '#6E9A44'); D.p(g, 66, 59, '#8EB05A');
+  D.r(g, 34, 70, 48, 3, '#F4FAF8');
+  // tub
+  D.ell(g, 60, 146, 44, 13, '#B8C8D0'); D.r(g, 16, 128, 88, 18, '#F6F8F8'); D.ell(g, 60, 146, 43, 12, '#F6F8F8');
+  D.r(g, 14, 126, 92, 4, '#FFFFFF'); D.r(g, 14, 129, 92, 1, '#C8D8E0'); D.r(g, 18, 131, 84, 4, '#DCE8EC');
+  for (const x of [24, 94]) { D.r(g, x - 2, 156, 5, 4, C.gold); D.p(g, x - 2, 156, C.goldL); }
+  D.r(g, 16, 114, 3, 12, '#B8C8D0'); D.r(g, 16, 114, 8, 3, '#B8C8D0'); D.p(g, 23, 118, '#9ACDE0');
+  // toilet
+  D.r(g, 116, 118, 18, 14, '#F6F8F8'); D.r(g, 116, 118, 18, 2, '#FFFFFF'); D.ell(g, 125, 140, 11, 5, '#F6F8F8'); D.ell(g, 125, 139, 9, 3, '#DCE8EC'); D.r(g, 120, 144, 10, 10, '#E8EEF0'); D.r(g, 132, 122, 3, 2, '#B8C8D0');
+  // sink + mirror
+  D.r(g, 160, 60, 32, 44, C.gold); D.r(g, 162, 62, 28, 40, '#9AB8C8'); D.line(g, 165, 70, 172, 64, '#E8F4F8'); D.line(g, 166, 76, 176, 66, '#D0E4EC'); D.r(g, 160, 60, 32, 1, C.goldL);
+  D.ell(g, 176, 118, 18, 5, '#F6F8F8'); D.ell(g, 176, 117, 14, 3, '#C8DCE4'); D.r(g, 170, 122, 12, 32, '#F6F8F8'); D.r(g, 170, 122, 3, 32, '#FFFFFF'); D.r(g, 166, 152, 20, 3, '#E8EEF0');
+  D.r(g, 175, 106, 2, 8, '#B8C8D0'); D.r(g, 175, 106, 6, 2, '#B8C8D0');
+  // cup with toothbrushes
+  D.r(g, 186, 108, 6, 7, '#9ACDE0'); D.r(g, 186, 108, 6, 1, '#E8F6FA');
+  D.line(g, 187, 108, 185, 100, '#E8628A'); D.r(g, 184, 99, 2, 2, '#FFFFFF'); D.line(g, 190, 108, 193, 101, '#F2C94C'); D.r(g, 192, 100, 2, 2, '#FFFFFF');
+  // shelf for jar
+  D.r(g, 206, 98, 36, 3, '#E8F4F0'); D.r(g, 206, 101, 36, 1, '#8FB0A6'); D.r(g, 208, 102, 2, 4, '#B8C8D0'); D.r(g, 238, 102, 2, 4, '#B8C8D0');
+  D.r(g, 232, 92, 6, 6, '#F2A0B0'); D.r(g, 232, 92, 6, 1, '#FFD0DC');
+  // towel rack
+  D.r(g, 206, 118, 30, 2, '#B8C8D0'); D.r(g, 210, 120, 22, 20, '#E8628A'); D.r(g, 210, 120, 22, 2, '#F7A6BE'); for (let y = 126; y < 140; y += 4) D.r(g, 210, y, 22, 1, '#C84A70');
+  // a little hanging lamp
+  D.r(g, 120, 0, 1, 14, '#6E9A8E'); D.poly(g, [[113, 22], [127, 22], [124, 14], [116, 14]], '#F2C94C'); D.r(g, 113, 22, 15, 1, '#C89A30'); D.r(g, 118, 23, 4, 2, '#FFF6C8');
+  // door back to the studio
+  D.r(g, 250, 90, 34, 62, '#6E9A8E'); planksV(g, 253, 94, 28, 58, 7, ['#E2CFA8', '#D8C29A', '#E8D8B6'], rnd, false); D.disc(g, 256, 124, 1, C.gold);
+}
+function drawJar(g, x, y, n, t, glowK = 0) {
+  // a round glass jar, 18 wide x 22 tall, standing on (x, y)
+  D.ell(g, x, y - 9, 9, 10, '#2C1A1E'); D.ell(g, x, y - 9, 8, 9, '#DCEEF4');
+  D.r(g, x - 5, y - 21, 10, 4, '#2C1A1E'); D.r(g, x - 4, y - 20, 8, 3, '#C8A06A'); D.r(g, x - 4, y - 20, 8, 1, '#E8C890');
+  const spots = [[-4, -3], [1, -2], [5, -5], [-2, -7], [3, -9], [-5, -10], [0, -12], [4, -14]];
+  for (let i = 0; i < Math.min(n, spots.length); i++) {
+    const [dx, dy] = spots[i]; const sx = x + dx, sy = y + dy;
+    D.r(g, sx - 1, sy, 3, 1, '#F2B030'); D.r(g, sx, sy - 1, 1, 3, '#F2B030'); D.p(g, sx, sy, Math.sin(t * 3 + i * 1.7) > 0.4 ? '#FFFFFF' : '#FFE38A');
+  }
+  if (n > 0) D.glow(g, x, y - 9, 14, '#FFD84A', 0.06 + 0.025 * n + glowK * 0.3, 3);
+  D.r(g, x - 6, y - 14, 1, 7, '#FFFFFF'); D.p(g, x - 5, y - 15, '#FFFFFF');
+}
+function drawDuck(g, x, y) { D.ell(g, x, y - 3, 5, 3, '#F2C94C'); D.disc(g, x + 3, y - 7, 3, '#F2C94C'); D.p(g, x + 4, y - 8, C.ink); D.r(g, x + 6, y - 7, 2, 1, '#E8893F'); D.p(g, x - 2, y - 4, '#F8E08A'); }
+function drawBubbleBath(g, t) {
+  for (let i = 0; i < 22; i++) { const x = 22 + (i * 37) % 78, y = 128 - ((i * 13) % 7) + Math.round(Math.sin(t * 1.5 + i) * 0.7); D.disc(g, x, y, 3 + (i % 3), '#FFFFFF'); D.ring(g, x, y, 3 + (i % 3), '#C8DCE4'); D.p(g, x - 1, y - 1, '#E8F6FA'); }
+}
+function drawBathRug(g) { D.ell(g, 176, 172, 22, 6, '#9A6AB0'); D.ell(g, 176, 172, 20, 5, '#B08AC0'); for (let x = 156; x < 198; x += 3) D.p(g, x, 178, '#9A6AB0'); }
+function drawNightlight(g, t) { D.r(g, 195, 140, 7, 9, '#E8F4F0'); D.r(g, 195, 140, 7, 1, '#FFFFFF'); D.twinkle(g, 198, 144, 2, '#FFD84A'); D.p(g, 198, 144, '#FFFFFF'); D.glow(g, 198, 144, 16, '#FFE38A', 0.15 + 0.05 * Math.sin(t * 2), 3); }
+function drawFern(g) { drawPlant(g, 146, 152); }
+const BATH_ITEMS = {
+  duck: { draw: (g) => drawDuck(g, 97, 126), at: [97, 120] },
+  bubbles: { fg: true, draw: (g) => drawBubbleBath(g, T), at: [60, 126] },
+  bathrug: { draw: (g) => drawBathRug(g), at: [176, 172] },
+  nightlight: { draw: (g) => drawNightlight(g, T), at: [198, 144] },
+  fern: { draw: (g) => drawFern(g), at: [146, 136] },
+};
+const ROOM_ITEMS = { library: LIB_ITEMS, studio: STU_ITEMS, bath: BATH_ITEMS };
+
+// ===================== Quest content =====================
+// Tell steps:
+//   { type: 'animal' }                         animal grid (the first quest)
+//   { type: 'pick', key, q, options, react }   a grid of picture choices; react[k] = [line, line]
+//   { type: 'color', key, q }                  cover-color swatches
+//   { type: 'feel' }                           how did it feel
+//   { type: 'outloud', say }                   say something out loud, then tap
+
+const READ_QUESTS = [
+  {
+    id: 'animal', title: 'The Animal Book Hunt',
+    lead: 'Somewhere in your house, there is a book with an animal on the cover.',
+    steps: ['Find it.', 'Read it.', 'Tell the Sparkees all about it.'],
+    ask: 'Did you find a book with an animal on the cover? And read it?',
+    sendoff: 'Go find your animal book!',
+    cover: { color: '#612C48' },
+    tell: [{ type: 'animal' }, { type: 'feel' }, { type: 'outloud', say: 'Tell us one thing that happened in the story. Say it out loud!' }],
+  },
+  {
+    id: 'someone', title: 'Read to Someone',
+    lead: 'Read a book out loud to someone. A grown-up, a kid, or even a stuffed animal!',
+    steps: ['Pick a book.', 'Find a listener.', 'Read it out loud!'],
+    ask: 'Did you read a book out loud to someone?',
+    sendoff: 'Go find a listener!',
+    cover: { color: '#C76580', emblem: 'heart' },
+    tell: [
+      { type: 'pick', key: 'who', q: 'Who was listening?', options: [
+        ['mom', 'Mom', 'p_mom'], ['dad', 'Dad', 'p_dad'], ['kid', 'A kid', 'p_sister'], ['grown', 'A grown-up', 'p_grandma'], ['stuffy', 'A stuffed animal', 'a_bear'], ['pet', 'A pet', 'a_dog']],
+        react: {
+          mom: ['Mom! Did she clap?', 'Greg would have clapped.'],
+          dad: ['Dad! Excellent choice.', 'Dads have very big ears for listening.'],
+          kid: ['A kid! You are basically a teacher now.', 'Professor {name}.'],
+          grown: ['A grown-up! Grown-ups love being read to.', 'They just forget to ask.'],
+          stuffy: ['A stuffed animal!', 'Did it clap? Stuffed animals are terrible at clapping.'],
+          pet: ['A pet!', 'Pets understand more than they let on.'],
+        } },
+      { type: 'feel' },
+      { type: 'outloud', say: 'Read us your favorite line from the book. Out loud!' },
+    ],
+  },
+  {
+    id: 'fort', title: 'The Reading Fort',
+    lead: 'Make a cozy reading spot. A blanket fort. A pillow pile. A nest under the covers. Then read a book in it.',
+    steps: ['Build your cozy spot.', 'Crawl in with a book.', 'Read it!'],
+    ask: 'Did you read a book in a cozy spot?',
+    sendoff: 'Go build your cozy spot!',
+    cover: { color: '#5D6A3E', emblem: 'tent' },
+    tell: [
+      { type: 'pick', key: 'where', q: 'Where did you read?', options: [
+        ['fort', 'Blanket fort', 'e_tent'], ['covers', 'Under the covers', 'e_bed'], ['pillows', 'Pillow pile', 'e_pillow'], ['table', 'Under a table', 'e_table'], ['outside', 'Outside', 'e_sun'], ['silly', 'Somewhere silly', 'a_other']],
+        react: {
+          fort: ['A blanket fort!', 'The best kind of building. No grown-ups allowed. Unless they bring snacks.'],
+          covers: ['Under the covers!', 'Very sneaky. Very cozy.'],
+          pillows: ['A pillow pile!', 'Greg once got lost in a pillow pile for three days.'],
+          table: ['Under a table!', 'A table is just a roof with legs.'],
+          outside: ['Outside!', 'The trees were probably listening too.'],
+          silly: ['Somewhere silly!', 'Greg is not going to ask. Greg respects your privacy.'],
+        } },
+      { type: 'feel' },
+      { type: 'outloud', say: 'Tell us what the book was about!' },
+    ],
+  },
+  {
+    id: 'color', title: 'The Color Hunt',
+    lead: 'Find a book with a cover that is mostly one color. Read it!',
+    steps: ['Hunt for a colorful cover.', 'Read the book.', 'Tell the Sparkees the color.'],
+    ask: 'Did you find a colorful book and read it?',
+    sendoff: 'Go hunt for a color!',
+    cover: { color: '#E8893F', emblem: 'splash', fromColor: true },
+    tell: [
+      { type: 'color', key: 'color', q: 'What color was the cover?' },
+      { type: 'feel' },
+      { type: 'outloud', say: 'Tell us your favorite part!' },
+    ],
+  },
+  {
+    id: 'new', title: 'The Brand-New Book',
+    lead: 'Read a book you have never, ever read before.',
+    steps: ['Find a book that is new to you.', 'Read the whole thing.', 'Tell the Sparkees what you think.'],
+    ask: 'Did you read a brand-new book?',
+    sendoff: 'Go find a book you have never read!',
+    cover: { color: '#3E5AA8', emblem: 'star' },
+    tell: [
+      { type: 'feel' },
+      { type: 'pick', key: 'again', q: 'Would you read it again?', options: [['yes', 'Yes!', 'e_yes'], ['maybe', 'Maybe', 'e_maybe'], ['no', 'Nope', 'e_no']],
+        react: {
+          yes: ['Yes! A new favorite!', 'Greg will make room on the shelf.'],
+          maybe: ['Maybe! That is fair.', 'Some books need a second try.'],
+          no: ['Nope! That is allowed.', 'Not every book is your book. Greg does not like books about soup.'],
+        } },
+      { type: 'outloud', say: 'Tell us what happened in it!' },
+    ],
+  },
+  {
+    id: 'hero', title: 'The Hero Hunt',
+    lead: 'Read a story with a hero in it. A hero is anybody who is brave or kind.',
+    steps: ['Find a story with a hero.', 'Read it.', 'Tell the Sparkees about the hero.'],
+    ask: 'Did you read a story with a hero in it?',
+    sendoff: 'Go find a hero!',
+    cover: { color: '#B4502A', emblem: 'shield' },
+    tell: [
+      { type: 'pick', key: 'hero', q: 'Who was the hero?', options: [
+        ['kid', 'A kid', 'p_sister'], ['animal', 'An animal', 'a_fox'], ['grown', 'A grown-up', 'p_dad'], ['creature', 'A creature', 'a_dragon'], ['robot', 'A robot', 'e_robot'], ['other', 'Someone else', 'a_other']],
+        react: {
+          kid: ['A kid hero!', 'Kids are the bravest. Greg has seen it.'],
+          animal: ['An animal hero!', 'Paws can be very brave.'],
+          grown: ['A grown-up hero!', 'Sometimes grown-ups get it right.'],
+          creature: ['A creature hero!', 'Creatures are underrated. Greg is technically a creature.'],
+          robot: ['A robot hero! Beep boop.', 'That means "thank you, robot" in robot.'],
+          other: ['A mystery hero!', 'The best heroes are full of surprises.'],
+        } },
+      { type: 'pick', key: 'did', q: 'What did the hero do?', options: [
+        ['save', 'Saved someone', 'e_heart'], ['solve', 'Solved a problem', 'e_bulb'], ['brave', 'Was brave', 'e_shield'], ['kind', 'Was kind', 'e_smile'], ['friend', 'Made a friend', 'e_friends']],
+        react: {
+          save: ['They saved someone!', 'Greg needs a moment. That is beautiful.'],
+          solve: ['They solved a problem!', 'Thinking is a superpower.'],
+          brave: ['They were brave!', 'Brave is doing it even when your tummy feels wobbly.'],
+          kind: ['They were kind!', 'Kind is the strongest kind of strong.'],
+          friend: ['They made a friend!', 'Like you and the Sparkees.'],
+        } },
+      { type: 'outloud', say: 'Tell us the bravest part!' },
+    ],
+  },
+  {
+    id: 'night', title: 'The Bedtime Book',
+    lead: 'At bedtime, read a book about the night, the moon, the stars, or sleeping.',
+    steps: ['Wait until bedtime.', 'Read a sleepy book.', 'Tell the Sparkees in the morning.'],
+    ask: 'Did you read a bedtime book?',
+    sendoff: 'Save this one for bedtime!',
+    cover: { color: '#2E3D4A', emblem: 'moon' },
+    tell: [
+      { type: 'pick', key: 'sky', q: 'What was in the book?', options: [
+        ['moon', 'The moon', 'e_moon'], ['stars', 'Stars', 'e_star'], ['sleep', 'Someone sleeping', 'e_bed'], ['dark', 'The dark', 'e_dark'], ['dream', 'A dream', 'e_cloud']],
+        react: {
+          moon: ['The moon!', 'Greg waves at the moon every night. It never waves back.'],
+          stars: ['Stars!', 'Sparkees are related to stars. Very distant cousins.'],
+          sleep: ['Someone sleeping!', 'Shh. Greg is whispering now.'],
+          dark: ['The dark!', 'The dark is just the day with its eyes closed.'],
+          dream: ['A dream!', 'Greg dreams about sandwiches. Every night.'],
+        } },
+      { type: 'feel' },
+      { type: 'outloud', say: 'Tell us how the story ended!' },
+    ],
+  },
+  {
+    id: 'rhyme', title: 'Rhyme Time',
+    lead: 'Find a book with rhyming words in it. Cat, hat. Moon, spoon. Greg, egg.',
+    steps: ['Find a rhyming book.', 'Read it.', 'Bring back two words that rhyme.'],
+    ask: 'Did you read a rhyming book?',
+    sendoff: 'Go find some rhymes!',
+    cover: { color: '#9A6AB0', emblem: 'note' },
+    tell: [
+      { type: 'outloud', say: 'Say two words from your book that rhyme. Out loud!' },
+      { type: 'feel' },
+    ],
+  },
+  {
+    id: 'chapter', title: 'The Chapter Explorer',
+    lead: 'Read one chapter of a chapter book. Just one. (Or more. We are not the boss of you.)',
+    steps: ['Pick a chapter book.', 'Read one chapter.', 'Tell the Sparkees what happened.'],
+    ask: 'Did you read a whole chapter?',
+    sendoff: 'Go explore a chapter!',
+    cover: { color: '#7A4E33', emblem: 'book' },
+    tell: [
+      { type: 'pick', key: 'next', q: 'Do you want to know what happens next?', options: [['yes', 'YES!', 'e_yes'], ['bit', 'A little', 'e_maybe'], ['peek', 'I already peeked', 'e_eyes']],
+        react: {
+          yes: ['YES! The best feeling!', 'That is called a cliffhanger. Greg once hung from a cliff. Not on purpose.'],
+          bit: ['A little!', 'Maybe the next chapter will grab you.'],
+          peek: ['You peeked!', 'Greg peeks too. Do not tell anyone.'],
+        } },
+      { type: 'outloud', say: 'Tell us what happened in the chapter!' },
+    ],
+  },
+  {
+    id: 'funny', title: 'The Funny Bone',
+    lead: 'Find the funniest book in your house. Read it. Try not to laugh. (You will laugh.)',
+    steps: ['Find a funny book.', 'Read it with a straight face.', 'Fail. Laugh.'],
+    ask: 'Did you read a funny book?',
+    sendoff: 'Go find something funny!',
+    cover: { color: '#E8A832', emblem: 'smile' },
+    tell: [
+      { type: 'pick', key: 'laugh', q: 'How much did you laugh?', options: [['little', 'A little', 'e_smile'], ['lot', 'A LOT', 'e_laugh'], ['floor', 'I fell over', 'e_floor']],
+        react: {
+          little: ['A little giggle!', 'Giggles count. Greg is counting.'],
+          lot: ['A LOT!', 'The Sparkees can tell. You are still smiling.'],
+          floor: ['You fell over?!', 'That is the highest rating a book can get.'],
+        } },
+      { type: 'outloud', say: 'Tell us the funniest part!' },
+    ],
+  },
+];
+const COVER_COLORS = [
+  ['red', 'Red', '#C8323C'], ['orange', 'Orange', '#E8893F'], ['yellow', 'Yellow', '#F2C94C'], ['green', 'Green', '#6F8A45'], ['blue', 'Blue', '#3E5AA8'],
+  ['purple', 'Purple', '#7C5B85'], ['pink', 'Pink', '#E98AA2'], ['black', 'Black', '#2A2230'], ['white', 'White', '#F4EBD9'],
+];
+const COLOR_REACT = {
+  red: ['Red! Like a fire truck.', 'Or a very embarrassed tomato.'], orange: ['Orange!', 'Greg once ate an orange. It was orange.'],
+  yellow: ['Yellow! Like a Sparkee!', 'Excellent taste.'], green: ['Green!', 'The color of the whole forest.'],
+  blue: ['Blue! Like the sky.', 'Or a whale. Or a whale in the sky.'], purple: ['Purple!', 'The fanciest color. Kings wear purple. And Greg, on Tuesdays.'],
+  pink: ['Pink!', 'One of the best colors. Greg checked.'], black: ['Black!', 'Very mysterious. Very cool.'], white: ['White!', 'Like a cloud. Or a page before the story.'],
+};
+const FEEL_REACT_LINES = { outloud: [["We're listening!", 'We have very small ears, but we are doing our best.'], ['Ooh, tell us!', 'Greg is all ears. Greg is mostly fuzz, but also ears.'], ['Go on!', 'Nobody move. Story time.']] };
+const STORY_WOW = [['Wow.', 'No way!', 'Tell it again!'], ['Ooooh.', 'Amazing!', 'Again!'], ['Whoa.', 'Hooray!', 'More!']];
+const GREG_WOW = ['That is the best thing I have ever heard.', 'Incredible. Greg has goosebumps. Greg does not have a goose.', 'That was wonderful. Truly.'];
+
+// ---------------- Art quests ----------------
+const ART_QUESTS = [
+  {
+    id: 'family', title: 'The Family Tree',
+    icons: ['e_splash', 'e_tree', 'e_heart'],
+    lead: 'Draw a big tree with your whole family on it. Grown-ups, kids, babies, grandparents, and pets all count!',
+    steps: ['Get paper and crayons.', 'Draw a big tree.', 'Put your whole family on it!'],
+    aside: '(Ask a grown-up who else belongs on your tree. Family trees can get very big.)',
+    ask: 'Did you make your family tree?',
+    tell: ['photo', 'family', 'feel'],
+    frame: 'big',
+  },
+  {
+    id: 'greg', title: 'A Portrait of Greg',
+    icons: ['e_splash', 'e_star', 'e_camera'],
+    lead: 'Greg would like a portrait. A very nice one. Draw Greg!',
+    steps: ['Get paper and crayons.', "Draw Greg. Don't forget the mustache.", 'Show Dot.'],
+    aside: '(Greg would like you to know his left side is his best side.)',
+    ask: 'Did you draw Greg?',
+    tell: ['photo', 'feel'],
+    after: [['dot', 'Is that Greg? Look at that mustache. It is magnificent.'], ['dot', 'Dot will show him. He is going to pretend not to cry.']],
+  },
+  {
+    id: 'food', title: 'Favorite Food',
+    icons: ['e_splash', 'e_star', 'e_camera'],
+    lead: 'Draw your very favorite food. Make it look so good that Greg gets hungry.',
+    steps: ['Get paper and crayons.', 'Draw your favorite food.', 'Show Dot.'],
+    aside: '(Please do not eat the drawing.)',
+    ask: 'Did you draw your favorite food?',
+    tell: ['photo', 'feel'],
+    after: [['dot', 'Dot is hungry now. Thank you. This is your fault.']],
+  },
+  {
+    id: 'card', title: 'A Card for Someone',
+    icons: ['e_book', 'e_splash', 'e_heart'],
+    lead: 'Make a card for someone you love. Fold the paper, draw on the front, and give it to them!',
+    steps: ['Fold a piece of paper.', 'Draw on it and decorate it.', 'Give it to someone you love!'],
+    aside: '(Grown-ups can help with the words inside.)',
+    ask: 'Did you make a card and give it to someone?',
+    tell: ['photo', 'who', 'feel'],
+  },
+  {
+    id: 'kitchen', title: 'Imagine the Kitchen',
+    icons: ['e_splash', 'e_bulb', 'e_camera'],
+    lead: 'The treehouse kitchen is locked. What do you think is behind the door? Draw it!',
+    steps: ['Get paper and crayons.', 'Imagine the kitchen.', 'Draw what is inside!'],
+    aside: '(Nobody knows. Not even Greg. Especially not Greg.)',
+    ask: 'Did you draw the kitchen?',
+    tell: ['photo', 'feel'],
+    after: [['dot', 'Is THAT what is in there? Dot needs to sit down.'], ['dot', 'Greg has been trying to open that door for years.']],
+  },
+  {
+    id: 'sparkee', title: 'Invent a Sparkee',
+    icons: ['e_splash', 'e_star', 'e_smile'],
+    lead: 'Invent a brand-new Sparkee! What color is it? Does it have a hat? What is its name?',
+    steps: ['Get paper and crayons.', 'Draw a brand-new Sparkee.', 'Give it a name!'],
+    aside: '(Sparkees can look like anything. Greg looks like Greg.)',
+    ask: 'Did you invent a new Sparkee?',
+    tell: ['photo', 'name', 'feel'],
+  },
+];
+const FAMILY = [
+  ['me', 'Me', 'p_me'], ['mom', 'Mom', 'p_mom'], ['dad', 'Dad', 'p_dad'], ['brother', 'Brother', 'p_brother'], ['sister', 'Sister', 'p_sister'],
+  ['baby', 'Baby', 'p_baby'], ['grandma', 'Grandma', 'p_grandma'], ['grandpa', 'Grandpa', 'p_grandpa'], ['aunt', 'Aunt', 'p_aunt'], ['uncle', 'Uncle', 'p_uncle'],
+  ['cousin', 'Cousin', 'p_cousin'], ['dog', 'Dog', 'a_dog'], ['cat', 'Cat', 'a_cat'], ['fish', 'Fish', 'a_fish'], ['other', 'Someone else', 'a_other'],
+];
+const ART_FEELS = [['fun', 'Fun', 'laugh'], ['proud', 'Proud', 'star'], ['calm', 'Calm', 'cozy'], ['tricky', 'Tricky', 'wide']];
+const ART_FEEL_REACT = {
+  fun: ['Fun! Art should be fun.', 'Dot is doing a happy dance. That is the happy dance.'],
+  proud: ['Proud! You should be.', 'Dot is proud too. Dot is crying a little. Happy tears.'],
+  calm: ['Calm. Like a quiet river.', 'Art can be a very quiet thing.'],
+  tricky: ['Tricky! But you did it anyway.', 'That is what real artists do.'],
+};
+
+// ---------------- Routines (bathroom) ----------------
+const ROUTINES = [
+  ['brush', 'Brush my teeth', 'e_brush'],
+  ['floss', 'Floss', 'e_floss'],
+];
+const JAR_SIZE = 8;
+
+// ---------------- Room items (presents) ----------------
+// Each item: room, intro lines, and where it lives. Drawing is in art.js (drawItem).
+const ITEMS = {
+  beanbag: { room: 'library', lines: ['A beanbag chair! For flopping.', 'Sparkees are excellent floppers.'] },
+  lights: { room: 'library', lines: ['Fairy lights! They twinkle.', 'Twinkling is our favorite thing to watch.'] },
+  headphones: { room: 'library', lines: ['Tiny headphones! Sparkee-sized.', 'For listening to very tiny music.'] },
+  plant: { room: 'library', lines: ['A big leafy plant!', 'Plants like stories too. They just listen very slowly.'] },
+  globe: { room: 'library', lines: ['A globe! The whole world, but small.', 'Greg likes to spin it and point. He has been to zero places.'] },
+  mobile: { room: 'library', lines: ['A star mobile! It spins.', 'For when you want stars indoors.'] },
+  telescope: { room: 'library', lines: ['A telescope! For looking at far-away things.', 'Like the moon. Or the kitchen.'] },
+  portrait: { room: 'library', lines: ['A portrait of you!', 'So we can see you even when you are reading.'] },
+  cushions: { room: 'library', lines: ['A pile of cushions!', 'For sitting. Or for building a very soft fort.'] },
+  rug: { room: 'studio', lines: ['A rainbow rug!', 'Now even the floor is art.'] },
+  sunflower: { room: 'studio', lines: ['A sunflower!', 'It is taller than Dot. Dot is not happy about it.'] },
+  stars: { room: 'studio', lines: ['A string of paper stars!', 'Dot cut out every single one. It took her all week.'] },
+  beret: { room: 'studio', lines: ['A beret! A real artist hat.', 'Dot has wanted one for 400 years.'] },
+  crayons: { room: 'studio', lines: ['A giant jar of crayons!', 'Every color. Even the weird ones.'] },
+  duck: { room: 'bath', lines: ['A rubber duck!', 'Bubbles named it Captain Quack.'] },
+  bubbles: { room: 'bath', lines: ['Bubble bath!', 'The tub is full of bubbles now. Bubbles is very proud.'] },
+  bathrug: { room: 'bath', lines: ['A fluffy bath mat!', 'For warm feet. Sparkees have very small feet.'] },
+  nightlight: { room: 'bath', lines: ['A star nightlight!', 'For brushing your teeth in the dark.'] },
+  fern: { room: 'bath', lines: ['A fern!', 'Ferns love bathrooms. It is a fern fact.'] },
+};
+const ROOM_POOL = (room) => Object.keys(ITEMS).filter((k) => ITEMS[k].room === room);
+
+// ===================== Save upgrade & shared quest flow =====================
+// Chapter one saved only save.book and save.item. Everything after it lives in these fields.
+function migrateSave() {
+  if (!Array.isArray(save.books)) save.books = save.book ? [Object.assign({ q: 'animal' }, save.book)] : [];
+  if (!save.items) save.items = { library: save.item ? [save.item] : [], studio: [], bath: [] };
+  for (const r of ['library', 'studio', 'bath']) if (!Array.isArray(save.items[r])) save.items[r] = [];
+  if (!save.active) save.active = { read: null, art: null };
+  if (!save.doneQ) save.doneQ = { read: save.book ? ['animal'] : [], art: [] };
+  if (!Array.isArray(save.arts)) save.arts = [];
+  if (!save.routines) save.routines = {};
+  if (typeof save.jar !== 'number') save.jar = 0;
+  if (!save.flags) save.flags = {};
+  if (!save.counts) save.counts = { read: save.book ? 1 : 0, art: 0, brush: 0, floss: 0 };
+  persist();
+}
+const pad2 = (n) => String(n).padStart(2, '0');
+function todayKey(d = new Date()) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+// brushing counts once in the morning and once at night; 3pm is the line
+function slotNow(d = new Date()) { return d.getHours() < 15 ? 'am' : 'pm'; }
+function todayRoutines() { return save.routines[todayKey()] || {}; }
+function markRoutine(key) {
+  const k = todayKey();
+  save.routines[k] = Object.assign({}, save.routines[k], { [key]: true });
+  // keep about a month of history
+  const keys = Object.keys(save.routines).sort();
+  while (keys.length > 40) delete save.routines[keys.shift()];
+}
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pickNextQuest(kind) {
+  const list = kind === 'read' ? READ_QUESTS : ART_QUESTS, done = save.doneQ[kind];
+  const left = list.filter((q) => !done.includes(q.id));
+  if (left.length) return kind === 'art' ? left[0] : left[Math.floor(Math.random() * left.length)];
+  // everything done once: any quest again, just not the one she did last
+  const last = done[done.length - 1];
+  const again = list.filter((q) => q.id !== last && q.id !== 'animal');
+  return again[Math.floor(Math.random() * again.length)];
+}
+function artQuest(id) { return ART_QUESTS.find((q) => q.id === id) || ART_QUESTS[0]; }
+function questOf(kind, id) { return kind === 'read' ? readQuest(id) : artQuest(id); }
+const ROOM_OF = { read: 'library', art: 'studio' };
+
+// ---------------- Presents (shared by every room) ----------------
+const WRAPS = [['#DB95B5', '#DCA438'], ['#A1AF7C', '#612C48'], ['#7E93A3', '#FE9B5B']];
+const PREVIEW = { lightsK: 1, squash: 0, dj: null };
+const Presents = {
+  // returns false when the room already has everything
+  offer(S, room, spots, opts = {}) {
+    let p = save.pending && save.pending.room === room ? save.pending : null;
+    if (!p) {
+      const pool = opts.items || shuffle(ROOM_POOL(room).filter((k) => !save.items[room].includes(k))).slice(0, 3);
+      if (!pool.length) return false;
+      p = save.pending = { room, items: pool, golden: !!opts.golden }; persist();
+    }
+    S.presents = p.items.map((item, i) => ({
+      x: spots[i][0], y: spots[i][1], item, lid: 0,
+      wrap: p.golden ? '#F2C230' : WRAPS[i % 3][0], ribbon: p.golden ? '#C8323C' : WRAPS[i % 3][1],
+    }));
+    AU.sfx('poof');
+    for (const q of S.presents) burst(q.x, q.y - 6, 10, { speed: 30, c: '#FFF6C8', extra: { layer: 'front' } });
+    return true;
+  },
+  hotspot(S) {
+    return {
+      hit: (x, y) => !!S.presents && S.presents.some((p) => !p.gone && Math.abs(p.x - x) < 9 && y > p.y - 18 && y < p.y + 2),
+      act: async () => {
+        const live = S.presents.filter((p) => !p.gone);
+        const p = live.sort((a, b) => Math.abs(a.x - S._tapX) - Math.abs(b.x - S._tapX))[0];
+        if (p) await Presents.peek(S, p);
+      },
+    };
+  },
+  async peek(S, p) {
+    if (S.choosing) return;
+    S.choosing = true;
+    AU.sfx('pop');
+    await tween(300, (k) => { p.lid = Math.round(k * 8); });
+    S.preview = p.item; p.peeked = true;
+    AU.sfx('sparkle');
+    const info = ITEMS[p.item].lines, host = S.host || 'greg';
+    if (S[host]) S[host].expr = 'happy';
+    await say(host, info[0]);
+    const c = await ask(host, info[1], ['Keep it!', 'Peek at another one.']);
+    if (c === 0) await Presents.place(S, p);
+    else { S.preview = null; await tween(250, (k) => { p.lid = Math.round((1 - k) * 8); }); }
+    S.choosing = false;
+  },
+  async place(S, p) {
+    const room = save.pending ? save.pending.room : S.room;
+    S.preview = null;
+    AU.sfx('poof');
+    for (const q of S.presents) { q.gone = true; burst(q.x, q.y - 6, 12, { speed: 30, c: '#FFF6C8', extra: { layer: 'front' } }); }
+    if (!save.items[room].includes(p.item)) save.items[room].push(p.item);
+    if (room === 'library') save.item = save.item || p.item;
+    save.pending = null; persist();
+    const at = ROOM_ITEMS[room][p.item].at;
+    burst(at[0], at[1] - 6, 22, { speed: 34, c: '#FFE38A', extra: { layer: 'front' } });
+    S.presents = null;
+    if (S.onPlaced) await S.onPlaced(p.item);
+  },
+  drawBg(S, g) {
+    const R = ROOM_ITEMS[S.room];
+    for (const k of save.items[S.room]) { const it = R[k]; if (it && !it.fg) it.draw(g, S); }
+    if (S.preview && R[S.preview] && !R[S.preview].fg) this.drawPreview(S, g);
+    if (S.presents) for (const p of S.presents) if (!p.gone) {
+      drawPresent(g, p.x, p.y, p.wrap, p.ribbon, p.lid);
+      if (p.peeked && !p.lid) { D.r(g, p.x + 5, p.y - 6, 4, 4, C.parch); D.p(g, p.x + 6, p.y - 5, C.ink); }
+    }
+  },
+  drawFg(S, g) {
+    const R = ROOM_ITEMS[S.room];
+    for (const k of save.items[S.room]) { const it = R[k]; if (it && it.fg) it.draw(g, S); }
+    if (S.preview && R[S.preview] && R[S.preview].fg) this.drawPreview(S, g);
+  },
+  drawPreview(S, g) {
+    const it = ROOM_ITEMS[S.room][S.preview];
+    g.globalAlpha = 0.55 + 0.25 * Math.sin(T * 8);
+    if (it.preview) it.preview(g, S); else it.draw(g, PREVIEW);
+    g.globalAlpha = 1;
+  },
+  // a Sparkee goes to admire something new
+  async admire(S, item, lines) {
+    const at = ROOM_ITEMS[S.room][item].at;
+    const s = (S.sps || []).filter((x) => x.visible).sort((a, b) => Math.hypot(a.x - at[0], a.y - at[1]) - Math.hypot(b.x - at[0], b.y - at[1]))[0];
+    if (s) {
+      s.sitting = false; s.mode = 'goto';
+      await s.goto(clamp(at[0] + (at[0] > 144 ? -16 : 16), 30, 258), clamp(at[1] + 24, 172, 194), 60);
+      s.look = { x: at[0], y: at[1] }; s.expr = 'star'; s.jump(80);
+      bubble(s, lines[Math.floor(Math.random() * lines.length)], 1800, true);
+      await sleep(1700);
+      s.look = zoe; s.expr = 'happy';
+    } else await sleep(600);
+  },
+};
+
+// paint, story glyphs, and other streams of magic from Zoe to a target
+function streamMagic(from, to, n, opts = {}) {
+  const [sx, sy] = from;
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const p0 = [sx + (Math.random() - 0.5) * 10, sy + (Math.random() - 0.5) * 8];
+      const p1 = [lerp(sx, to[0], 0.5) + (Math.random() - 0.5) * 50, Math.min(sy, to[1]) - 30 - Math.random() * 30];
+      const p = { kind: 'glyph', gi: Math.floor(Math.random() * GLYPHS.length), p0, p1, p2: [to[0] + (Math.random() - 0.5) * 16, to[1] + (Math.random() - 0.5) * 8], life: 1.2 + Math.random() * 0.5, layer: 'front' };
+      if (opts.colors) p.blob = opts.colors[i % opts.colors.length];
+      emit(p);
+      if (i % 6 === 0) AU.sfx('blip', 900 + Math.random() * 600);
+    }, i * (opts.gap || 45));
+  }
+  return sleep(n * (opts.gap || 45) + 1500);
+}
+// reveal a "living" room from a drab one: a circle grows out from (cx, cy)
+function drawReveal(g, drabC, aliveC, cx, cy, r) {
+  if (r >= 340) { g.drawImage(aliveC, 0, 0); return; }
+  g.drawImage(drabC, 0, 0);
+  if (r <= 0) return;
+  for (let y = 0; y < H; y++) {
+    const dy = y - cy; if (Math.abs(dy) >= r) continue;
+    const dx = Math.round(Math.sqrt(r * r - dy * dy));
+    const x0 = Math.max(0, cx - dx), x1 = Math.min(W, cx + dx);
+    if (x1 > x0) g.drawImage(aliveC, x0, y, x1 - x0, 1, x0, y, x1 - x0, 1);
+  }
+  for (let i = 0; i < 3; i++) { const a = Math.random() * Math.PI * 2; emit({ kind: 'spark', x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, vy: -10, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
+}
+async function wakeRoom(S, cx, cy, actors) {
+  AU.sfx('fwoomp');
+  FX.flashColor = '#FFE9A8';
+  tween(700, (k) => { FX.flash = 0.7 * (1 - k); });
+  burst(cx, cy, 40, { speed: 70, c: '#FFD84A', up: 30, life: 1.2, extra: { layer: 'front' } });
+  await sleep(250);
+  AU.setSong('warm');
+  await tween(2600, (k) => {
+    S.reveal = ease(k) * 340;
+    for (const s of actors) {
+      const d = Math.hypot(s.x - cx, s.y - cy);
+      if (d < S.reveal && s.glow < 1) { s.glow = 1; s.expr = 'happy'; s.sitting = false; s.jump(90); burst(s.x, s.y - 8, 6, { speed: 20, c: '#FFF6B8', extra: { layer: 'front' } }); AU.sfx('pop'); }
+    }
+  });
+  S.reveal = 999;
 }
 
 // ===================== Scenes =====================
@@ -2582,12 +3579,14 @@ SCENES.forest = {
 SCENES.library = {
   song: 'drab', walk: [40, 170, 250, 194],
   enter(o = {}) {
+    if (save.stage === 'done') save.lastRoom = 'library';
     this.alive = bgOf('libAlive', W, H, (g) => paintLibrary(g));
     this.drab = bgOf('libDrab', W, H, (g) => { g.drawImage(recolor(this.alive, drab), 0, 0); paintCobwebs(g); });
     const done = ['reward', 'done'].includes(save.stage);
-    this.reveal = done ? 999 : 0; this.fireK = done ? 1 : 0; this.wiggle = false; this.bookShown = !!(save.book && done);
-    this.flyBook = null; this.presents = null; this.preview = null; this.squash = 0; this.lightsK = save.item === 'lights' ? 1 : 0;
-    this.st = {}; this.storyIcon = null;
+    this.reveal = done ? 999 : 0; this.fireK = done ? 1 : 0; this.wiggle = false; this.bookShown = save.books.length > 0 && done;
+    this.flyBook = null; this.presents = null; this.preview = null; this.squash = 0; this.lightsK = save.items.library.includes('lights') ? 1 : 0;
+    this.st = {}; this.storyIcon = null; this.room = 'library'; this.host = 'greg'; this.hideTop = false; this.flare = 0;
+    this.hatchK = save.flags.hatch ? 1 : 0; this.shelfBookGone = false; this.dj = null; this.lounger = null; this.choosing = false;
     this.song = done ? 'warm' : 'drab';
     zoe.visible = true;
     if (o.arrive) { zoe.x = 31; zoe.y = 190; } else { zoe.x = 96; zoe.y = 186; }
@@ -2597,20 +3596,25 @@ SCENES.library = {
     const g0 = done ? 1 : 0.22;
     for (const s of [this.greg, ...this.sps]) { s.glow = g0; s.look = zoe; }
     if (done) this.sps.forEach((s, i) => { s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; });
-    if (save.item === 'headphones') { const s = this.sps[2]; s.x = 233; s.y = 136; s.acc = 'headphones'; s.mode = 'idle'; s.hop(true); this.dj = s; }
-    if (save.item === 'beanbag') { const s = this.sps[0]; s.x = LIB.beanbag[0]; s.y = LIB.beanbag[1] - 10; s.mode = 'idle'; s.sitting = true; this.lounger = s; }
+    if (save.items.library.includes('headphones')) { const s = this.sps[2]; s.x = 233; s.y = 136; s.acc = 'headphones'; s.mode = 'idle'; s.hop(true); this.dj = s; }
+    if (save.items.library.includes('beanbag')) { const s = this.sps[0]; s.x = LIB.beanbag[0]; s.y = LIB.beanbag[1] - 10; s.mode = 'idle'; s.sitting = true; this.lounger = s; }
     this.actors = [zoe, this.greg, ...this.sps];
     const self = this;
     const isDone = () => save.stage === 'done';
     hints = [
       { x: 98, y: 82, strong: true, when: () => save.stage === 'library' },
       { x: 180, y: 156, strong: true, when: () => save.stage === 'quest' },
-      { x: 142, y: 180, strong: true, when: () => save.stage === 'reward' && self.presents && !self.choosing },
+      { x: 142, y: 180, strong: true, when: () => !!self.presents && !self.choosing },
+      { x: 98, y: 82, strong: true, when: () => isDone() && !save.active.read && !self.presents && !save.pending && !self.shelfBookGone },
+      { x: 180, y: 156, when: () => isDone() && !!save.active.read && !self.presents },
+      { x: 118, y: 22, off: 0.6, when: () => isDone() && self.hatchK >= 1 && !save.flags.dotMet },
     ];
     this.hotspots = [
       { rect: [12, 176, 38, 22], stand: [44, 188], act: () => self.leave() },
       { rect: [16, 38, 104, 114], stand: [70, 184], face: 'front', act: () => self.shelf() },
-      { rect: [28, 44, 28, 26], when: () => self.bookShown, stand: [56, 184], face: 'front', act: () => openBookCard() },
+      { rect: [28, 44, 28, 26], when: () => self.bookShown, stand: [56, 184], face: 'front', act: () => openBookCard(save.books[save.books.length - 1]) },
+      { hit: (x, y) => self.spineAt(x, y) >= 0, stand: [70, 184], face: 'front', act: () => openBookCard(save.books[self.spineAt(self._tapX, self._tapY)] || save.books[0]) },
+      { rect: [100, 4, 30, 150], when: () => self.hatchK >= 1, stand: [114, 178], face: 'front', act: () => self.climb() },
       { rect: [142, 96, 72, 58], stand: [196, 178], act: async () => {
         if (self.fireK > 0) await say('n', cycle(['Crackle, crackle. The fire is showing off now.', 'Warm and cozy. Your story did that.'], 'fire', self.st));
         else await say('n', cycle(['The fireplace is cold. It looks bored.', 'A fire needs wood. This one also needs a story.'], 'fire0', self.st));
@@ -2619,9 +3623,10 @@ SCENES.library = {
       { rect: [218, 50, 32, 32], stand: [234, 184], act: async () => { await say('n', self.fireK > 0 ? 'The forest looks happier. Or it always looked like that. Hard to say.' : 'The forest outside is glowing. In here, not so much.'); } },
       { rect: [252, 80, 36, 72], stand: [250, 186], act: () => self.kitchen() },
       { rect: [170, 156, 20, 16], when: () => save.stage === 'quest', stand: [134, 186], face: 'front', act: () => self.tell() },
-      { rect: [170, 156, 20, 16], when: () => save.stage !== 'quest', stand: [160, 184], act: async () => { await say('n', cycle(['The storytelling stool. A little wobbly.', "The wobble is part of its charm. That's what Greg says."], 'stool', self.st)); } },
-      { rect: [112, 150, 34, 24], when: () => save.item === 'beanbag', stand: [104, 186], act: async () => { AU.sfx('squish'); self.squash = 3; await say('n', cycle(['The beanbag. Currently occupied.', 'Squish.'], 'bb', self.st)); } },
-      { rect: [10, 26, 268, 20], when: () => save.item === 'lights', act: async () => { AU.sfx('twinkle'); await say('n', cycle(['Twinkle, twinkle.', 'The Sparkees named every single light. They are all named Greg.'], 'lt', self.st)); } },
+      { rect: [170, 156, 20, 16], when: () => isDone() && !!save.active.read && !self.presents, stand: [134, 186], face: 'front', act: () => self.tellRead() },
+      { rect: [170, 156, 20, 16], when: () => save.stage !== 'quest' && !(isDone() && save.active.read), stand: [160, 184], act: async () => { await say('n', cycle(['The storytelling stool. A little wobbly.', "The wobble is part of its charm. That's what Greg says."], 'stool', self.st)); } },
+      { rect: [112, 150, 34, 24], when: () => save.items.library.includes('beanbag'), stand: [104, 186], act: async () => { AU.sfx('squish'); self.squash = 3; await say('n', cycle(['The beanbag. Currently occupied.', 'Squish.'], 'bb', self.st)); } },
+      { rect: [10, 26, 268, 20], when: () => save.items.library.includes('lights'), act: async () => { AU.sfx('twinkle'); await say('n', cycle(['Twinkle, twinkle.', 'The Sparkees named every single light. They are all named Greg.'], 'lt', self.st)); } },
       { hit: (x, y) => Math.hypot(self.greg.x - x, self.greg.y - 6 - y) < 11, when: () => !self.presents, stand: () => [self.greg.x - 22, clamp(self.greg.y, 170, 194)], act: () => self.talkGreg() },
       { hit: (x, y) => self.sps.some((s) => s.visible && Math.hypot(s.x - x, s.y - 5 - y) < 9), when: () => !self.presents, act: async () => {
         const s = self.sps.slice().sort((a, b) => Math.hypot(a.x - zoe.x, a.y - zoe.y) - Math.hypot(b.x - zoe.x, b.y - zoe.y))[0];
@@ -2629,11 +3634,8 @@ SCENES.library = {
         bubble(s, cycle(isDone() ? ['Hi!', 'Your book is my favorite book.', 'Is it tomorrow yet?', "I'm glowing! Look!", 'I love it here now.'] : ['Hi...', "It's chilly in here.", 'Do you like stories?', '*sniff*'], 'spk', self.st), 1600, true);
         await sleep(400);
       } },
-      { hit: (x, y) => !!self.presents && self.presents.some((p) => !p.gone && Math.abs(p.x - x) < 9 && y > p.y - 18 && y < p.y + 2), act: async () => {
-        const p = self.presents.find((pp) => !pp.gone);
-        const hitP = self.presents.filter((pp) => !pp.gone).sort((a, b) => Math.abs(a.x - self._tapX) - Math.abs(b.x - self._tapX))[0] || p;
-        await self.peek(hitP);
-      } },
+      ...libraryItemSpots(self),
+      Presents.hotspot(self),
     ];
   },
   onTapEmpty() { return false; },
@@ -2642,7 +3644,8 @@ SCENES.library = {
     G.expr = 'happy';
     if (save.stage === 'library') await say('greg', 'The bookshelf! Give it a tap. It knows what to do.');
     else if (save.stage === 'quest') { await say('greg', "Back already? Did you read your animal book?"); await say('greg', 'Sit on the storytelling stool and tell us everything!'); }
-    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', 'Come back tomorrow. The bookshelf will have a new quest.'], 'greg', this.st));
+    else if (save.active.read) { const q = readQuest(save.active.read); await say('greg', `Your quest is ${q.title}.`); await say('greg', 'When you are done, sit on the storytelling stool and tell us everything!'); }
+    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', 'The bookshelf has a new quest whenever you want one.', save.flags.hatch ? 'Dot is up the ladder. Tell her Greg says hi. She will pretend not to care.' : 'Greg has a good feeling about today.', `We have ${save.books.length} ${save.books.length === 1 ? 'story' : 'stories'} on the shelf now. Greg counts them every night.`], 'greg', this.st));
     G.expr = 'norm';
   },
   async kitchen() {
@@ -2662,8 +3665,16 @@ SCENES.library = {
   },
   async shelf() {
     if (save.stage === 'library') return this.giveQuest();
-    if (save.stage === 'quest') { await say('n', 'The bookshelf is waiting for your story.'); await openQuestPage(true); return; }
-    if (save.stage === 'done') { await say('n', cycle(['Lots of empty shelves. Plenty of room for more stories.', 'Shh. The bookshelf is dreaming up your next quest.', '(Your grown-ups are helping it. Come back tomorrow.)'], 'shelf', this.st)); return; }
+    if (save.stage === 'quest') { await say('n', 'The bookshelf is waiting for your story.'); await openQuestPage(READ_QUESTS[0], 'read', true); return; }
+    if (save.stage === 'done') {
+      if (this.presents || save.pending) { await say('n', 'Open your present first!'); return; }
+      if (save.active.read) {
+        const r = await openQuestPage(readQuest(save.active.read), 'read', true);
+        if (r === 'done') await this.tellRead(true);
+        return;
+      }
+      return this.giveReadQuest();
+    }
     await say('n', 'A big, empty bookshelf.');
   },
   async giveQuest() {
@@ -2679,7 +3690,7 @@ SCENES.library = {
     AU.sfx('page');
     this.flyBook = null;
     this.shelfBookGone = true;
-    await openQuestPage(false);
+    await openQuestPage(READ_QUESTS[0], 'read', false);
     AU.sfx('chime');
     save.stage = 'quest'; persist(); updateHud(true);
     const G = this.greg;
@@ -2805,12 +3816,14 @@ SCENES.library = {
     // the book appears and flies onto the shelf
     AU.sfx('sparkle');
     burst(zoe.x, zoe.y - 40, 16, { speed: 26, c: '#FFF6C8', extra: { layer: 'front' } });
-    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, to: [LIB.shelfBook[0] - 6, LIB.shelfBook[1] - 1], animal };
+    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, to: [LIB.shelfBook[0] - 6, LIB.shelfBook[1] - 1], book: { q: 'animal', animal } };
     await sleep(500);
     await tween(1300, (k) => { this.flyBook.t = k; });
     this.flyBook = null; this.bookShown = true; this.storyIcon = null;
     AU.sfx('pop'); burst(LIB.shelfBook[0] + 6, LIB.shelfBook[1] + 12, 14, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
-    save.book = { animal, feel }; save.stage = 'reward'; persist(); updateHud();
+    save.book = { animal, feel }; save.books.push({ q: 'animal', animal, feel, at: Date.now() });
+    if (!save.doneQ.read.includes('animal')) save.doneQ.read.push('animal');
+    save.counts.read = Math.max(save.counts.read, 1); save.stage = 'reward'; persist(); updateHud();
     AU.sfx('cheer');
     S.forEach((s) => { s.arms = 'up'; s.hop(true); s.expr = 'happy'; });
     bubble(S[0], 'It is WARM!', 1600, true); setTimeout(() => bubble(S[2], 'Look at the fire!', 1500), 400); setTimeout(() => bubble(S[5], 'Hooray!', 1300), 800);
@@ -2830,55 +3843,28 @@ SCENES.library = {
   },
   async reward() {
     const G = this.greg;
-    if (!this.presents) {
-      G.expr = 'happy';
-      await say('greg', 'The library wants to say thank you.');
-      const side = [[196, 184], [210, 192], [224, 182], [238, 192], [182, 194], [250, 180]];
-      this.sps.forEach((s, i) => { s.sitting = false; s.mode = 'goto'; s.goto(side[i][0], side[i][1], 55); });
-      await G.goto(176, 178, 45);
-      AU.sfx('poof');
-      this.presents = [
-        { x: 120, y: 192, wrap: '#DB95B5', ribbon: '#DCA438', item: 'beanbag', lid: 0 },
-        { x: 142, y: 196, wrap: '#A1AF7C', ribbon: '#612C48', item: 'lights', lid: 0 },
-        { x: 164, y: 192, wrap: '#7E93A3', ribbon: '#FE9B5B', item: 'headphones', lid: 0 },
-      ];
-      for (const p of this.presents) burst(p.x, p.y - 6, 10, { speed: 30, c: '#FFF6C8', extra: { layer: 'front' } });
-      await zoe.walkTo(96, 188); zoe.face(1);
-      await say('greg', 'Three presents! Pick one for the library.');
-      await say('greg', 'Tap a present to peek inside.');
-    }
-  },
-  async peek(p) {
-    if (this.choosing) return;
-    this.choosing = true;
-    const G = this.greg;
-    AU.sfx('pop');
-    await tween(300, (k) => { p.lid = Math.round(k * 8); });
-    this.preview = p.item;
-    p.peeked = true;
-    AU.sfx('sparkle');
-    const info = {
-      beanbag: ['A beanbag chair! For flopping.', 'Sparkees are excellent floppers.'],
-      lights: ['Fairy lights! They twinkle.', 'Twinkling is our favorite thing to watch.'],
-      headphones: ['Tiny headphones! Sparkee-sized.', 'For listening to very tiny music.'],
-    }[p.item];
+    if (this.presents) return;
+    const first = save.stage === 'reward';
     G.expr = 'happy';
-    await say('greg', info[0]);
-    const c = await ask('greg', info[1], ['Keep it!', 'Peek at another one.']);
-    if (c === 0) { await this.place(p); }
-    else { this.preview = null; await tween(250, (k) => { p.lid = Math.round((1 - k) * 8); }); }
-    this.choosing = false;
+    await say('greg', first ? 'The library wants to say thank you.' : cycle(['The library has something for you.', 'A present! The library is a big fan of yours.', 'Thank-you presents! The library insists.'], 'thanks', this.st));
+    const side = [[196, 184], [210, 192], [224, 182], [238, 192], [182, 194], [250, 180]];
+    this.sps.forEach((s, i) => { if (s === this.dj || s === this.lounger) return; s.sitting = false; s.mode = 'goto'; s.goto(side[i][0], side[i][1], 55); });
+    await G.goto(176, 178, 45);
+    const ok = Presents.offer(this, 'library', [[120, 192], [142, 196], [164, 192]], first ? { items: ['beanbag', 'lights', 'headphones'] } : {});
+    if (!ok) {
+      await say('greg', 'Hmm. The library already has every present it knows how to make.');
+      await say('greg', 'So instead, Greg will give you this: a very sincere thumbs up.');
+      await say('n', '(Greg does not have thumbs.)');
+      return this.afterPresent();
+    }
+    await zoe.walkTo(96, 188); zoe.face(1);
+    const n = this.presents.length;
+    await say('greg', n === 1 ? 'One present! Tap it to peek inside.' : `${n === 3 ? 'Three' : 'Two'} presents! Pick one for the library.`);
+    if (n > 1) await say('greg', 'Tap a present to peek inside.');
   },
-  async place(p) {
+  async onPlaced(item) {
     const G = this.greg, S = this.sps;
-    this.preview = null;
-    AU.sfx('poof');
-    for (const q of this.presents) { q.gone = true; burst(q.x, q.y - 6, 12, { speed: 30, c: '#FFF6C8', extra: { layer: 'front' } }); }
-    save.item = p.item; persist();
-    const target = { beanbag: LIB.beanbag, lights: [144, 36], headphones: LIB.table }[p.item];
-    burst(target[0], target[1] - 6, 22, { speed: 34, c: '#FFE38A', extra: { layer: 'front' } });
-    this.presents = null;
-    if (p.item === 'beanbag') {
+    if (item === 'beanbag') {
       const s = S[0]; s.sitting = false; s.mode = 'goto';
       await s.goto(LIB.beanbag[0] - 22, 184, 60);
       s.jump(120); await s.goto(LIB.beanbag[0], LIB.beanbag[1] - 10, 50);
@@ -2886,7 +3872,7 @@ SCENES.library = {
       bubble(s, 'I live here now.', 2000, true); this.lounger = s;
       await sleep(1800);
       await say('greg', 'Fair enough.');
-    } else if (p.item === 'lights') {
+    } else if (item === 'lights') {
       AU.sfx('twinkle');
       await tween(1600, (k) => { this.lightsK = k; });
       [G, ...S].forEach((s) => { s.expr = 'wide'; s.look = { x: s.x, y: 0 }; });
@@ -2894,7 +3880,7 @@ SCENES.library = {
       await sleep(1800);
       [G, ...S].forEach((s) => { s.expr = 'happy'; s.look = zoe; });
       await say('greg', 'Pretty. So pretty.');
-    } else {
+    } else if (item === 'headphones') {
       const s = S[2]; s.sitting = false; s.mode = 'goto';
       await s.goto(LIB.table[0] - 14, 168, 60);
       s.jump(150); await s.goto(LIB.table[0], LIB.table[1], 40);
@@ -2902,72 +3888,232 @@ SCENES.library = {
       await sleep(1600);
       await say('greg', 'He cannot hear us anymore.');
       await say('greg', 'He has never been happier.');
+    } else {
+      AU.sfx('twinkle');
+      await Presents.admire(this, item, ['Ooh!', 'I love it!', 'So fancy!', 'Can I touch it?', 'Best present ever.']);
     }
+    await this.afterPresent();
+  },
+  async afterPresent() {
+    const G = this.greg, S = this.sps;
     G.expr = 'happy';
     await say('greg', 'The library looks wonderful.');
-    await say('greg', 'Come back tomorrow, {name}. The bookshelf will have a new quest for you.');
+    if (save.stage === 'reward') {
+      await say('greg', 'And {name}, here is a secret: the bookshelf has more quests.');
+      await say('greg', 'Tap it whenever you want a new one. It is the bookshelf\'s job. It takes it very seriously.');
+      G.expr = 'norm';
+      save.stage = 'done'; save.doneAt = Date.now(); persist(); updateHud();
+      this.shelfBookGone = false;
+      this.wanderAll();
+      await openChapterCard();
+      await this.hatchIntro();
+    } else {
+      await say('greg', cycle(['Tap the bookshelf whenever you want another quest.', 'The bookshelf is already wiggling. It loves this.', 'More stories, more magic. That is the rule.'], 'after', this.st));
+      G.expr = 'norm';
+      this.wanderAll();
+    }
+  },
+  wanderAll() {
+    this.sps.forEach((s, i) => { if (s !== this.dj && s !== this.lounger) { s.sitting = false; s.expr = 'norm'; s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; } });
+  },
+  spineAt(x, y) {
+    const n = save.books.length - (this.hideTop ? 1 : 0) - 1;
+    for (let i = 0; i < Math.min(n, SPINE_SLOTS.length); i++) { const [sx, sy, h] = SPINE_SLOTS[i]; if (x >= sx - 1 && x < sx + 5 && y >= sy + 16 - h && y < sy + 16) return i; }
+    return -1;
+  },
+  async giveReadQuest() {
+    const q = pickNextQuest('read');
+    this.wiggle = true; AU.sfx('rattle');
+    await say('n', cycle(['A book is wiggling.', 'Another book is wiggling.', 'Wiggle, wiggle. A book wants out.'], 'wig', this.st));
+    AU.sfx('rattle'); this.wiggle = false;
+    AU.sfx('pop');
+    burst(98, 80, 10, { speed: 24, c: '#CBBCA3', ay: 40 });
+    this.shelfBookGone = true;
+    this.flyBook = { x: 96, y: 76, t: 0, to: [zoe.x, zoe.y - 34], quest: true };
+    await tween(700, (k) => { this.flyBook.t = k; });
+    AU.sfx('page'); this.flyBook = null;
+    const r = await openQuestPage(q, 'read', false);
+    this.shelfBookGone = false;
+    if (r !== 'ok') { await say('greg', 'No rush. The book will wait. Books are excellent at waiting.'); return; }
+    AU.sfx('chime');
+    save.active.read = q.id; persist(); updateHud(true);
+    const G = this.greg; G.expr = 'happy';
+    await say('greg', cycle(['A new quest!', 'Another quest! The bookshelf is on a roll.', 'Ooh, a good one.'], 'newq', this.st));
+    await say('greg', q.sendoff);
+    if ((save.counts.read || 0) < 3) await say('greg', 'When you are done, sit on the storytelling stool and tell us everything.');
     G.expr = 'norm';
-    await say('greg', 'It is the bookshelf\'s job. It takes it very seriously.');
-    save.stage = 'done'; save.doneAt = Date.now(); persist(); updateHud();
-    S.forEach((s, i) => { if (s !== this.dj && s !== this.lounger) { s.sitting = false; s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; } });
-    await openChapterCard();
+  },
+  async tellRead(skipAsk) {
+    const q = readQuest(save.active.read), G = this.greg, S = this.sps;
+    zoe.face('front');
+    const spots = [[96, 190], [84, 180], [196, 190], [208, 180], [110, 196], [222, 192]];
+    S.forEach((s, i) => { if (s === this.dj || s === this.lounger) return; s.mode = 'goto'; s.goto(spots[i][0], spots[i][1], 40); s.look = zoe; });
+    if (Math.hypot(zoe.x - 134, zoe.y - 186) > 6) { await zoe.walkTo(134, 186); zoe.face('front'); }
+    await G.goto(108, 182, 40);
+    G.look = zoe; G.expr = 'happy';
+    if (!skipAsk) {
+      await say('greg', cycle(['{name}! You are back!', 'Story time? Story time!', 'Is it a story? Greg can feel a story coming.'], 'back', this.st));
+      G.expr = 'norm';
+      const r = await ask('greg', q.ask, ['Yes! I did it!', 'Not yet.']);
+      if (r === 1) { await say('greg', 'No rush! The fire is not going anywhere.'); this.wanderAll(); return; }
+    }
+    AU.sfx('cheer');
+    S.forEach((s) => { s.expr = 'happy'; s.jump(70 + Math.random() * 30); });
+    bubble(S[0], 'Story time!', 1500, true); setTimeout(() => bubble(S[3], 'Yay!', 1200), 300);
+    await sleep(1200);
+    await say('greg', 'Everybody sit!');
+    S.forEach((s) => { s.sitting = true; s.expr = 'norm'; });
+    const book = { q: q.id, picks: {}, at: Date.now() };
+    for (const step of q.tell) await this.tellStep(step, book);
+    this.storyIcon = this.storyIcon || ('e_' + (q.cover.emblem || 'book'));
+    G.expr = 'wide';
+    await say('greg', 'Stand back, everyone...');
+    await this.magicAgain(book);
+  },
+  async tellStep(step, book) {
+    const G = this.greg, S = this.sps;
+    if (step.type === 'animal') {
+      const a = await openAnimalPicker(); book.animal = a; this.storyIcon = 'a_' + a; AU.sfx('sparkle'); await this.reactAnimal(a);
+    } else if (step.type === 'pick') {
+      await say('greg', step.q);
+      const k = await openPicker(step.q, step.options);
+      const opt = step.options.find((o) => o[0] === k);
+      book.picks[step.key] = k; this.storyIcon = opt[2]; AU.sfx('sparkle');
+      S.forEach((s) => (s.expr = 'happy')); G.expr = 'happy';
+      const lines = step.react[k] || ['Ooh!', 'Good answer.'];
+      await say('greg', lines[0]); await say('greg', lines[1]);
+    } else if (step.type === 'color') {
+      const k = await openColorPicker(step.q);
+      book.color = k; AU.sfx('sparkle');
+      S.forEach((s) => (s.expr = 'happy')); G.expr = 'happy';
+      const lines = COLOR_REACT[k] || ['What a color!', 'Greg approves.'];
+      await say('greg', lines[0]); await say('greg', lines[1]);
+    } else if (step.type === 'feel') {
+      const f = await openFeelingPicker(); book.feel = f; await this.reactFeeling(f);
+    } else if (step.type === 'outloud') {
+      G.expr = 'norm'; S.forEach((s) => { s.expr = 'wide'; });
+      await say('greg', 'Now the best part.');
+      await say('greg', step.say);
+      const [l1, l2] = FEEL_REACT_LINES.outloud[Math.floor(Math.random() * FEEL_REACT_LINES.outloud.length)];
+      await say('sp', l1, { actor: S[1] });
+      await say('sp2', l2, { actor: S[2] });
+      await ask('n', 'Tell the Sparkees. Then tap the button.', ['I told them!']);
+      S.forEach((s) => { s.expr = 'star'; });
+      const wow = STORY_WOW[Math.floor(Math.random() * STORY_WOW.length)];
+      bubble(S[0], wow[0], 1400, true); setTimeout(() => bubble(S[2], wow[1], 1400), 400); setTimeout(() => bubble(S[4], wow[2], 1500), 800);
+      await sleep(1700);
+      G.expr = 'happy';
+      await say('greg', GREG_WOW[Math.floor(Math.random() * GREG_WOW.length)]);
+    }
+  },
+  async magicAgain(book) {
+    const G = this.greg, S = this.sps;
+    zoe.mode = 'cheer';
+    AU.sfx('whoosh');
+    await streamMagic([zoe.x, zoe.y - 24], LIB.fire, 32);
+    AU.sfx('fwoomp');
+    FX.flashColor = '#FFE9A8';
+    tween(600, (k) => { FX.flash = 0.5 * (1 - k); });
+    burst(LIB.fire[0], LIB.fire[1], 36, { speed: 70, c: '#FFD84A', up: 30, life: 1.2, extra: { layer: 'front' } });
+    tween(1800, (k) => { this.flare = Math.sin(k * Math.PI); });
+    S.forEach((s) => { s.sitting = false; s.expr = 'happy'; s.jump(90 + Math.random() * 30); });
+    await sleep(900);
+    zoe.mode = 'front';
+    // the old book slides onto the shelf as a spine, the new one flies to the stand
+    if (save.books.length) { AU.sfx('page'); burst(42, 56, 10, { speed: 18, c: '#FFE38A', extra: { layer: 'front' } }); }
+    this.hideTop = true;
+    save.books.push(book);
+    AU.sfx('sparkle');
+    burst(zoe.x, zoe.y - 40, 16, { speed: 26, c: '#FFF6C8', extra: { layer: 'front' } });
+    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, to: [LIB.shelfBook[0] - 6, LIB.shelfBook[1] - 1], book };
+    await sleep(400);
+    await tween(1200, (k) => { this.flyBook.t = k; });
+    this.flyBook = null; this.hideTop = false; this.bookShown = true; this.storyIcon = null;
+    AU.sfx('pop'); burst(LIB.shelfBook[0] + 6, LIB.shelfBook[1] + 12, 14, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
+    save.doneQ.read.push(book.q); save.active.read = null; save.counts.read = (save.counts.read || 0) + 1;
+    persist(); updateHud();
+    AU.sfx('cheer');
+    S.forEach((s) => { s.arms = 'up'; s.hop(true); });
+    bubble(S[0], cycle(['Another one!', 'The fire LOVES it!', 'Hooray!'], 'yay', this.st), 1600, true);
+    await sleep(1800);
+    S.forEach((s) => { s.arms = 'down'; s.hop(false); });
+    G.expr = 'happy';
+    await say('greg', cycle(['Another story for the shelf!', 'The fire is so happy. Look at it showing off.', 'The library is getting cozier every time.'], 'shelfline', this.st));
+    if (save.books.length === 5) await say('greg', 'Five stories! Greg had to learn a new number for this.');
+    if (save.books.length === 10) await say('greg', 'TEN stories! Greg ran out of fingers. Greg did not have fingers to begin with.');
+    await this.reward();
+  },
+  async hatchIntro() {
+    if (save.flags.hatch) return;
+    const G = this.greg, S = this.sps;
+    await sleep(500);
+    AU.sfx('rattle');
+    const shake = (ms) => tween(ms, (k) => { cam.x = Math.round(Math.sin(k * 60) * 2 * (1 - k)); });
+    shake(900);
+    for (let i = 0; i < 14; i++) emit({ kind: 'mote', x: 100 + Math.random() * 40, y: 8 + Math.random() * 12, vy: 20 + Math.random() * 20, life: 2.5, c: '#CBBCA3', a: 1 });
+    [G, ...S].forEach((s) => { s.expr = 'wide'; s.look = { x: 118, y: 0 }; });
+    await say('n', 'Rumble. Rumble.');
+    await say('greg', 'What was that?');
+    AU.sfx('rattle'); shake(700);
+    await sleep(500);
+    AU.sfx('creak');
+    await tween(900, (k) => { this.hatchK = ease(k); });
+    AU.sfx('sparkle');
+    burst(118, 16, 20, { speed: 30, c: '#FFE38A', extra: { layer: 'front' } });
+    await say('sp', 'The ceiling has a door!', { actor: S[1] });
+    G.expr = 'happy'; [G, ...S].forEach((s) => (s.look = zoe));
+    await say('greg', 'The art studio! It has been stuck shut since the magic faded.');
+    await say('greg', 'All your stories must have shaken it loose.');
+    await say('greg', 'Dot lives up there. Dot is an artist. Dot has not painted anything in a very long time.');
+    await say('greg', 'Climb the ladder whenever you like, {name}.');
+    G.expr = 'norm';
+    save.flags.hatch = true; persist();
+  },
+  async climb() {
+    AU.sfx('climb');
+    save.lastRoom = 'studio';
+    await irisOut(118, 30, 600);
+    goScene('studio', { arrive: true });
+    await irisIn(30, 186, 600);
   },
   drawBg(g) {
-    if (this.reveal >= 340) g.drawImage(this.alive, 0, 0);
-    else {
-      g.drawImage(this.drab, 0, 0);
-      if (this.reveal > 0) {
-        const [cx, cy] = LIB.fire, r = this.reveal;
-        for (let y = 0; y < H; y++) {
-          const dy = y - cy; if (Math.abs(dy) >= r) continue;
-          const dx = Math.round(Math.sqrt(r * r - dy * dy));
-          const x0 = Math.max(0, cx - dx), x1 = Math.min(W, cx + dx);
-          if (x1 > x0) g.drawImage(this.alive, x0, y, x1 - x0, 1, x0, y, x1 - x0, 1);
-        }
-        for (let i = 0; i < 3; i++) { const a = Math.random() * Math.PI * 2; emit({ kind: 'spark', x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, vy: -10, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
-      }
-    }
-    // the dusty quest book
+    drawReveal(g, this.drab, this.alive, LIB.fire[0], LIB.fire[1], this.reveal);
+    // the hatch to the art studio, at the top of the rolling ladder
+    if (this.hatchK > 0) drawHatch(g, this.hatchK, save.arts.length > 0);
+    // the dusty quest book (chapter one) or a glowing new quest book
     if (!this.shelfBookGone && ['new', 'met', 'library'].includes(save.stage)) drawShelfBook(g, 96, 76, this.wiggle);
-    if (this.bookShown && save.book) drawBookCover(g, 30, 44, save.book.animal);
+    if (!this.shelfBookGone && save.stage === 'done' && !save.active.read && !save.pending && !this.presents && !this.flyBook) {
+      D.glow(g, 98, 84, 10, '#FFE38A', 0.25 + 0.1 * Math.sin(T * 3), 3);
+      drawShelfBook(g, 96, 76, this.wiggle || Math.sin(T * 1.7) > 0.86);
+    }
+    // finished books: the newest on the stand, older ones as spines
+    const shown = save.books.length - (this.hideTop ? 1 : 0);
+    if (this.bookShown) {
+      for (let i = 0; i < Math.min(shown - 1, SPINE_SLOTS.length); i++) { const [x, y, h] = SPINE_SLOTS[i]; drawSpine(g, x, y + 16 - h, h, bookColor(save.books[i])); }
+      if (shown > 0) drawBookCover(g, 30, 44, save.books[shown - 1]);
+    }
     // fire
-    drawFire(g, LIB.fire[0], 147, T, this.fireK);
+    drawFire(g, LIB.fire[0], 147, T, Math.min(1.25, this.fireK + this.flare * 0.3));
     if (this.fireK > 0 && this.reveal >= 340) {
       g.save(); g.globalCompositeOperation = 'lighter';
-      g.globalAlpha = 0.05 + 0.02 * Math.sin(T * 7); D.poly(g, [[222, 70], [246, 70], [196, 196], [150, 196]], '#FFE9A8');
+      g.globalAlpha = 0.05 + 0.02 * Math.sin(T * 7) + this.flare * 0.08; D.poly(g, [[222, 70], [246, 70], [196, 196], [150, 196]], '#FFE9A8');
       g.restore();
     }
-    // items
-    if (save.item === 'beanbag' || this.preview === 'beanbag') {
-      if (this.preview === 'beanbag') g.globalAlpha = 0.55 + 0.25 * Math.sin(T * 8);
-      drawBeanbag(g, LIB.beanbag[0], LIB.beanbag[1], Math.round(this.squash));
-      g.globalAlpha = 1;
-    }
-    if (save.item === 'headphones' && !this.dj) drawHeadphonesItem(g, LIB.table[0], LIB.table[1] - 2);
-    if (this.preview === 'headphones') { g.globalAlpha = 0.55 + 0.25 * Math.sin(T * 8); drawHeadphonesItem(g, LIB.table[0], LIB.table[1] - 3); g.globalAlpha = 1; }
-    // presents
-    if (this.presents) for (const p of this.presents) if (!p.gone) {
-      drawPresent(g, p.x, p.y, p.wrap, p.ribbon, p.lid);
-      if (p.peeked && !p.lid) { D.r(g, p.x + 5, p.y - 6, 4, 4, C.parch); D.p(g, p.x + 6, p.y - 5, C.ink); }
-    }
+    Presents.drawBg(this, g);
   },
   drawFg(g) {
-    if (save.item === 'lights' || this.preview === 'lights') {
-      if (this.preview === 'lights') g.globalAlpha = 0.5 + 0.3 * Math.sin(T * 8);
-      drawLights(g, T, this.preview === 'lights' ? 1 : this.lightsK);
-      g.globalAlpha = 1;
-    }
+    Presents.drawFg(this, g);
     if (this.storyIcon) {
-      const ic = ICONS['a_' + this.storyIcon];
+      const ic = ICONS[this.storyIcon] || ICONS['a_' + this.storyIcon];
       const y = Math.round(zoe.y - 56 + Math.sin(T * 2) * 1.5);
       D.glow(g, zoe.x, y + 11, 18, '#FFE38A', 0.3, 3);
-      g.drawImage(ic, Math.round(zoe.x - 11), y);
+      if (ic) g.drawImage(ic, Math.round(zoe.x - ic.width / 2), y);
     }
     if (this.flyBook) {
       const f = this.flyBook, t = ease(f.t);
       const x = lerp(f.x, f.to[0], t), y = lerp(f.y, f.to[1], t) - Math.sin(t * Math.PI) * (f.quest ? 20 : 40);
       if (f.quest) { drawShelfBook(g, x, y, false); }
-      else { D.glow(g, x + 12, y + 12, 22, '#FFE38A', 0.35, 3); drawBookCover(g, Math.round(x), Math.round(y), f.animal); if (Math.random() < 0.5) emit({ kind: 'spark', x: x + 12, y: y + 12, vy: 6, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
+      else { D.glow(g, x + 12, y + 12, 22, '#FFE38A', 0.35, 3); drawBookCover(g, Math.round(x), Math.round(y), f.book); if (Math.random() < 0.5) emit({ kind: 'spark', x: x + 12, y: y + 12, vy: 6, life: 0.6, c: '#FFF6B8', layer: 'front' }); }
     }
   },
   update(dt) {
@@ -2977,7 +4123,7 @@ SCENES.library = {
     if (done && Math.random() < dt * 6) AU.sfx('crackle');
     if (!done && Math.random() < dt * 2) emit({ kind: 'mote', x: 20 + Math.random() * 250, y: 40 + Math.random() * 120, life: 5, c: '#B8B2C4', a: 0.6 });
     if (this.dj && Math.random() < dt * 1.5) emit({ kind: 'note', x: this.dj.x + (Math.random() - 0.5) * 8, y: this.dj.y - 14, vy: -10, vx: (Math.random() - 0.5) * 6, life: 1.4, c: ['#E8628A', '#FFD84A', '#9ACDE0'][Math.floor(Math.random() * 3)], layer: 'front' });
-    if (save.stage === 'quest' && !isBusy() && !Dlg.active && !Modal.open) {
+    if ((save.stage === 'quest' || save.active.read) && !isBusy() && !Dlg.active && !Modal.open && !this.presents) {
       this.waitT = (this.waitT || 8) - dt;
       if (this.waitT < 0) {
         this.waitT = 12 + Math.random() * 8;
@@ -3015,18 +4161,635 @@ SCENES.library = {
       });
     } else if (save.stage === 'reward') {
       cut(async () => { FX.fade = 1; await fadeIn(500); await this.reward(); });
+    } else if (save.stage === 'done' && (save.pending && save.pending.room === 'library' || !save.flags.hatch || o.tell)) {
+      cut(async () => {
+        if (!o.arrive) { FX.fade = 1; await fadeIn(500); }
+        if (save.pending && save.pending.room === 'library') { await say('greg', 'Your present is still here! Pick one.'); return this.reward(); }
+        if (!save.flags.hatch) { await say('greg', '{name}! Welcome back!'); await this.hatchIntro(); }
+        if (o.tell && save.active.read) await this.tellRead(true);
+      });
     } else if (!o.arrive) { FX.fade = 1; fadeIn(500); }
   },
 };
+function libraryItemSpots(S) {
+  const line = (key, lines) => async () => { await say('n', cycle(lines, key, S.st)); };
+  const has = (k) => () => save.items.library.includes(k);
+  return [
+    { rect: [0, 128, 18, 26], when: has('plant'), stand: [44, 186], act: line('plant', ['A big leafy plant. It is listening. Slowly.', 'You water it with your eyes. It seems to help.']) },
+    { rect: [86, 56, 16, 16], when: has('globe'), stand: [96, 184], face: 'front', act: async () => { AU.sfx('whoosh'); await say('n', cycle(['You spin the globe. Wheee.', 'You point at a random spot. Greg says that is where he is from. It is the ocean.'], 'globe', S.st)); } },
+    { rect: [186, 34, 30, 30], when: has('mobile'), stand: [196, 180], act: async () => { AU.sfx('twinkle'); await say('n', cycle(['The star mobile spins. Indoor stars!', 'One of the stars is a moon. It is trying its best.'], 'mob', S.st)); } },
+    { rect: [254, 138, 24, 36], when: has('telescope'), stand: [246, 186], act: line('tele', ['You look through the telescope. You see... the kitchen door. Very close up.', 'Through the telescope, a Sparkee waves at you from very far away. It is right there.']) },
+    { rect: [218, 84, 30, 32], when: has('portrait'), stand: [232, 184], face: 'front', act: line('port', ['A portrait of you! Very handsome. Very heroic.', 'The Sparkees say goodnight to it every night.']) },
+    { rect: [222, 176, 30, 18], when: has('cushions'), stand: [214, 190], act: async () => { AU.sfx('squish'); await say('n', cycle(['A pile of cushions. You sink in a little.', 'Somewhere in the cushions, a Sparkee is napping.'], 'cush', S.st)); } },
+  ];
+}
 // record tap x for present picking
-stage.addEventListener('pointerdown', (e) => { if (scene === SCENES.library) { const [x] = stageToWorld(e); SCENES.library._tapX = x; } }, true);
+stage.addEventListener('pointerdown', (e) => { if (scene) { const [x, y] = stageToWorld(e); scene._tapX = x; scene._tapY = y; } }, true);
+
+// ===================== The Art Studio =====================
+const PAINTS = ['#E8628A', '#3E5AA8', '#F2C94C', '#6F9A45', '#9A6AB0', '#E8893F'];
+SCENES.studio = {
+  song: 'drab', walk: [30, 168, 262, 194], room: 'studio', host: 'dot',
+  enter(o = {}) {
+    save.lastRoom = 'studio';
+    this.alive = bgOf('stuAlive', W, H, (g) => { paintStudio(g); drawClothesline(g); });
+    this.drab = bgOf('stuDrab', W, H, (g) => { g.drawImage(recolor(this.alive, drab), 0, 0); });
+    const awake = save.arts.length > 0;
+    this.reveal = awake ? 999 : 0; this.song = awake ? 'warm' : 'drab';
+    this.st = {}; this.presents = null; this.preview = null; this.choosing = false;
+    this.canvasK = 0; this.easelArt = null; this.flyArt = null;
+    zoe.visible = true;
+    if (o.arrive) { zoe.x = 40; zoe.y = 188; } else { zoe.x = 120; zoe.y = 186; }
+    zoe.face(1);
+    this.dot = new Sparkee({ r: 6, seed: 77, x: 200, y: 182, name: 'dot', acc: 'paint' + (save.items.studio.includes('beret') ? ' beret' : '') });
+    this.dot.glow = awake ? 1 : 0.22; this.dot.look = zoe;
+    if (!save.flags.dotMet) { this.dot.visible = false; this.dot.x = 176; this.dot.y = 168; }
+    this.sps = makeSparkees([{ x: 92, y: 186, seed: 41 }, { x: 232, y: 186, seed: 48 }, { x: 160, y: 194, seed: 55 }]);
+    this.sps.forEach((s, i) => { s.visible = awake; s.look = zoe; s.mode = 'wander'; s.speed = 20; s.area = [[70, 176, 120, 194], [200, 176, 250, 194], [140, 186, 190, 196]][i]; });
+    this.actors = [zoe, this.dot, ...this.sps];
+    const self = this;
+    const lineArts = () => save.arts.filter((a) => a.q !== 'family').slice(-CLOTHES.length);
+    const famArt = () => save.arts.filter((a) => a.q === 'family').slice(-1)[0];
+    this.lineArts = lineArts; this.famArt = famArt;
+    hints = [
+      { x: 170, y: 110, strong: true, when: () => save.flags.dotMet && !save.active.art && !self.presents && !save.pending },
+      { x: 170, y: 110, when: () => save.flags.dotMet && !!save.active.art && !self.presents },
+      { x: 132, y: 186, strong: true, when: () => !!self.presents && !self.choosing },
+      { x: 262, y: 118, off: 1.1, when: () => save.flags.dotMet && save.arts.length > 0 && !save.flags.bathMet && !self.presents },
+    ];
+    const line = (key, lines) => async () => { await say('n', cycle(lines, key, self.st)); };
+    this.hotspots = [
+      { rect: [12, 178, 34, 20], stand: [44, 188], act: () => self.down() },
+      { rect: [194, 100, 46, 40], stand: [214, 184], act: line('jars', ['Paint jars. Pink, orange, yellow, green, blue, purple.', 'Dot keeps the lids on very tight. She says paint likes to escape.']) },
+      { rect: [12, 118, 64, 22], stand: [48, 184], act: line('table', ['A worktable covered in crayons, brushes, and old paint.', 'There is a crayon here named Kevin. Nobody knows why.']) },
+      { rect: [126, 20, 36, 36], stand: [144, 184], face: 'front', act: async () => { await say('n', self.reveal >= 340 ? 'Through the round window, the sky is very blue. The kind of blue you can only paint.' : 'A round window. The sky outside looks like it is waiting to be colored in.'); } },
+      { rect: [124, 156, 22, 18], stand: [118, 186], act: line('stool', ['A paint-splattered stool.', 'Dot says every splatter is a memory. Most of them are memories of spilling.']) },
+      { rect: [22, 74, 56, 44], stand: [52, 184], face: 'front', act: async () => {
+        const f = famArt();
+        if (f) return openArtCard(f);
+        await say('n', save.active.art === 'family' ? 'An empty frame. It is saving a spot for your family tree.' : 'A big empty frame. It looks like it is waiting for something important.');
+      } },
+      { hit: (x, y) => self.clothesAt(x, y) >= 0, stand: () => [clamp(self._tapX, 40, 250), 184], face: 'front', act: () => openArtCard(lineArts()[self.clothesAt(self._tapX, self._tapY)]) },
+      { rect: [148, 90, 46, 80], stand: [144, 186], act: () => self.easel() },
+      { rect: [242, 84, 42, 70], stand: [252, 188], act: () => self.toBath() },
+      ...studioItemSpots(self),
+      { hit: (x, y) => self.dot.visible && Math.hypot(self.dot.x - x, self.dot.y - 6 - y) < 11, when: () => !self.presents, stand: () => [clamp(self.dot.x - 22, 40, 250), clamp(self.dot.y, 170, 194)], act: () => self.talkDot() },
+      { hit: (x, y) => self.sps.some((s) => s.visible && Math.hypot(s.x - x, s.y - 5 - y) < 9), when: () => !self.presents, act: async () => {
+        const s = self.sps.filter((q) => q.visible).sort((a, b) => Math.hypot(a.x - self._tapX, a.y - self._tapY) - Math.hypot(b.x - self._tapX, b.y - self._tapY))[0];
+        s.jump(70);
+        bubble(s, cycle(['I came up the ladder!', 'Dot let me hold a crayon.', 'I painted a dot. Dot was not impressed.', 'Is that your family? They look nice.', 'I love it up here.'], 'spk', self.st), 1600, true);
+        await sleep(400);
+      } },
+      Presents.hotspot(self),
+    ];
+  },
+  clothesAt(x, y) {
+    const n = this.lineArts().length;
+    for (let i = 0; i < n; i++) { const [cx, cy] = CLOTHES[i]; if (x >= cx - 1 && x < cx + 25 && y >= cy - 3 && y < cy + 19) return i; }
+    return -1;
+  },
+  async down() {
+    if (this.presents) { await say('dot', 'Wait! Your present!'); return; }
+    await irisOut(28, 188, 600);
+    goScene('library', { arrive: true, fromStudio: true });
+    zoe.x = 114; zoe.y = 178; zoe.face('front');
+    await irisIn(118, 30, 600);
+  },
+  async toBath() {
+    if (this.presents) { await say('dot', 'Wait! Your present!'); return; }
+    AU.sfx('creak');
+    await fadeOut(400);
+    goScene('bath', { arrive: true });
+  },
+  async talkDot() {
+    const D0 = this.dot;
+    D0.expr = 'happy';
+    if (save.active.art) { const q = artQuest(save.active.art); await say('dot', `Your art quest is ${q.title}.`); await say('dot', 'When it is done, tap my easel and show me!'); }
+    else await say('dot', cycle(['Dot. Like a dot. The smallest kind of art.', 'Every artist starts with one dot. Then another dot. Then, a giraffe.', 'Greg asked me to paint him once. I painted a potato. He cried. Happy tears, I think.', 'My easel has another quest whenever you want one.', save.flags.bathMet ? 'Have you brushed your teeth today? Bubbles will ask. Bubbles always asks.' : 'The door with the sign? That is the bathroom. Bubbles lives there.'], 'dot', this.st));
+    D0.expr = 'norm';
+  },
+  async easel() {
+    if (!save.flags.dotMet) return;
+    if (this.presents || save.pending) { await say('dot', 'Open your present first!'); return; }
+    if (save.active.art) {
+      const r = await openQuestPage(artQuest(save.active.art), 'art', true);
+      if (r === 'done') await this.tellArt(true);
+      return;
+    }
+    await this.giveArtQuest();
+  },
+  async giveArtQuest() {
+    const q = pickNextQuest('art');
+    AU.sfx('sparkle');
+    await tween(700, (k) => { this.canvasK = k * 0.9; });
+    await say('n', cycle(['The blank canvas is glowing.', 'The easel shimmers. It has an idea.', 'The canvas glows. It knows what it wants.'], 'canv', this.st));
+    const r = await openQuestPage(q, 'art', false);
+    tween(500, (k) => { this.canvasK = 0.9 * (1 - k); });
+    if (r !== 'ok') { await say('dot', 'Whenever you are ready. Art cannot be rushed.'); return; }
+    AU.sfx('chime');
+    save.active.art = q.id; persist(); updateHud(true);
+    const D0 = this.dot; D0.expr = 'star';
+    if (!(save.counts.art > 0)) {
+      await say('dot', 'Make it for real! Real paper. Real crayons. At your real table.');
+      D0.expr = 'happy';
+      await say('dot', 'Then come back and show me. Hold it up to the big glowing rectangle so I can see it.');
+      await say('n', '(That means you can take a picture of it. A grown-up can help.)');
+      await say('dot', 'When it is done, tap my easel.');
+    } else await say('dot', cycle(['Go make something wonderful!', 'Go! Create! Dot believes in you.', 'Dot cannot wait. Dot is already waiting.'], 'send', this.st));
+    D0.expr = 'norm';
+  },
+  async tellArt(skipAsk) {
+    const q = artQuest(save.active.art), D0 = this.dot;
+    if (Math.hypot(zoe.x - 144, zoe.y - 186) > 6) await zoe.walkTo(144, 186);
+    zoe.face(1);
+    await D0.goto(196, 184, 45);
+    D0.look = zoe;
+    if (!skipAsk) {
+      D0.expr = 'happy';
+      await say('dot', cycle(['You are back!', 'Is it done? Is it DONE?'], 'back', this.st));
+      D0.expr = 'norm';
+      const r = await ask('dot', q.ask, ['Yes! I made it!', 'Not yet.']);
+      if (r === 1) { await say('dot', 'Art takes time. Dot once spent a hundred years painting a pear.'); await say('dot', 'It was a very good pear.'); return; }
+    }
+    D0.expr = 'star'; D0.jump(100); AU.sfx('cheer');
+    this.sps.forEach((s) => { if (s.visible) { s.mode = 'goto'; s.goto(s.x < 144 ? 104 : 224, 190, 40); s.look = zoe; } });
+    await say('dot', 'Show me! Show me!');
+    const art = { q: q.id, at: Date.now() };
+    for (const step of q.tell) await this.tellStep(step, art, q);
+    if (q.after) for (const [who, t] of q.after) await say(who, t);
+    D0.expr = 'wide';
+    await say('dot', 'Now watch this.');
+    await this.paintMagic(art);
+  },
+  async tellStep(step, art, q) {
+    const D0 = this.dot;
+    if (step === 'photo') {
+      D0.expr = 'happy';
+      await say('dot', 'Hold it up and take a picture, so I can see it!');
+      const ph = await openPhotoModal(q);
+      if (ph) {
+        art.pix = ph.pix; art.photo = ph.photo;
+        D0.expr = 'star'; AU.sfx('sparkle');
+        await say('dot', cycle(['Oh!', 'Oh my.', 'OH.'], 'oh', this.st));
+        await say('dot', cycle(['It is magnificent.', 'Look at those colors!', 'Dot needs to sit down. That is how good it is.'], 'mag', this.st));
+      } else {
+        D0.expr = 'happy';
+        await say('dot', 'No picture? That is okay.');
+        await say('n', '(You describe it with your hands. Dot nods a lot.)');
+        await say('dot', 'I can see it perfectly. In my imagination.');
+      }
+    } else if (step === 'family') {
+      D0.expr = 'happy';
+      await say('dot', 'Who is on your family tree?');
+      const people = await openPeoplePicker();
+      art.people = people;
+      AU.sfx('sparkle'); D0.expr = 'star';
+      const n = people.length;
+      if (n <= 1) await say('dot', 'A tree with one very important person on it!');
+      else await say('dot', n >= 6 ? 'What a BIG family! That is a strong tree.' : 'What a wonderful family! That is a strong tree.');
+      if (people.some((p) => ['dog', 'cat', 'fish'].includes(p))) await say('dot', 'And pets! Pets count. Pets are family with fur. Or fins.');
+      if (people.includes('grandma') || people.includes('grandpa')) await say('dot', 'Grandparents are the roots. That is why the tree stands up so well.');
+      D0.expr = 'happy';
+      await say('dot', 'Family trees are Dot\'s favorite kind of tree. They grow in every direction.');
+    } else if (step === 'who') {
+      await say('dot', 'Who is the card for?');
+      const k = await openPicker('Who is the card for?', FAMILY.filter((f) => f[0] !== 'me'));
+      art.who = k;
+      const lbl = (FAMILY.find((f) => f[0] === k) || [0, 'them'])[1];
+      D0.expr = 'cozy';
+      await say('dot', k === 'other' ? 'For someone special! They are so lucky.' : `For ${lbl.toLowerCase().startsWith('mom') || lbl.toLowerCase().startsWith('dad') ? lbl : 'your ' + lbl.toLowerCase()}! They are so lucky.`);
+      await say('dot', 'A card is a hug you can put on the fridge.');
+    } else if (step === 'name') {
+      await say('dot', 'What is your Sparkee called? Say its name out loud!');
+      await ask('n', 'Say its name. Then tap the button.', ['I said it!']);
+      D0.expr = 'star';
+      await say('dot', 'What a perfect name.');
+      await say('dot', 'Greg is going to be so jealous. Greg only has one name, and it is Greg.');
+    } else if (step === 'feel') {
+      const f = await openFeelingPicker(ART_FEELS, 'How did making it feel?');
+      art.feel = f;
+      D0.expr = { fun: 'laugh', proud: 'star', calm: 'cozy', tricky: 'wide' }[f] || 'happy';
+      const [a, b] = ART_FEEL_REACT[f] || ['Wonderful.', 'Art is like that.'];
+      if (f === 'fun') D0.hop(true);
+      await say('dot', a); await say('dot', b);
+      D0.hop(false);
+    }
+  },
+  async paintMagic(art) {
+    const D0 = this.dot, first = this.reveal < 340;
+    zoe.mode = 'cheer';
+    AU.sfx('whoosh');
+    await streamMagic([zoe.x, zoe.y - 24], STU.easel, 36, { colors: PAINTS });
+    this.easelArt = art;
+    AU.sfx('fwoomp');
+    tween(500, (k) => { this.canvasK = 1 - k; });
+    if (first) {
+      await wakeRoom(this, STU.easel[0], STU.easel[1], [D0]);
+    } else {
+      FX.flashColor = '#FFE9A8'; tween(600, (k) => { FX.flash = 0.45 * (1 - k); });
+      for (const c of PAINTS) burst(STU.easel[0], STU.easel[1], 6, { speed: 50, c, up: 20, extra: { layer: 'front' } });
+      D0.jump(100);
+      await sleep(900);
+    }
+    zoe.mode = 'front';
+    save.arts.push(art); save.doneQ.art.push(art.q); save.active.art = null; save.counts.art = (save.counts.art || 0) + 1;
+    persist(); updateHud();
+    // the picture flies from the easel to its place
+    const to = art.q === 'family' ? [26, 78, 48, 36] : (() => { const i = this.lineArts().length - 1; const [x, y] = CLOTHES[Math.max(0, i)]; return [x, y, 24, 18]; })();
+    this.hideNew = art;
+    this.flyArt = { from: [154, 98, 32, 27], to, art, t: 0 };
+    this.easelArt = null;
+    AU.sfx('sparkle');
+    await tween(1100, (k) => { this.flyArt.t = k; });
+    this.flyArt = null; this.hideNew = null;
+    AU.sfx('pop'); burst(to[0] + to[2] / 2, to[1] + to[3] / 2, 16, { speed: 24, c: '#FFE38A', extra: { layer: 'front' } });
+    if (first) {
+      D0.expr = 'star'; D0.arms = 'up'; D0.hop(true);
+      await say('dot', 'My colors! My colors are BACK!');
+      D0.hop(false); D0.arms = 'down';
+      // Sparkees from the library heard the commotion
+      AU.sfx('pop');
+      for (const [i, s] of this.sps.entries()) {
+        s.visible = true; s.x = 28; s.y = 188; s.glow = 1; s.mode = 'goto';
+        await sleep(250); s.jump(120); burst(28, 186, 6, { speed: 20, c: '#FFF6B8', extra: { layer: 'front' } });
+        s.goto([96, 226, 160][i], [186, 186, 194][i], 70);
+      }
+      bubble(this.sps[0], 'We heard a FWOOMP!', 1800, true);
+      await sleep(1600);
+      await say('dot', 'Look at this place. Look at ME!');
+    }
+    D0.expr = 'happy';
+    if (art.q === 'family') {
+      await say('dot', 'Your family is on our wall now.');
+      await say('dot', 'So now the treehouse has a family too.');
+    } else await say('dot', cycle(['Another masterpiece for the clothesline!', 'The gallery is getting very fancy.', 'Dot will look at this every single day.'], 'hung', this.st));
+    this.sps.forEach((s, i) => { s.mode = 'wander'; s.area = [[70, 176, 120, 194], [200, 176, 250, 194], [140, 186, 190, 196]][i]; });
+    if (first && !save.flags.ch2) { save.flags.ch2 = true; persist(); await openChapterTwoCard(art); }
+    await this.reward();
+  },
+  async reward() {
+    const D0 = this.dot;
+    if (this.presents) return;
+    await say('dot', cycle(['The studio would like to say thank you.', 'A present! The studio insists.', 'Thank-you presents! Dot wrapped them herself. Badly.'], 'thx', this.st));
+    await D0.goto(214, 182, 45);
+    const ok = Presents.offer(this, 'studio', [[110, 192], [132, 196], [154, 192]]);
+    if (!ok) { await say('dot', 'The studio already has every present I know how to make.'); await say('dot', 'So here is a very fancy invisible present instead. It is a painting of the wind.'); return this.afterPresent(); }
+    await zoe.walkTo(86, 188); zoe.face(1);
+    await say('dot', this.presents.length > 1 ? 'Pick one for the studio! Tap a present to peek inside.' : 'Tap the present to peek inside!');
+  },
+  async onPlaced(item) {
+    const D0 = this.dot;
+    if (item === 'beret') {
+      AU.sfx('twinkle'); D0.acc = 'paint beret'; D0.expr = 'star'; D0.jump(140);
+      burst(D0.x, D0.y - 14, 14, { speed: 26, c: '#FFE38A', extra: { layer: 'front' } });
+      await sleep(600);
+      await say('dot', 'I have waited four hundred years for this hat.');
+      await say('dot', 'I am now officially fancy.');
+    } else if (item === 'sunflower') {
+      await Presents.admire(this, item, ['It is so tall!', 'Hello, sunflower!']);
+      await say('dot', 'It is taller than me. I hate it. I love it.');
+    } else {
+      AU.sfx('twinkle');
+      await Presents.admire(this, item, ['Ooh!', 'So colorful!', 'I love it!', 'Fancy!']);
+    }
+    await this.afterPresent();
+  },
+  async afterPresent() {
+    const D0 = this.dot;
+    D0.expr = 'happy';
+    await say('dot', 'The studio looks wonderful.');
+    await say('dot', 'Tap my easel whenever you want another art quest.');
+    if (!save.flags.bathMet) {
+      await say('dot', 'Oh! And the door over there, with the sign?');
+      D0.look = { x: 280, y: 120 };
+      await say('dot', 'That is the bathroom. Bubbles lives in there. Bubbles is very, very clean.');
+      D0.look = zoe;
+    }
+    D0.expr = 'norm';
+  },
+  drawBg(g) {
+    drawReveal(g, this.drab, this.alive, STU.easel[0], STU.easel[1], this.reveal);
+    const fam = this.famArt();
+    if (fam && fam !== this.hideNew) drawArtPiece(g, artCanvas(fam), 26, 78, 48, 36, false);
+    this.lineArts().forEach((a, i) => { if (a !== this.hideNew) { const [x, y] = CLOTHES[i]; drawArtPiece(g, artCanvas(a), x, y, 24, 18); } });
+    if (this.easelArt) drawArtPiece(g, artCanvas(this.easelArt), 154, 98, 32, 27, false);
+    drawCanvasGlow(g, this.canvasK);
+    Presents.drawBg(this, g);
+  },
+  drawFg(g) {
+    Presents.drawFg(this, g);
+    if (this.flyArt) {
+      const f = this.flyArt, t = ease(f.t), L = (i) => lerp(f.from[i], f.to[i], t);
+      const lift = Math.sin(t * Math.PI) * 30;
+      D.glow(g, L(0) + L(2) / 2, L(1) + L(3) / 2 - lift, 26, '#FFE38A', 0.3, 3);
+      drawArtPiece(g, artCanvas(f.art), Math.round(L(0)), Math.round(L(1) - lift), Math.round(L(2)), Math.round(L(3)), false);
+      if (Math.random() < 0.5) emit({ kind: 'spark', x: L(0) + L(2) / 2, y: L(1) - lift, vy: 6, life: 0.6, c: PAINTS[Math.floor(Math.random() * 6)], layer: 'front' });
+    }
+  },
+  update(dt) {
+    const awake = this.reveal >= 340;
+    if (!awake && Math.random() < dt * 2) emit({ kind: 'mote', x: 20 + Math.random() * 250, y: 40 + Math.random() * 110, life: 5, c: '#B8B2C4', a: 0.6 });
+    if (awake && Math.random() < dt * 0.8) emit({ kind: 'mote', x: 130 + Math.random() * 30, y: 30 + Math.random() * 30, vy: 3, life: 4, c: '#FFF1C8', a: 0.8 });
+    if (save.active.art && !isBusy() && !Dlg.active && !Modal.open && !this.presents && this.dot.visible) {
+      this.waitT = (this.waitT || 9) - dt;
+      if (this.waitT < 0) { this.waitT = 14 + Math.random() * 8; bubble(this.dot, cycle(['Is it done yet?', 'Dot is practicing patience.', 'I bet it is beautiful.', 'Hmm hmm hmm.'], 'wait', this.st), 2200); }
+    }
+  },
+  start(o = {}) {
+    if (!save.flags.dotMet) {
+      cut(async () => {
+        await zoe.walkTo(70, 186); zoe.face(1);
+        await narrate('You climb up through the hatch.', 'A long room with a round window.', 'It should be bright up here. But everything is grey.', 'Even the paint is grey. Grey paint is just sad paint.');
+        const D0 = this.dot;
+        D0.visible = true; AU.sfx('surprise'); D0.jump(130);
+        await D0.goto(190, 182, 60);
+        D0.expr = 'wide';
+        await say('dot', 'A VISITOR!');
+        D0.expr = 'happy';
+        await say('dot', 'Hello! I am Dot. I am an artist.');
+        D0.expr = 'sad';
+        await say('dot', 'Well. I used to be. When the magic faded, all my colors went grey.');
+        D0.expr = 'norm';
+        await say('dot', 'Greg yelled up the ladder. He says you bring stories, and stories bring the magic back.');
+        D0.expr = 'happy';
+        await say('dot', 'Here is a secret: a picture is a kind of story. A story you can SEE.');
+        await say('dot', 'Would you make some art for me? Real art, in your world, with real crayons?');
+        await say('dot', 'Tap my easel. It always knows what to make next.');
+        save.flags.dotMet = true; persist();
+      });
+    } else if (save.pending && save.pending.room === 'studio') {
+      cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await say('dot', 'Your present is still here! Pick one.'); await this.reward(); });
+    } else if (o.tell && save.active.art) {
+      cut(async () => { FX.fade = 1; await fadeIn(500); await this.tellArt(true); });
+    } else if (!o.arrive) { FX.fade = 1; fadeIn(500); }
+  },
+};
+function studioItemSpots(S) {
+  const has = (k) => () => save.items.studio.includes(k);
+  const line = (key, lines) => async () => { await say('n', cycle(lines, key, S.st)); };
+  return [
+    { rect: [92, 162, 80, 28], when: has('rug'), stand: [132, 190], act: line('rug', ['A rainbow rug. Every color, in a circle.', 'You stand on purple. You feel fancy.']) },
+    { rect: [100, 92, 24, 62], when: has('sunflower'), stand: [112, 184], act: line('sun', ['The sunflower is facing the round window. It knows where the sun is.', 'It is very tall. Dot pretends it is not.']) },
+    { rect: [84, 136, 16, 24], when: has('crayons'), stand: [92, 184], act: line('cray', ['A giant jar of crayons. Every color. Even the weird ones.', 'You find a crayon called "Dragon Burp Green." Good name.']) },
+  ];
+}
+
+// ===================== The Bathroom =====================
+SCENES.bath = {
+  song: 'drab', walk: [24, 162, 270, 194], room: 'bath', host: 'bubbles',
+  enter(o = {}) {
+    save.lastRoom = 'bath';
+    this.alive = bgOf('bathAlive', W, H, paintBath);
+    this.drab = bgOf('bathDrab', W, H, (g) => { g.drawImage(recolor(this.alive, drab), 0, 0); });
+    const awake = !!save.flags.bathAwake;
+    this.reveal = awake ? 999 : 0; this.song = awake ? 'warm' : 'drab';
+    this.st = {}; this.presents = null; this.preview = null; this.choosing = false; this.jarK = 0;
+    zoe.visible = true;
+    if (o.arrive) { zoe.x = 250; zoe.y = 188; zoe.face(-1); } else { zoe.x = 150; zoe.y = 186; zoe.face(1); }
+    this.bubbles = new Sparkee({ r: 5, seed: 63, x: 120, y: 184, name: 'bubbles', acc: 'cap' });
+    this.bubbles.glow = awake ? 1 : 0.22; this.bubbles.look = zoe;
+    if (!save.flags.bathMet) { this.bubbles.visible = false; this.bubbles.x = 60; this.bubbles.y = 140; }
+    this.sps = [this.bubbles];
+    this.actors = [zoe, this.bubbles];
+    const self = this;
+    const slotDone = () => !!todayRoutines()[slotNow() + '_brush'];
+    hints = [
+      { x: 176, y: 114, strong: true, when: () => save.flags.bathMet && !slotDone() && !self.presents },
+      { x: 222, y: 72, off: 0.7, when: () => save.flags.bathMet && save.jar >= JAR_SIZE - 2 && !self.presents },
+      { x: 132, y: 186, strong: true, when: () => !!self.presents && !self.choosing },
+    ];
+    const line = (key, lines) => async () => { await say('n', cycle(lines, key, self.st)); };
+    this.hotspots = [
+      { rect: [248, 86, 40, 68], stand: [256, 188], act: () => self.toStudio() },
+      { rect: [12, 110, 96, 50], stand: [70, 186], act: line('tub', ['A big bathtub with golden feet.', 'Sparkees take baths in a teacup. This tub is for show.']) },
+      { rect: [112, 114, 26, 42], stand: [128, 186], act: line('loo', ['A very small toilet.', 'Bubbles is very proud of it. Do not ask why.', 'You decide not to ask.']) },
+      { rect: [34, 28, 50, 46], stand: [60, 186], act: line('win', ['A frosty window. You can see the forest through it. Sort of.', 'Someone drew a smiley face in the frost. It was Bubbles.']) },
+      { rect: [206, 116, 30, 26], stand: [220, 186], act: line('towel', ['A pink towel. Very fluffy.', 'It is folded perfectly. Bubbles did that with no hands. Somehow.']) },
+      { rect: [158, 58, 36, 46], stand: [176, 186], face: 'front', act: async () => { await say('n', cycle(["It's you! Your teeth look ready for anything.", 'You smile at the mirror. The mirror smiles back. Rude, copying you.'], 'mir', self.st)); await openMirror(); } },
+      { rect: [160, 104, 34, 52], stand: [168, 186], face: 1, act: () => self.sink() },
+      { rect: [210, 70, 24, 30], stand: [222, 186], face: 'front', act: () => self.jarTalk() },
+      ...bathItemSpots(self),
+      { hit: (x, y) => self.bubbles.visible && Math.hypot(self.bubbles.x - x, self.bubbles.y - 5 - y) < 10, when: () => !self.presents, stand: () => [clamp(self.bubbles.x - 20, 30, 250), clamp(self.bubbles.y, 170, 194)], act: () => self.talkBubbles() },
+      Presents.hotspot(self),
+    ];
+  },
+  async toStudio() {
+    if (this.presents) { await say('bubbles', 'Wait! Your present!'); return; }
+    AU.sfx('creak');
+    await fadeOut(400);
+    goScene('studio', {});
+    zoe.x = 248; zoe.y = 186; zoe.face(-1);
+  },
+  async talkBubbles() {
+    const B = this.bubbles, t = todayRoutines(), slot = slotNow();
+    B.expr = 'happy';
+    if (!t[slot + '_brush']) await say('bubbles', slot === 'am' ? 'Good morning! Did you brush your teeth yet?' : 'Have you brushed your teeth tonight? Bubbles is asking for a friend. The friend is your teeth.');
+    else await say('bubbles', cycle(['Bubbles. Like the bubbles. The best part of a bath.', 'Fun fact: Sparkees have 32 teeth. Each one is the size of a grain of sugar.', 'Remember: little circles! Never scrub like a floor.', 'Floss gets the sneaky crumbs. The crumbs hate floss.', 'Captain Quack says hello. Captain Quack is a duck.'], 'bub', this.st));
+    B.expr = 'norm';
+  },
+  async jarTalk() {
+    const B = this.bubbles, n = save.jar, t = todayRoutines();
+    AU.sfx('twinkle'); this.jarK = 1; tween(800, (k) => { this.jarK = 1 - k; });
+    await say('n', `The Sparkle Jar. ${n} of ${JAR_SIZE} sparkles.`);
+    const done = [t.am_brush && 'brushed this morning', t.pm_brush && 'brushed tonight', t.floss && 'flossed'].filter(Boolean);
+    if (!save.flags.bathMet) return;
+    if (done.length) await say('bubbles', `Today you ${done.length === 1 ? done[0] : done.slice(0, -1).join(', ') + ' and ' + done[done.length - 1]}!`);
+    await say('bubbles', n >= JAR_SIZE - 1 ? 'One more sparkle and something golden happens!' : 'Brush or floss, then tap the sink, and a sparkle goes in.');
+  },
+  async sink() {
+    if (!save.flags.bathMet) return;
+    if (this.presents || save.pending) { await say('bubbles', 'Open your present first!'); return; }
+    const r = await openSinkCard();
+    if (!r) return;
+    if (r === 'along') {
+      const finished = await this.brushAlong();
+      if (finished) await this.logRoutine('brush');
+      return;
+    }
+    await this.logRoutine(r === 'floss' ? 'floss' : 'brush');
+  },
+  async brushAlong() {
+    const B = this.bubbles;
+    B.expr = 'happy';
+    await say('bubbles', 'Brush along! Get your toothbrush and some toothpaste.');
+    const ok = await ask('bubbles', 'Bubbles will brush too. Ready?', ['Ready!', 'Not right now.']);
+    if (ok === 1) { await say('bubbles', 'Okay! Bubbles will keep the toothbrush warm.'); return false; }
+    await B.goto(196, 184, 50); B.look = zoe;
+    B.acc = 'cap brush foam';
+    const parts = [
+      ['Top teeth, this side', ['Little circles!', 'Swish swish swish.']],
+      ['Top teeth, that side', ['Do not forget the back teeth!', 'All the way in the back!']],
+      ['Bottom teeth, this side', ['Brush, brush, brush!', 'Bubbles is getting foamy.']],
+      ['Bottom teeth, that side', ['Almost done!', 'Now your tongue! Bleh!']],
+    ];
+    const bar = brushBar();
+    let stopped = false;
+    bar.stop.addEventListener('click', (e) => { e.stopPropagation(); stopped = true; });
+    AU.sfx('chime');
+    const total = 120, t0 = performance.now();
+    let part = -1;
+    await new Promise((res) => {
+      const step = () => {
+        const sec = (performance.now() - t0) / 1000;
+        if (stopped || sec >= total) return res();
+        const p = Math.min(3, Math.floor(sec / 30));
+        if (p !== part) {
+          part = p; AU.sfx(p === 0 ? 'sparkle' : 'chime');
+          bar.part.textContent = parts[p][0];
+          [...bar.dots.children].forEach((d, i) => d.classList.toggle('on', i <= p));
+          bubble(B, parts[p][1][0], 2400, true);
+        } else if (Math.floor(sec) % 30 === 15 && !step.mid) { step.mid = true; bubble(B, parts[p][1][1], 2400, true); }
+        if (Math.floor(sec) % 30 !== 15) step.mid = false;
+        bar.fill.style.width = `${(sec / total) * 100}%`;
+        bar.time.textContent = `${Math.max(0, Math.ceil(total - sec))}`;
+        if (Math.random() < 0.15) emit({ kind: 'spark', x: B.x + (Math.random() - 0.5) * 8, y: B.y - 6, vy: -8, vx: (Math.random() - 0.5) * 10, life: 0.7, c: '#FFFFFF', layer: 'front' });
+        requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+    bar.root.remove();
+    B.acc = 'cap';
+    if (stopped) {
+      const r = await ask('bubbles', 'Done already? Did you finish brushing?', ['Yes, all done!', 'Not really.']);
+      return r === 0;
+    }
+    AU.sfx('cheer'); B.expr = 'star'; B.hop(true);
+    await say('bubbles', 'Two whole minutes! Your dentist would be so proud.');
+    B.hop(false); B.expr = 'happy';
+    await say('bubbles', 'Now spit! Into the sink, please. Not on Bubbles.');
+    return true;
+  },
+  async logRoutine(kind) {
+    const B = this.bubbles, key = kind === 'brush' ? slotNow() + '_brush' : 'floss', t = todayRoutines();
+    B.expr = 'happy';
+    if (t[key]) {
+      if (kind === 'brush') await say('bubbles', slotNow() === 'am' ? 'You already brushed this morning! Super brusher!' : 'You already brushed tonight! Your teeth are SO clean.');
+      else await say('bubbles', 'You already flossed today! Your gums are cheering.');
+      await say('bubbles', kind === 'brush' ? (slotNow() === 'am' ? 'Come back tonight for another sparkle.' : 'Come back in the morning for another sparkle.') : 'Floss again tomorrow for another sparkle.');
+      return;
+    }
+    markRoutine(key); save.counts[kind] = (save.counts[kind] || 0) + 1; persist();
+    B.expr = 'star'; B.jump(110);
+    if (kind === 'brush') await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
+    else await say('bubbles', cycle(['Flossing! The secret hero of teeth.', 'Floss: the tiny string that does big work.', 'In between! Where the sneaky crumbs hide.'], 'fl', this.st));
+    // a sparkle flies into the jar
+    await streamMagic([zoe.x, zoe.y - 30], [BATH.jar[0], BATH.jar[1] - 10], 6, { colors: ['#FFD84A', '#FFF6C8'], gap: 60 });
+    save.jar = Math.min(JAR_SIZE, save.jar + 1); persist();
+    AU.sfx('chime'); this.jarK = 1; tween(900, (k) => { this.jarK = 1 - k; });
+    burst(BATH.jar[0], BATH.jar[1] - 10, 12, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
+    if (!save.flags.bathAwake) {
+      await sleep(400);
+      await wakeRoom(this, BATH.sink[0], BATH.sink[1], [B]);
+      save.flags.bathAwake = true; persist();
+      B.expr = 'star';
+      await say('bubbles', 'Whoa! The whole bathroom is sparkling!');
+      B.expr = 'happy';
+      await say('bubbles', 'Clean teeth are a kind of magic. Bubbles always knew it.');
+    }
+    const now = todayRoutines();
+    if (now.am_brush && now.pm_brush && now.floss && !this.st.perfect) { this.st.perfect = true; await say('bubbles', 'Morning, night, AND floss! That is a perfect teeth day.'); }
+    if (save.jar >= JAR_SIZE) return this.golden();
+    const left = JAR_SIZE - save.jar;
+    await say('bubbles', left <= 3 ? `${left} more ${left === 1 ? 'sparkle' : 'sparkles'} until the jar is full!` : 'Another sparkle in the jar!');
+    B.expr = 'norm';
+  },
+  async golden() {
+    const B = this.bubbles;
+    B.expr = 'star'; B.arms = 'up'; B.hop(true);
+    AU.sfx('surprise');
+    await say('bubbles', 'The Sparkle Jar is FULL!');
+    B.hop(false); B.arms = 'down';
+    AU.sfx('whoosh');
+    await streamMagic([BATH.jar[0], BATH.jar[1] - 12], [132, 186], 24, { colors: ['#FFD84A', '#FFF6C8', '#F2B030'], gap: 50 });
+    save.jar = 0; persist();
+    const ok = Presents.offer(this, 'bath', [[110, 192], [132, 196], [154, 192]], { golden: true });
+    if (!ok) {
+      await say('bubbles', 'The bathroom already has every present Bubbles can think of!');
+      await say('bubbles', 'So these sparkles go up into the sky. Look!');
+      for (let i = 0; i < 20; i++) emit({ kind: 'star', x: 120 + Math.random() * 40, y: 180, vy: -60 - Math.random() * 40, vx: (Math.random() - 0.5) * 30, life: 2, c: '#FFE38A', layer: 'front' });
+      await sleep(1200);
+      await say('bubbles', 'A brand-new jar starts now!');
+      return;
+    }
+    await zoe.walkTo(90, 188); zoe.face(1);
+    await say('bubbles', 'Golden presents! Pick one for the bathroom. Tap one to peek inside.');
+  },
+  async onPlaced(item) {
+    const B = this.bubbles;
+    AU.sfx('twinkle');
+    if (item === 'duck') { await say('bubbles', 'Captain Quack! Welcome aboard!'); }
+    else if (item === 'bubbles') { B.expr = 'star'; await say('bubbles', 'Bubbles loves bubbles. Obviously.'); }
+    else await Presents.admire(this, item, ['Ooh!', 'So fancy!', 'Squeaky clean!']);
+    B.expr = 'happy';
+    await say('bubbles', 'The bathroom looks wonderful. A brand-new jar starts now!');
+    B.expr = 'norm';
+  },
+  drawBg(g) {
+    drawReveal(g, this.drab, this.alive, BATH.sink[0], BATH.sink[1], this.reveal);
+    if (this.reveal >= 340) { D.glow(g, 120, 30, 70, '#FFE9A8', 0.07, 5); D.glow(g, 120, 24, 12, '#FFF1C8', 0.2, 3); }
+    Presents.drawBg(this, g);
+    drawJar(g, BATH.jar[0], BATH.jar[1], save.jar, T, this.jarK);
+  },
+  drawFg(g) { Presents.drawFg(this, g); },
+  update(dt) {
+    if (this.reveal < 340 && Math.random() < dt * 1.5) emit({ kind: 'mote', x: 20 + Math.random() * 250, y: 40 + Math.random() * 110, life: 5, c: '#B8B2C4', a: 0.6 });
+    if (this.reveal >= 340 && Math.random() < dt * 0.7) { const x = 20 + Math.random() * 80; emit({ kind: 'spark', x, y: 126, vy: -8, vx: (Math.random() - 0.5) * 4, life: 1.6, c: '#FFFFFF', layer: 'front' }); }
+  },
+  start(o = {}) {
+    if (!save.flags.bathMet) {
+      cut(async () => {
+        FX.fade = 1; await fadeIn(500);
+        await zoe.walkTo(214, 186); zoe.face(-1);
+        await narrate('A bathroom! In a treehouse!', 'There is a bathtub, a sink, and a very small toilet.', 'Everything is grey. Even the towel. Towels should never be grey.');
+        const B = this.bubbles;
+        B.visible = true; AU.sfx('pop'); B.jump(150);
+        for (let i = 0; i < 12; i++) emit({ kind: 'spark', x: 50 + Math.random() * 30, y: 128, vy: -20 - Math.random() * 20, vx: (Math.random() - 0.5) * 20, life: 1.2, c: '#FFFFFF', layer: 'front' });
+        await B.goto(150, 184, 60);
+        B.expr = 'star';
+        await say('bubbles', 'Ta-da!');
+        B.expr = 'happy';
+        await say('bubbles', 'I am Bubbles. I am in charge of teeth.');
+        await say('n', '(Sparkees have teeth. Who knew?)');
+        await say('bubbles', 'Every morning and every night, Sparkees brush their tiny teeth. And we floss!');
+        B.expr = 'sad';
+        await say('bubbles', 'But since the magic faded, this bathroom lost all its sparkle.');
+        B.expr = 'happy';
+        await say('bubbles', 'So here is the deal. When you brush YOUR teeth, or floss, tap the sink and tell me.');
+        this.jarK = 1; tween(1500, (k) => { this.jarK = 1 - k; }); AU.sfx('twinkle');
+        await say('bubbles', 'Every time, a sparkle goes in the Sparkle Jar. When the jar is full, something golden happens.');
+        await say('bubbles', 'You can brush along with me, too. I count to two minutes. I am very good at counting. Mostly.');
+        save.flags.bathMet = true; persist();
+      });
+    } else if (save.pending && save.pending.room === 'bath') {
+      cut(async () => { FX.fade = 1; await fadeIn(500); await say('bubbles', 'Your golden present is still here! Pick one.'); Presents.offer(this, 'bath', [[110, 192], [132, 196], [154, 192]]); });
+    } else { FX.fade = 1; fadeIn(500); }
+  },
+};
+function bathItemSpots(S) {
+  const has = (k) => () => save.items.bath.includes(k);
+  return [
+    { rect: [88, 112, 20, 16], when: has('duck'), stand: [96, 186], act: async () => { AU.sfx('squish'); await say('n', cycle(['Squeak! Captain Quack salutes you.', 'Captain Quack is the bravest duck on the seven bathtubs.'], 'duck', S.st)); } },
+    { rect: [150, 162, 52, 20], when: has('bathrug'), stand: [176, 190], act: async () => { await say('n', cycle(['A fluffy bath mat. Your toes say thank you.', 'So soft. Sparkees nap on it sometimes.'], 'rug', S.st)); } },
+    { rect: [192, 136, 14, 16], when: has('nightlight'), stand: [196, 186], act: async () => { AU.sfx('twinkle'); await say('n', 'A little star nightlight. For brushing in the dark.'); } },
+    { rect: [136, 120, 22, 34], when: has('fern'), stand: [146, 186], act: async () => { await say('n', cycle(['A fern! Ferns love bathrooms.', 'It is a fern fact. Bubbles has a lot of fern facts.'], 'fern', S.st)); } },
+  ];
+}
+// the brush-along timer, drawn over the scene (not a modal, so the scene stays visible)
+function brushBar() {
+  const fill = h('div', { class: 'bfill' }), time = h('div', { class: 'btime' }, '120'), part = h('div', { class: 'bpart' }, 'Get ready...');
+  const dots = h('div', { class: 'bdots' }, h('i'), h('i'), h('i'), h('i'));
+  const stop = h('button', { class: 'bstop', type: 'button' }, 'Stop');
+  const root = h('div', { class: 'brushbar ui' }, h('div', { class: 'btop' }, pixImg(ICONS.e_brush, 1, 'bicon'), part, dots, time), h('div', { class: 'btrack' }, fill), stop);
+  $('#stage').append(root);
+  return { root, fill, time, part, dots, stop };
+}
 
 // ===================== HUD =====================
 function updateHud(newQuest) {
   const onTitle = scene === SCENES.title;
   $('#hud').hidden = onTitle;
   const q = $('#hQuest');
-  q.hidden = save.stage !== 'quest';
+  q.hidden = !activeQuests().length;
   if (newQuest) { q.classList.remove('pulse'); void q.offsetWidth; q.classList.add('pulse'); }
   $('#hMusic').classList.toggle('off', !AU.musicOn);
 }
@@ -3034,13 +4797,14 @@ function mountHud() {
   $('#hQuest').append(pixImg(ICONS.scroll, 1, 'hicon'));
   $('#hMusic').append(pixImg(ICONS.note, 1, 'hicon'));
   $('#hQuest').addEventListener('click', async () => {
-    if (isBusy() || Dlg.active || Modal.open) return;
+    if (isBusy() || Dlg.active || Modal.open || scene === SCENES.title) return;
     AU.sfx('page');
-    const r = await openQuestPage(true);
-    if (r === 'done' && scene === SCENES.library) {
-      const hs = SCENES.library.hotspots.find((h) => h.when && h.rect && h.rect[0] === 170 && h.when());
-      if (hs) runHotspot(hs);
-    }
+    const list = activeQuests();
+    if (!list.length) return;
+    const pick = list.length === 1 ? list[0] : await openQuestChooser(list);
+    if (!pick) return;
+    const r = await openQuestPage(pick.q, pick.kind, true);
+    if (r === 'done') goTell(pick.kind);
   });
   $('#hMusic').addEventListener('click', () => { AU.init(); AU.setMusic(!AU.musicOn); save.musicOn = AU.musicOn; persist(); updateHud(); });
 }
@@ -3080,41 +4844,115 @@ async function openMirror() {
   done.addEventListener('click', () => { AU.sfx('sparkle'); persist(); Modal.close(); });
   Voice.say('Tap the buttons to look like you.', 'n');
   await Modal.show(node, 'dim');
-  zoe.rebuild();
+  zoe.rebuild(); rebuildPeopleIcons();
 }
 
-async function openQuestPage(fromHud) {
-  const steps = h('ol', { class: 'qsteps' },
-    h('li', {}, pixImg(ICONS.magnifier, 1.2), h('span', {}, 'Find it.')),
-    h('li', {}, pixImg(ICONS.openbook, 1.1), h('span', {}, 'Read it.')),
-    h('li', {}, pixImg(ICONS.talk, 1.2), h('span', {}, 'Tell the Sparkees all about it.')));
-  const read = 'The Animal Book Hunt. Somewhere in your house, there is a book with an animal on the cover. Find it. Read it. Then come back and tell the Sparkees all about it.';
+function activeQuests() {
+  const out = [];
+  if (save.stage === 'quest') out.push({ kind: 'read', q: READ_QUESTS[0] });
+  if (save.active && save.active.read) out.push({ kind: 'read', q: readQuest(save.active.read) });
+  if (save.active && save.active.art) out.push({ kind: 'art', q: artQuest(save.active.art) });
+  return out;
+}
+// "I did it!" from the quest scroll: go to the right room and start telling
+async function goTell(kind) {
+  const room = ROOM_OF[kind];
+  if (save.stage === 'quest') {
+    if (scene !== SCENES.library) { await fadeOut(400); goScene('library'); return; }
+    const hs = SCENES.library.hotspots.find((x) => x.when && x.rect && x.rect[0] === 170 && x.when());
+    if (hs) runHotspot(hs);
+    return;
+  }
+  if (scene === SCENES[room]) {
+    runHotspot({ stand: kind === 'read' ? [134, 186] : [144, 186], act: () => (kind === 'read' ? scene.tellRead(true) : scene.tellArt(true)) });
+    return;
+  }
+  await fadeOut(400);
+  goScene(room, { tell: kind });
+}
+async function openQuestChooser(list) {
+  const node = card('chooser', h('div', { class: 'ptitle' }, 'Which quest?'));
+  const row = h('div', { class: 'chrow' });
+  for (const it of list) {
+    const ic = it.kind === 'read' ? ICONS.openbook : ICONS.e_splash;
+    const b = h('button', { class: 'chbtn', type: 'button' }, pixImg(ic, 1.4), h('span', { class: 'chk' }, it.kind === 'read' ? 'From the bookshelf' : 'From the easel'), h('span', { class: 'cht' }, it.q.title));
+    b.addEventListener('click', () => { AU.sfx('tap'); Modal.close(it); });
+    row.append(b);
+  }
+  const x = h('button', { class: 'ghostbtn', type: 'button' }, 'Close');
+  x.addEventListener('click', () => { AU.sfx('tap'); Modal.close(null); });
+  node.append(row, x);
+  return Modal.show(node, 'dim');
+}
+async function openQuestPage(q, kind = 'read', fromHud = false) {
+  const icons = q.icons ? q.icons.map((k) => ICONS[k]) : [ICONS.magnifier, ICONS.openbook, ICONS.talk];
+  const steps = h('ol', { class: 'qsteps' }, q.steps.map((t, i) => h('li', {}, pixImg(icons[i] || ICONS.seal, i === 1 && kind === 'read' ? 1.1 : 1.2), h('span', {}, t))));
   const btns = h('div', { class: 'qbtns' });
-  const node = card('quest',
-    h('div', { class: 'qkicker' }, 'A quest from the bookshelf ', speakBtn(read)),
-    h('h2', {}, 'The Animal Book Hunt'),
-    h('p', { class: 'qlead' }, 'Somewhere in your house, there is a book with an animal on the cover.'),
+  const node = card('quest' + (kind === 'art' ? ' art' : ''),
+    h('div', { class: 'qkicker' }, kind === 'read' ? 'A quest from the bookshelf' : 'A quest from the easel'),
+    h('h2', {}, q.title),
+    h('p', { class: 'qlead' }, q.lead),
     steps,
-    h('p', { class: 'qaside' }, '(Grown-ups can help with big words. That is what grown-ups are for.)'),
+    h('p', { class: 'qaside' }, q.aside || '(Grown-ups can help with big words. That is what grown-ups are for.)'),
     btns);
   if (!fromHud) {
     const b = h('button', { class: 'seal', type: 'button' }, pixImg(ICONS.seal, 1.4), h('span', {}, "I'll do it!"));
     b.addEventListener('click', () => { AU.sfx('chime'); Modal.close('ok'); });
     btns.append(b);
+    if (save.stage === 'done') {
+      const l = h('button', { class: 'ghostbtn', type: 'button' }, 'Maybe later');
+      l.addEventListener('click', () => { AU.sfx('tap'); Modal.close('later'); });
+      btns.append(l);
+    }
   } else {
-    const b1 = h('button', { class: 'big', type: 'button' }, 'I read my book!');
+    const b1 = h('button', { class: 'big', type: 'button' }, kind === 'read' ? 'I did it!' : 'I made it!');
     const b2 = h('button', { class: 'ghostbtn', type: 'button' }, 'Not yet');
     b1.addEventListener('click', () => { AU.sfx('tap'); Modal.close('done'); });
     b2.addEventListener('click', () => { AU.sfx('tap'); Modal.close('later'); });
     btns.append(b1, b2);
   }
   AU.sfx('page');
-  Voice.say(read, 'n');
-  const r = await Modal.show(node, 'dim');
-  Voice.stop();
-  return r;
+  return Modal.show(node, 'dim');
 }
-
+// a grid of picture choices: options = [[key, label, iconKey], ...]
+async function openPicker(title, options) {
+  const grid = h('div', { class: 'agrid' });
+  const n = options.length, cols = n <= 5 ? n : n === 6 ? 3 : 5;
+  grid.style.gridTemplateColumns = `repeat(${cols}, calc(var(--u) * ${n <= 4 ? 44 : 38}))`;
+  for (const [k, label, ic] of options) {
+    const b = h('button', { class: 'acell big2', type: 'button' }, ICONS[ic] ? pixImg(ICONS[ic], 1.4) : '', h('span', {}, label));
+    b.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close(k); });
+    grid.append(b);
+  }
+  return Modal.show(card('picker', h('div', { class: 'ptitle' }, title), grid), 'dim');
+}
+async function openColorPicker(title) {
+  const grid = h('div', { class: 'cgrid' });
+  for (const [k, label, hex] of COVER_COLORS) {
+    const sw = h('i', { class: 'cswatch' }); sw.style.background = hex;
+    const b = h('button', { class: 'acell ccell', type: 'button' }, sw, h('span', {}, label));
+    b.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close(k); });
+    grid.append(b);
+  }
+  return Modal.show(card('picker', h('div', { class: 'ptitle' }, title), grid), 'dim');
+}
+async function openPeoplePicker() {
+  const chosen = new Set();
+  const grid = h('div', { class: 'agrid people' });
+  const done = h('button', { class: 'big', type: 'button', disabled: '' }, "That's everyone!");
+  for (const [k, label, ic] of FAMILY) {
+    const b = h('button', { class: 'acell', type: 'button', 'aria-pressed': 'false' }, pixImg(ICONS[ic], 1.25), h('span', {}, label), h('b', { class: 'tick', 'aria-hidden': 'true' }, '✓'));
+    b.addEventListener('click', () => {
+      if (chosen.has(k)) { chosen.delete(k); AU.sfx('tap'); } else { chosen.add(k); AU.sfx('pop'); }
+      b.classList.toggle('on', chosen.has(k)); b.setAttribute('aria-pressed', chosen.has(k) ? 'true' : 'false');
+      if (chosen.size) done.removeAttribute('disabled'); else done.setAttribute('disabled', '');
+    });
+    grid.append(b);
+  }
+  done.addEventListener('click', () => { if (!chosen.size) return; AU.sfx('sparkle'); Modal.close(FAMILY.map((f) => f[0]).filter((k) => chosen.has(k))); });
+  const node = card('picker peoplecard', h('div', { class: 'ptitle' }, 'Who is on your family tree?'), h('p', { class: 'psub' }, 'Tap everybody. Tap again to take someone off.'), grid, h('div', { class: 'pfoot' }, done));
+  return Modal.show(node, 'dim');
+}
 async function openAnimalPicker() {
   const grid = h('div', { class: 'agrid' });
   const q = 'What animal was on the cover?';
@@ -3127,10 +4965,10 @@ async function openAnimalPicker() {
   Voice.say(q, 'greg');
   return Modal.show(node, 'dim');
 }
-async function openFeelingPicker() {
-  const q = 'How did the story make you feel?';
+async function openFeelingPicker(list, title) {
+  const q = title || 'How did the story make you feel?';
   const row = h('div', { class: 'frow' });
-  for (const [k, label, ex] of [['funny', 'Funny', 'laugh'], ['exciting', 'Exciting', 'star'], ['cozy', 'Cozy', 'cozy'], ['sad', 'Sad', 'sad']]) {
+  for (const [k, label, ex] of list || [['funny', 'Funny', 'laugh'], ['exciting', 'Exciting', 'star'], ['cozy', 'Cozy', 'cozy'], ['sad', 'Sad', 'sad']]) {
     const b = h('button', { class: 'fcell', type: 'button' }, pixImg(sparkeeFace(ex), 2.2), h('span', {}, label));
     b.addEventListener('click', () => { AU.sfx('tap'); Voice.say(label, 'sp'); Modal.close(k); });
     row.append(b);
@@ -3145,34 +4983,145 @@ async function openChapterCard() {
   const b = save.book || { animal: 'other' };
   const items = ['Found the tiny door', 'Met the Sparkees (and Greg)', `Read a book about ${animalName(b.animal)}`, 'Lit the library fire'];
   const btn = h('button', { class: 'big', type: 'button' }, 'Keep exploring');
-  const text = `Chapter one, complete! The library wakes up. Come back tomorrow for a new quest.`;
+  const text = `Chapter one, complete! The library wakes up.`;
   const node = card('chapter',
     h('div', { class: 'ckicker' }, 'Chapter One ', speakBtn(text)),
     h('h2', {}, 'The Library Wakes Up'),
     h('ul', { class: 'clist' }, items.map((t) => h('li', {}, h('i', { 'aria-hidden': 'true' }, '✦'), t))),
-    h('p', { class: 'cnext' }, 'Come back tomorrow for a new quest. The kitchen smells like cookies.'),
+    h('p', { class: 'cnext' }, 'The bookshelf has more quests whenever you want one. And something upstairs is rumbling...'),
     btn);
   btn.addEventListener('click', () => { AU.sfx('tap'); Modal.close(); });
   Voice.say(text, 'n');
   await Modal.show(node, 'dim');
 }
-async function openBookCard() {
-  const b = save.book; if (!b) return;
-  const [c, g] = mk(24, 24); drawBookCover(g, 0, 0, b.animal);
-  const feelWord = { funny: 'funny', exciting: 'excited', cozy: 'cozy', sad: 'a little sad' }[b.feel] || 'happy';
+function bookTitle(b) {
+  const q = readQuest(b.q || 'animal');
+  if (q.id === 'animal') return `A book about ${animalName(b.animal)}`;
+  if (q.id === 'color' && b.color) { const c = COVER_COLORS.find((x) => x[0] === b.color); if (c) return `A ${c[1].toLowerCase()} book`; }
+  return q.title;
+}
+function bookDetail(b) {
+  const q = readQuest(b.q || 'animal'), out = [];
+  for (const st of q.tell) if (st.type === 'pick' && b.picks && b.picks[st.key]) { const o = st.options.find((x) => x[0] === b.picks[st.key]); if (o) out.push(`${st.q} ${o[1]}.`); }
+  return out;
+}
+async function openBookCard(b) {
+  b = b || save.books[save.books.length - 1]; if (!b) return;
+  const [c, g] = mk(24, 24); drawBookCover(g, 0, 0, b);
+  const feelWord = { funny: 'funny', exciting: 'excited', cozy: 'cozy', sad: 'a little sad' }[b.feel];
   const who = save.name === 'Visitor' ? 'the Visitor' : 'Zoe';
-  const text = `A book about ${animalName(b.animal)}. Read by ${who}. It made you feel ${feelWord}. Sparkee rating: nine stars. They don't know when to stop.`;
   const btn = h('button', { class: 'big', type: 'button' }, 'Put it back');
   const node = card('bookcard',
     pixImg(c, 3.2, 'bcover'),
     h('div', { class: 'binfo' },
-      h('div', { class: 'ckicker' }, 'On the library shelf ', speakBtn(text)),
-      h('h2', {}, `A book about ${animalName(b.animal)}`),
+      h('div', { class: 'ckicker' }, `Book ${save.books.indexOf(b) + 1} on the library shelf`),
+      h('h2', {}, bookTitle(b)),
       h('p', {}, `Read by ${who}.`),
-      h('p', {}, `It made you feel ${feelWord}.`),
+      bookDetail(b).map((t) => h('p', {}, t)),
+      feelWord ? h('p', {}, `It made you feel ${feelWord}.`) : null,
       h('p', { class: 'stars' }, '★★★★★★★★★'),
       h('p', { class: 'qaside' }, "(The Sparkees don't know when to stop.)"),
       btn));
+  btn.addEventListener('click', () => { AU.sfx('tap'); Modal.close(); });
+  await Modal.show(node, 'dim');
+}
+function famLabel(k) { const f = FAMILY.find((x) => x[0] === k); return f ? f[1] : k; }
+async function openArtCard(a) {
+  if (!a) return;
+  const q = artQuest(a.q);
+  let pic;
+  if (a.photo) { pic = h('img', { class: 'aphoto', src: a.photo, alt: q.title }); }
+  else pic = pixImg(artCanvas(a), 2.5, 'apix');
+  const lines = [];
+  if (a.people && a.people.length) lines.push(`On the tree: ${a.people.map(famLabel).join(', ')}.`);
+  if (a.who) lines.push(`Made for: ${famLabel(a.who)}.`);
+  const feel = { fun: 'fun', proud: 'proud', calm: 'calm', tricky: 'tricky (but you did it)' }[a.feel];
+  if (feel) lines.push(`Making it felt ${feel}.`);
+  const btn = h('button', { class: 'big', type: 'button' }, 'Lovely');
+  const node = card('artcard',
+    h('div', { class: 'aframe' }, pic),
+    h('div', { class: 'binfo' },
+      h('div', { class: 'ckicker' }, 'In the art studio'),
+      h('h2', {}, q.title),
+      h('p', {}, `By ${save.name === 'Visitor' ? 'the Visitor' : 'Zoe'}.`),
+      lines.map((t) => h('p', {}, t)),
+      h('p', { class: 'qaside' }, '(Dot rating: magnificent. Dot only has one rating.)'),
+      btn));
+  btn.addEventListener('click', () => { AU.sfx('tap'); Modal.close(); });
+  await Modal.show(node, 'dim');
+}
+// take a picture of real art and turn it into pixel art
+function openPhotoModal(q) {
+  return new Promise((resolve) => {
+    const input = h('input', { type: 'file', accept: 'image/*', capture: 'environment', class: 'hiddenfile' });
+    const area = h('div', { class: 'pharea' });
+    const btns = h('div', { class: 'qbtns' });
+    const take = h('button', { class: 'big', type: 'button' }, pixImg(ICONS.e_camera, 0.8, 'inl'), ' Take a picture');
+    const skip = h('button', { class: 'ghostbtn', type: 'button' }, 'Skip the picture');
+    const node = card('photo', h('div', { class: 'qkicker' }, 'Show Dot'), h('h2', {}, q.title), area, btns, input);
+    const reset = () => {
+      area.innerHTML = '';
+      area.append(h('div', { class: 'phempty' }, pixImg(ICONS.e_camera, 2.6), h('p', {}, 'Hold your art up flat, in good light.')));
+      btns.innerHTML = ''; btns.append(take, skip);
+    };
+    take.addEventListener('click', () => { AU.sfx('tap'); input.value = ''; input.click(); });
+    skip.addEventListener('click', () => { AU.sfx('tap'); Modal.close(null); });
+    input.addEventListener('change', () => {
+      const f = input.files && input.files[0]; if (!f) return;
+      area.innerHTML = ''; area.append(h('p', { class: 'phwait' }, 'Dot is looking...'));
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = () => {
+        let res;
+        try { res = photoToArt(img); } catch (e) { console.error(e); reset(); return; }
+        URL.revokeObjectURL(url);
+        const small = h('img', { class: 'phpix', src: res.pix, alt: 'Your art as pixel art' });
+        const real = h('img', { class: 'phreal', src: res.photo, alt: 'Your photo' });
+        area.innerHTML = '';
+        area.append(h('div', { class: 'phpair' }, h('figure', {}, real, h('figcaption', {}, 'Your art')), h('span', { class: 'pharrow', 'aria-hidden': 'true' }, '→'), h('figure', {}, small, h('figcaption', {}, 'In the treehouse'))));
+        const use = h('button', { class: 'big', type: 'button' }, 'Show Dot!');
+        const again = h('button', { class: 'ghostbtn', type: 'button' }, 'Try again');
+        use.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close(res); });
+        again.addEventListener('click', () => { AU.sfx('tap'); input.value = ''; input.click(); });
+        btns.innerHTML = ''; btns.append(use, again);
+      };
+      img.onerror = () => { reset(); area.prepend(h('p', { class: 'phwait' }, "Hmm, that picture didn't work. Try again?")); };
+      img.src = url;
+    });
+    reset();
+    Modal.show(node, 'dim').then(resolve);
+  });
+}
+async function openSinkCard() {
+  const t = todayRoutines(), slot = slotNow();
+  const mark = (ok) => h('b', { class: ok ? 'yes' : 'no' }, ok ? '✓' : '○');
+  const bBrush = h('button', { class: 'big', type: 'button' }, t[slot + '_brush'] ? 'I brushed again!' : 'I brushed!');
+  const bAlong = h('button', { class: 'ghost2', type: 'button' }, 'Brush along (2 minutes)');
+  const bFloss = h('button', { class: 'big', type: 'button' }, 'I flossed!');
+  const node = card('sink',
+    h('div', { class: 'qkicker' }, 'The sink'),
+    h('h2', {}, 'Teeth Time'),
+    h('div', { class: 'srow' }, pixImg(ICONS.e_brush, 1.5), h('div', { class: 'sinfo' }, h('div', { class: 'sname' }, 'Brush my teeth'), h('div', { class: 'sstat' }, h('span', { class: slot === 'am' ? 'now' : '' }, 'Morning ', mark(t.am_brush)), h('span', { class: slot === 'pm' ? 'now' : '' }, 'Night ', mark(t.pm_brush)))), h('div', { class: 'sbtns' }, bBrush, bAlong)),
+    h('div', { class: 'srow' }, pixImg(ICONS.e_floss, 1.5), h('div', { class: 'sinfo' }, h('div', { class: 'sname' }, 'Floss'), h('div', { class: 'sstat' }, h('span', {}, 'Today ', mark(t.floss)))), h('div', { class: 'sbtns' }, bFloss)),
+    h('p', { class: 'qaside' }, '(Morning lasts until 3 in the afternoon. After that, it counts as night.)'));
+  const close = h('button', { class: 'ghostbtn', type: 'button' }, 'Not now');
+  node.append(close);
+  bBrush.addEventListener('click', () => { AU.sfx('tap'); Modal.close('brushed'); });
+  bAlong.addEventListener('click', () => { AU.sfx('tap'); Modal.close('along'); });
+  bFloss.addEventListener('click', () => { AU.sfx('tap'); Modal.close('floss'); });
+  close.addEventListener('click', () => { AU.sfx('tap'); Modal.close(null); });
+  return Modal.show(node, 'dim');
+}
+async function openChapterTwoCard(art) {
+  AU.sfx('chime');
+  const items = ['Found the hatch in the ceiling', 'Met Dot, the artist', art && art.q === 'family' ? 'Made a family tree' : 'Made real art', 'Brought the colors back'];
+  const btn = h('button', { class: 'big', type: 'button' }, 'Keep exploring');
+  const node = card('chapter',
+    h('div', { class: 'ckicker' }, 'Chapter Two'),
+    h('h2', {}, 'The Art Studio Opens'),
+    h('ul', { class: 'clist' }, items.map((t) => h('li', {}, h('i', { 'aria-hidden': 'true' }, '✦'), t))),
+    h('p', { class: 'cnext' }, 'The easel has more art quests. And the door marked BATH is waiting...'),
+    btn);
   btn.addEventListener('click', () => { AU.sfx('tap'); Modal.close(); });
   await Modal.show(node, 'dim');
 }
@@ -3183,6 +5132,8 @@ function routeByStage() {
   if (s === 'new' || s === 'hallway') return goScene('hall');
   if (s === 'stairs') return goScene('stairs', { arrive: false });
   if (s === 'forest' || s === 'met') return goScene('forest');
+  if (s === 'done' && save.lastRoom === 'studio' && save.flags.hatch) return goScene('studio');
+  if (s === 'done' && save.lastRoom === 'bath' && save.flags.hatch) return goScene('bath');
   return goScene('library');
 }
 function showTitle() {
@@ -3203,16 +5154,18 @@ function begin() {
 }
 function boot() {
   loadSave();
+  migrateSave();
   AU.musicOn = save.musicOn !== false;
   makeIcons();
   for (const [k] of ANIMALS) ICONS['a_' + k] = animalIcon(k);
+  makeIcons2();
   zoe.rebuild();
   mountHud();
   layout();
   $('#bStart').addEventListener('click', (e) => { e.stopPropagation(); begin(); });
   $('#title').addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) { AU.init(); } });
   $('#bNew').addEventListener('click', (e) => { e.stopPropagation(); $('#confirm').hidden = false; $('#tbtns').hidden = true; });
-  $('#bYes').addEventListener('click', (e) => { e.stopPropagation(); wipeSave(); for (const k in BG) if (k.startsWith('forest')) delete BG[k]; $('#tbtns').hidden = false; begin(); });
+  $('#bYes').addEventListener('click', (e) => { e.stopPropagation(); wipeSave(); migrateSave(); for (const k in BG) if (k.startsWith('forest')) delete BG[k]; $('#tbtns').hidden = false; begin(); });
   $('#bNo').addEventListener('click', (e) => { e.stopPropagation(); $('#confirm').hidden = true; $('#tbtns').hidden = false; });
   $('#bAnyway').addEventListener('click', () => { playAnyway = true; layout(); });
   document.addEventListener('visibilitychange', () => {

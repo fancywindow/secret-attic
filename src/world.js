@@ -241,7 +241,21 @@ class Sparkee {
       D.p(g, left + B.cx - this.r - 1, ay + 1, ac); D.p(g, left + B.cx + this.r + 1, ay + 1, ac);
     }
     this.drawFace(g, left + B.cx, top + B.cy);
-    if (this.acc === 'headphones') {
+    const acc = (this.acc || '').split(' ');
+    const hx0 = left + B.cx, hy0 = top + B.cy, R = this.r;
+    if (acc.includes('paint')) { D.p(g, hx0 - R + 2, hy0 + 2, '#E8628A'); D.p(g, hx0 - R + 3, hy0 + 2, '#E8628A'); D.p(g, hx0 + R - 2, hy0 + 3, '#3E5AA8'); D.p(g, hx0 + 1, hy0 + R - 1, '#6F9A45'); D.p(g, hx0 + 2, hy0 + R - 1, '#6F9A45'); }
+    if (acc.includes('beret')) {
+      D.ell(g, hx0 + 1, hy0 - R + 1, R, 2, '#2C1A1E'); D.ell(g, hx0 + 1, hy0 - R + 1, R - 1, 1, '#C8323C'); D.r(g, hx0 + 1, hy0 - R - 2, 1, 2, '#2C1A1E');
+    }
+    if (acc.includes('cap')) {
+      D.ell(g, hx0, hy0 - R + 2, R + 1, 3, '#2C1A1E'); D.ell(g, hx0, hy0 - R + 2, R, 2, '#F2A0B0');
+      for (let k = -R + 1; k < R; k += 2) D.p(g, hx0 + k, hy0 - R + 4, '#FFFFFF');
+      D.p(g, hx0 - 2, hy0 - R + 1, '#FFFFFF'); D.p(g, hx0 + 2, hy0 - R, '#FFFFFF');
+    }
+    if (acc.includes('foam')) { for (const [dx, dy] of [[-2, 3], [0, 4], [2, 3], [-1, 5], [1, 5], [3, 4]]) D.p(g, hx0 + dx, hy0 + dy, '#FFFFFF'); }
+    if (acc.includes('brush')) { const s = Math.round(Math.sin(this.t * 22) * 1.5); D.line(g, hx0 + R + 1, hy0 + 3 + s, hx0 + 2, hy0 + 3 + s, '#5ACDE0'); D.r(g, hx0 + 1, hy0 + 2 + s, 2, 2, '#FFFFFF'); }
+    if (acc.includes('floss')) { const s = Math.round(Math.sin(this.t * 10) * 2); D.line(g, hx0 - R - 2, hy0 + s, hx0 + R + 2, hy0 - s, '#FFFFFF'); }
+    if (acc.includes('headphones')) {
       const hx = left + B.cx, hy = top + B.cy;
       D.line(g, hx - this.r, hy - 1, hx - this.r + 2, hy - this.r - 1, C.ink);
       D.line(g, hx - this.r + 2, hy - this.r - 1, hx + this.r - 2, hy - this.r - 1, C.ink);
@@ -340,6 +354,10 @@ function drawParticles(g, layer) {
     else if (p.kind === 'leaf') { g.globalAlpha = Math.min(1, k * 4); const f = Math.floor(p.age * 4 + p.ph) % 2; D.r(g, x, y, f ? 2 : 1, f ? 1 : 2, p.c); g.globalAlpha = 1; }
     else if (p.kind === 'smoke') { g.globalAlpha = k * 0.35; D.disc(g, x, y, Math.round(1 + (1 - k) * 3), p.c); g.globalAlpha = 1; }
     else if (p.kind === 'note') { g.globalAlpha = Math.min(1, k * 2); D.r(g, x, y - 3, 1, 4, p.c); D.r(g, x - 2, y, 2, 2, p.c); D.p(g, x + 1, y - 3, p.c); g.globalAlpha = 1; }
+    else if (p.kind === 'glyph' && p.blob) {
+      D.glow(g, x + 1, y + 1, 4, p.blob, 0.3, 2);
+      D.r(g, x, y, 3, 2, p.blob); D.r(g, x + 1, y - 1, 1, 4, p.blob); D.p(g, x, y, '#FFFFFF');
+    }
     else if (p.kind === 'glyph') {
       D.glow(g, x + 1, y + 2, 5, '#FFC93A', 0.35, 2);
       const gl = GLYPHS[p.gi];
@@ -352,10 +370,11 @@ function drawParticles(g, layer) {
 const SPEAKERS = {
   n: { name: '', v: 'n' }, greg: { name: 'Greg', v: 'greg' }, sp: { name: 'A Sparkee', v: 'sp' },
   sp2: { name: 'Another Sparkee', v: 'sp' }, sp3: { name: 'A small Sparkee', v: 'sp' }, all: { name: 'The Sparkees', v: 'all' },
+  dot: { name: 'Dot', v: 'sp' }, bubbles: { name: 'Bubbles', v: 'sp' },
 };
 const Dlg = {
-  active: false, typing: false, talker: null, res: null, full: '', shown: 0, acc: 0, opts: null, hold: 0,
-  el: $('#dlg'), nm: $('#dlgName'), tx: $('#dlgText'), op: $('#dlgOpts'), more: $('#dlgMore'),
+  active: false, typing: false, talker: null, res: null, full: '', shown: 0, acc: 0, opts: null, hold: 0, lineId: 0, readyAt: 0,
+  el: $('#dlg'), nm: $('#dlgName'), tx: $('#dlgText'), op: $('#dlgOpts'), next: $('#dlgNext'),
   open(who, text, o, res) {
     text = text.replace(/\{name\}/g, callName());
     const sp = SPEAKERS[who] || { name: who, v: 'sp' };
@@ -364,9 +383,9 @@ const Dlg = {
     this.el.classList.toggle('narr', this.narr);
     this.el.classList.toggle('bottom', o.pos === 'bottom' || (o.pos !== 'top' && scene && scene.dlgPos === 'bottom'));
     this.nm.textContent = sp.name; this.nm.hidden = !sp.name;
-    this.op.innerHTML = ''; this.op.hidden = true; this.more.hidden = true;
+    this.op.innerHTML = ''; this.op.hidden = true; this.next.hidden = true; this.lineId++;
     this.el.hidden = false; this.active = true;
-    this.talker = o.actor || (who === 'greg' ? scene && scene.greg : null) || null;
+    this.talker = o.actor || (['greg', 'dot', 'bubbles'].includes(who) && scene ? scene[who] : null) || null;
     this.render();
     Voice.say(text, sp.v);
   },
@@ -394,19 +413,26 @@ const Dlg = {
   },
   finish() {
     this.shown = this.full.length; this.typing = false; this.render();
-    if (this.opts) {
-      this.op.hidden = false; this.op.innerHTML = '';
-      this.opts.forEach((t, i) => {
-        const b = document.createElement('button');
-        b.className = 'opt'; b.type = 'button'; b.textContent = t;
-        b.addEventListener('click', (e) => { e.stopPropagation(); AU.sfx('tap'); this.close(i); });
-        this.op.appendChild(b);
-      });
-    } else this.more.hidden = false;
+    // a short pause before anything can be tapped, so a quick double-tap never skips a line
+    const myId = ++this.lineId;
+    this.readyAt = performance.now() + 550;
+    setTimeout(() => {
+      if (!this.active || this.lineId !== myId) return;
+      if (this.opts) {
+        this.op.hidden = false; this.op.innerHTML = '';
+        this.opts.forEach((t, i) => {
+          const b = document.createElement('button');
+          b.className = 'opt'; b.type = 'button'; b.textContent = t;
+          b.addEventListener('click', (e) => { e.stopPropagation(); if (performance.now() < this.readyAt) return; AU.sfx('tap'); this.close(i); });
+          this.op.appendChild(b);
+        });
+      } else this.next.hidden = false;
+    }, 550);
   },
-  tap() {
-    if (this.typing) { this.finish(); return; }
-    if (this.opts) return;
+  // tapping the scene or the text only finishes typing; it never advances
+  tap() { if (this.typing) this.finish(); },
+  advance() {
+    if (!this.active || this.typing || this.opts || this.next.hidden || performance.now() < this.readyAt) return;
     AU.sfx('tap');
     this.close();
   },
@@ -415,7 +441,9 @@ const Dlg = {
     const r = this.res; this.res = null; if (r) r(v);
   },
 };
-$('#dlg').addEventListener('pointerdown', (e) => { e.stopPropagation(); if (!e.target.closest('.opt')) Dlg.tap(); });
+$('#dlg').addEventListener('pointerdown', (e) => { e.stopPropagation(); if (!e.target.closest('.opt') && !e.target.closest('#dlgNext')) Dlg.tap(); });
+$('#dlgNext').addEventListener('click', (e) => { e.stopPropagation(); Dlg.advance(); });
+document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && Dlg.active && !Dlg.opts) { e.preventDefault(); if (Dlg.typing) Dlg.finish(); else Dlg.advance(); } });
 function say(who, text, o = {}) { return new Promise((res) => Dlg.open(who, text, o, res)); }
 function ask(who, text, options, o = {}) { return new Promise((res) => Dlg.open(who, text, Object.assign({}, o, { options }), res)); }
 async function narrate(...lines) { for (const l of lines) await say('n', l); }

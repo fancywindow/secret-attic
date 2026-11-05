@@ -144,9 +144,17 @@ const save = { stage: 'new', look: { skin: 0, hair: 0, hairColor: 0, shirt: 0 },
 function loadSave() {
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s && typeof s === 'object') Object.assign(save, s); } catch (e) { /* storage unavailable */ }
 }
-function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* storage unavailable */ } }
+function persist() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
+  catch (e) {
+    // out of room: drop the full-size photos (oldest first) but keep the pixel art
+    const arts = (save.arts || []).filter((a) => a.photo);
+    for (const a of arts) { delete a.photo; try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); return; } catch (e2) { /* keep trimming */ } }
+  }
+}
 function wipeSave() {
   try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* storage unavailable */ }
+  for (const k of Object.keys(save)) delete save[k];
   Object.assign(save, { stage: 'new', look: { skin: 0, hair: 0, hairColor: 0, shirt: 0 }, name: null, book: null, item: null, seenMirror: false });
 }
 const callName = () => (save.name === 'Visitor' ? 'Visitor' : 'Zoe');
