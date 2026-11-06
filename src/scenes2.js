@@ -24,7 +24,7 @@ SCENES.studio = {
     const famArt = () => save.arts.filter((a) => a.q === 'family').slice(-1)[0];
     this.lineArts = lineArts; this.famArt = famArt;
     hints = [
-      { x: 170, y: 110, strong: true, when: () => save.flags.dotMet && !save.active.art && !self.presents && !save.pending },
+      { x: 170, y: 110, strong: true, when: () => save.flags.dotMet && !save.active.art && !dayDone('art') && !self.presents && !save.pending },
       { x: 170, y: 110, when: () => save.flags.dotMet && !!save.active.art && !self.presents },
       { x: 132, y: 186, strong: true, when: () => !!self.presents && !self.choosing },
       { x: 262, y: 118, off: 1.1, when: () => save.flags.dotMet && save.arts.length > 0 && !save.flags.bathMet && !self.presents },
@@ -77,21 +77,23 @@ SCENES.studio = {
     const D0 = this.dot;
     D0.expr = 'happy';
     if (save.active.art) { const q = artQuest(save.active.art); await say('dot', `Your art quest is ${q.title}.`); await say('dot', 'When it is done, tap my easel and show me!'); }
-    else await say('dot', cycle(['Dot. Like a dot. The smallest kind of art.', 'Every artist starts with one dot. Then another dot. Then, a giraffe.', 'Greg asked me to paint him once. I painted a potato. He cried. Happy tears, I think.', 'My easel has another quest whenever you want one.', save.flags.bathMet ? 'Have you brushed your teeth today? Bubbles will ask. Bubbles always asks.' : 'The door with the sign? That is the bathroom. Bubbles lives there.'], 'dot', this.st));
+    else await say('dot', cycle(['Dot. Like a dot. The smallest kind of art.', 'Every artist starts with one dot. Then another dot. Then, a giraffe.', 'Greg asked me to paint him once. I painted a potato. He cried. Happy tears, I think.', dayDone('art') ? 'Three art quests in one day! Dot is speechless. Dot is still talking, but Dot is speechless inside.' : 'My easel has three art quests today. Pick any one!', save.flags.bathMet ? 'Have you brushed your teeth today? Bubbles will ask. Bubbles always asks.' : 'The door with the sign? That is the bathroom. Bubbles lives there.'], 'dot', this.st));
     D0.expr = 'norm';
   },
   async easel() {
     if (!save.flags.dotMet) return;
     if (this.presents || save.pending) { await say('dot', 'Open your present first!'); return; }
-    if (save.active.art) {
-      const r = await openQuestPage(artQuest(save.active.art), 'art', true);
+    const pick = await openQuestBoard('art');
+    if (!pick) { if (dayDone('art')) await say('dot', 'All three art quests done today! My easel needs a rest. Three new ones tomorrow.'); return; }
+    if (pick === save.active.art) {
+      const r = await openQuestPage(artQuest(pick), 'art', true);
       if (r === 'done') await this.tellArt(true);
       return;
     }
-    await this.giveArtQuest();
+    await this.giveArtQuest(artQuest(pick));
   },
-  async giveArtQuest() {
-    const q = pickNextQuest('art');
+  async giveArtQuest(q) {
+    const switching = !!save.active.art;
     AU.sfx('sparkle');
     await tween(700, (k) => { this.canvasK = k * 0.9; });
     await say('n', cycle(['The blank canvas is glowing.', 'The easel shimmers. It has an idea.', 'The canvas glows. It knows what it wants.'], 'canv', this.st));
@@ -107,7 +109,8 @@ SCENES.studio = {
       await say('dot', 'Then come back and show me. Hold it up to the big glowing rectangle so I can see it.');
       await say('n', '(That means you can take a picture of it. A grown-up can help.)');
       await say('dot', 'When it is done, tap my easel.');
-    } else await say('dot', cycle(['Go make something wonderful!', 'Go! Create! Dot believes in you.', 'Dot cannot wait. Dot is already waiting.'], 'send', this.st));
+    } else if (switching) await say('dot', 'Changed your mind? Artists do that. The other quest will wait for you today.');
+    else await say('dot', cycle(['Go make something wonderful!', 'Go! Create! Dot believes in you.', 'Dot cannot wait. Dot is already waiting.'], 'send', this.st));
     D0.expr = 'norm';
   },
   async tellArt(skipAsk) {
@@ -204,7 +207,7 @@ SCENES.studio = {
       await sleep(900);
     }
     zoe.mode = 'front';
-    save.arts.push(art); save.doneQ.art.push(art.q); save.active.art = null; save.counts.art = (save.counts.art || 0) + 1;
+    save.arts.push(art); save.doneQ.art.push(art.q); markDayDone('art', art.q); save.active.art = null; save.counts.art = (save.counts.art || 0) + 1;
     persist(); updateHud();
     // the picture flies from the easel to its place
     const to = art.q === 'family' ? [26, 78, 48, 36] : (() => { const i = this.lineArts().length - 1; const [x, y] = CLOTHES[Math.max(0, i)]; return [x, y, 24, 18]; })();
@@ -270,7 +273,7 @@ SCENES.studio = {
     const D0 = this.dot;
     D0.expr = 'happy';
     await say('dot', 'The studio looks wonderful.');
-    await say('dot', 'Tap my easel whenever you want another art quest.');
+    for (const t of leftLines('art')) await say('dot', t);
     if (!save.flags.bathMet) {
       await say('dot', 'Oh! And the door over there, with the sign?');
       D0.look = { x: 280, y: 120 };

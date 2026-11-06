@@ -158,6 +158,24 @@ button[disabled] { opacity: 0.45; }
 .cgrid { display: grid; grid-template-columns: repeat(5, calc(var(--u) * 34)); gap: calc(var(--u) * 2.5); justify-content: center; }
 .cswatch { display: block; width: calc(var(--u) * 18); height: calc(var(--u) * 18); border-radius: calc(var(--u) * 2); box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--ink); }
 .ccell span { font-size: calc(var(--u) * 5.5); font-weight: 700; }
+/* today's three quests */
+.card.board { display: grid; justify-items: center; gap: calc(var(--u) * 3); }
+.card.board.art { background: linear-gradient(#F4F0F8, #E8E0F0); }
+.card.board.art .qkicker { color: #9A4AA0; }
+.brow { display: flex; gap: calc(var(--u) * 4); }
+.bcard { position: relative; display: grid; justify-items: center; align-content: start; gap: calc(var(--u) * 2); width: calc(var(--u) * 66); min-height: calc(var(--u) * 76); padding: calc(var(--u) * 4) calc(var(--u) * 3);
+  background: #FFF9EC; border: 0; border-radius: calc(var(--u) * 3); color: var(--ink);
+  box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--parch-edge), 0 calc(var(--u) * 1.2) 0 calc(var(--u) * 0.75) var(--parch-edge); }
+.bcard:active:not([disabled]) { transform: translateY(calc(var(--u) * 1)); }
+.bcard .bt { font-size: calc(var(--u) * 6.5); font-weight: 700; color: var(--plum); text-align: center; line-height: 1.12; }
+.bcard.isact { background: #FFE9C4; box-shadow: 0 0 0 calc(var(--u) * 1.2) var(--pumpkin), 0 calc(var(--u) * 1.2) 0 calc(var(--u) * 1.2) #8C4113; }
+.bcard.isdone { opacity: 1; filter: saturate(0.4); background: #EEE6D6; }
+.btag { margin-top: auto; font-size: calc(var(--u) * 4.5); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pumpkin); }
+.btag.now { color: #8C4113; } .btag.done { color: #5E8A3A; }
+.bprog { display: flex; align-items: center; gap: calc(var(--u) * 1.5); font-size: calc(var(--u) * 5.5); font-weight: 600; color: #6E5A62; }
+.bprog i { width: calc(var(--u) * 4); height: calc(var(--u) * 4); border-radius: 50%; background: #E2D6C0; box-shadow: 0 0 0 calc(var(--u) * 0.5) var(--ink); }
+.bprog i.on { background: #6F9A45; }
+.bprog span { margin-left: calc(var(--u) * 2); }
 /* which quest */
 .card.chooser { display: grid; justify-items: center; gap: calc(var(--u) * 2); }
 .chrow { display: flex; gap: calc(var(--u) * 5); }

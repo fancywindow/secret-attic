@@ -415,7 +415,7 @@ SCENES.library = {
       { x: 98, y: 82, strong: true, when: () => save.stage === 'library' },
       { x: 180, y: 156, strong: true, when: () => save.stage === 'quest' },
       { x: 142, y: 180, strong: true, when: () => !!self.presents && !self.choosing },
-      { x: 98, y: 82, strong: true, when: () => isDone() && !save.active.read && !self.presents && !save.pending && !self.shelfBookGone },
+      { x: 98, y: 82, strong: true, when: () => isDone() && !save.active.read && !dayDone('read') && !self.presents && !save.pending && !self.shelfBookGone },
       { x: 180, y: 156, when: () => isDone() && !!save.active.read && !self.presents },
       { x: 118, y: 22, off: 0.6, when: () => isDone() && self.hatchK >= 1 && !save.flags.dotMet },
     ];
@@ -455,7 +455,7 @@ SCENES.library = {
     if (save.stage === 'library') await say('greg', 'The bookshelf! Give it a tap. It knows what to do.');
     else if (save.stage === 'quest') { await say('greg', "Back already? Did you read your animal book?"); await say('greg', 'Sit on the storytelling stool and tell us everything!'); }
     else if (save.active.read) { const q = readQuest(save.active.read); await say('greg', `Your quest is ${q.title}.`); await say('greg', 'When you are done, sit on the storytelling stool and tell us everything!'); }
-    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', 'The bookshelf has a new quest whenever you want one.', save.flags.hatch ? 'Dot is up the ladder. Tell her Greg says hi. She will pretend not to care.' : 'Greg has a good feeling about today.', `We have ${save.books.length} ${save.books.length === 1 ? 'story' : 'stories'} on the shelf now. Greg counts them every night.`], 'greg', this.st));
+    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', dayDone('read') ? 'You did all three quests today! Greg is exhausted, and Greg did nothing.' : 'The bookshelf has quests for you today. Three of them!', save.flags.hatch ? 'Dot is up the ladder. Tell her Greg says hi. She will pretend not to care.' : 'Greg has a good feeling about today.', `We have ${save.books.length} ${save.books.length === 1 ? 'story' : 'stories'} on the shelf now. Greg counts them every night.`], 'greg', this.st));
     G.expr = 'norm';
   },
   async kitchen() {
@@ -478,12 +478,14 @@ SCENES.library = {
     if (save.stage === 'quest') { await say('n', 'The bookshelf is waiting for your story.'); await openQuestPage(READ_QUESTS[0], 'read', true); return; }
     if (save.stage === 'done') {
       if (this.presents || save.pending) { await say('n', 'Open your present first!'); return; }
-      if (save.active.read) {
-        const r = await openQuestPage(readQuest(save.active.read), 'read', true);
+      const pick = await openQuestBoard('read');
+      if (!pick) { if (dayDone('read')) await say('greg', 'All three quests done today! The bookshelf is napping. Three new quests tomorrow.'); return; }
+      if (pick === save.active.read) {
+        const r = await openQuestPage(readQuest(pick), 'read', true);
         if (r === 'done') await this.tellRead(true);
         return;
       }
-      return this.giveReadQuest();
+      return this.giveReadQuest(readQuest(pick));
     }
     await say('n', 'A big, empty bookshelf.');
   },
@@ -710,7 +712,7 @@ SCENES.library = {
     await say('greg', 'The library looks wonderful.');
     if (save.stage === 'reward') {
       await say('greg', 'And {name}, here is a secret: the bookshelf has more quests.');
-      await say('greg', 'Tap it whenever you want a new one. It is the bookshelf\'s job. It takes it very seriously.');
+      await say('greg', 'Every day it has three. Do one, or do all three! It is the bookshelf\'s job. It takes it very seriously.');
       G.expr = 'norm';
       save.stage = 'done'; save.doneAt = Date.now(); persist(); updateHud();
       this.shelfBookGone = false;
@@ -718,7 +720,7 @@ SCENES.library = {
       await openChapterCard();
       await this.hatchIntro();
     } else {
-      await say('greg', cycle(['Tap the bookshelf whenever you want another quest.', 'The bookshelf is already wiggling. It loves this.', 'More stories, more magic. That is the rule.'], 'after', this.st));
+      for (const t of leftLines('read')) await say('greg', t);
       G.expr = 'norm';
       this.wanderAll();
     }
@@ -731,8 +733,8 @@ SCENES.library = {
     for (let i = 0; i < Math.min(n, SPINE_SLOTS.length); i++) { const [sx, sy, h] = SPINE_SLOTS[i]; if (x >= sx - 1 && x < sx + 5 && y >= sy + 16 - h && y < sy + 16) return i; }
     return -1;
   },
-  async giveReadQuest() {
-    const q = pickNextQuest('read');
+  async giveReadQuest(q) {
+    const switching = !!save.active.read;
     this.wiggle = true; AU.sfx('rattle');
     await say('n', cycle(['A book is wiggling.', 'Another book is wiggling.', 'Wiggle, wiggle. A book wants out.'], 'wig', this.st));
     AU.sfx('rattle'); this.wiggle = false;
@@ -748,7 +750,7 @@ SCENES.library = {
     AU.sfx('chime');
     save.active.read = q.id; persist(); updateHud(true);
     const G = this.greg; G.expr = 'happy';
-    await say('greg', cycle(['A new quest!', 'Another quest! The bookshelf is on a roll.', 'Ooh, a good one.'], 'newq', this.st));
+    await say('greg', switching ? 'A different quest? Good idea. The other one will still be on the bookshelf today.' : cycle(['A new quest!', 'Another quest! The bookshelf is on a roll.', 'Ooh, a good one.'], 'newq', this.st));
     await say('greg', q.sendoff);
     if ((save.counts.read || 0) < 3) await say('greg', 'When you are done, sit on the storytelling stool and tell us everything.');
     G.expr = 'norm';
@@ -840,7 +842,7 @@ SCENES.library = {
     await tween(1200, (k) => { this.flyBook.t = k; });
     this.flyBook = null; this.hideTop = false; this.bookShown = true; this.storyIcon = null;
     AU.sfx('pop'); burst(LIB.shelfBook[0] + 6, LIB.shelfBook[1] + 12, 14, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
-    save.doneQ.read.push(book.q); save.active.read = null; save.counts.read = (save.counts.read || 0) + 1;
+    save.doneQ.read.push(book.q); markDayDone('read', book.q); save.active.read = null; save.counts.read = (save.counts.read || 0) + 1;
     persist(); updateHud();
     AU.sfx('cheer');
     S.forEach((s) => { s.arms = 'up'; s.hop(true); });
@@ -892,7 +894,7 @@ SCENES.library = {
     if (this.hatchK > 0) drawHatch(g, this.hatchK, save.arts.length > 0);
     // the dusty quest book (chapter one) or a glowing new quest book
     if (!this.shelfBookGone && ['new', 'met', 'library'].includes(save.stage)) drawShelfBook(g, 96, 76, this.wiggle);
-    if (!this.shelfBookGone && save.stage === 'done' && !save.active.read && !save.pending && !this.presents && !this.flyBook) {
+    if (!this.shelfBookGone && save.stage === 'done' && !save.active.read && !dayDone('read') && !save.pending && !this.presents && !this.flyBook) {
       D.glow(g, 98, 84, 10, '#FFE38A', 0.25 + 0.1 * Math.sin(T * 3), 3);
       drawShelfBook(g, 96, 76, this.wiggle || Math.sin(T * 1.7) > 0.86);
     }

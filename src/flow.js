@@ -35,6 +35,32 @@ function pickNextQuest(kind) {
   const again = list.filter((q) => q.id !== last && q.id !== 'animal');
   return again[Math.floor(Math.random() * again.length)];
 }
+// ---------------- Today's three quests per room ----------------
+// Each room offers three quests a day. Finish one, or all three; then that room rests until tomorrow.
+const DAILY_N = 3;
+function makeDailySet(kind) {
+  const list = kind === 'read' ? READ_QUESTS : ART_QUESTS, done = save.doneQ[kind], set = [];
+  if (save.active && save.active[kind]) set.push(save.active[kind]);
+  const left = list.filter((q) => !done.includes(q.id) && !set.includes(q.id));
+  for (const q of kind === 'art' ? left : shuffle(left)) { if (set.length >= DAILY_N) break; set.push(q.id); }
+  const last = done[done.length - 1];
+  for (const q of shuffle(list.filter((q) => !set.includes(q.id) && q.id !== 'animal' && q.id !== last))) { if (set.length >= DAILY_N) break; set.push(q.id); }
+  return set;
+}
+function daily() {
+  const k = todayKey();
+  if (!save.daily || save.daily.date !== k) { save.daily = { date: k, read: makeDailySet('read'), art: makeDailySet('art'), done: { read: [], art: [] } }; persist(); }
+  return save.daily;
+}
+function dayOpen(kind) { const d = daily(); return d[kind].filter((id) => !d.done[kind].includes(id)); }
+function dayDone(kind) { return dayOpen(kind).length === 0; }
+function markDayDone(kind, id) { const d = daily(); if (d[kind].includes(id) && !d.done[kind].includes(id)) d.done[kind].push(id); }
+// what the room's helper says after a quest: how many are left today
+function leftLines(kind) {
+  const n = dayOpen(kind).length, where = kind === 'read' ? 'bookshelf' : 'easel';
+  if (!n) return ['That is all three quests for today!', `The ${where} is taking a nap now. It will have three new quests tomorrow.`];
+  return [`${n === 1 ? 'One more quest' : 'Two more quests'} on the ${where} today, if you want ${n === 1 ? 'it' : 'them'}.`];
+}
 function artQuest(id) { return ART_QUESTS.find((q) => q.id === id) || ART_QUESTS[0]; }
 function questOf(kind, id) { return kind === 'read' ? readQuest(id) : artQuest(id); }
 const ROOM_OF = { read: 'library', art: 'studio' };

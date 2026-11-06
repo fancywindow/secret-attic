@@ -84,6 +84,27 @@ async function goTell(kind) {
   await fadeOut(400);
   goScene(room, { tell: kind });
 }
+// the room's three quests for today
+async function openQuestBoard(kind) {
+  const d = daily(), ids = d[kind], doneIds = d.done[kind], act = save.active[kind];
+  const row = h('div', { class: 'brow' });
+  for (const id of ids) {
+    const q = questOf(kind, id), isDone = doneIds.includes(id), isAct = id === act;
+    const ic = kind === 'read' ? (ICONS['e_' + q.cover.emblem] || ICONS.openbook) : (ICONS[(q.icons || [])[1]] || ICONS.e_splash);
+    const tag = isDone ? h('span', { class: 'btag done' }, 'Done ✓') : isAct ? h('span', { class: 'btag now' }, 'Your quest') : h('span', { class: 'btag' }, 'Pick me!');
+    const b = h('button', { class: 'bcard' + (isDone ? ' isdone' : '') + (isAct ? ' isact' : ''), type: 'button' }, pixImg(ic, 1.6), h('span', { class: 'bt' }, q.title), tag);
+    if (isDone) b.setAttribute('disabled', '');
+    else b.addEventListener('click', () => { AU.sfx('page'); Modal.close(id); });
+    row.append(b);
+  }
+  const n = doneIds.length;
+  const dots = h('div', { class: 'bprog' }, ids.map((_, i) => h('i', { class: i < n ? 'on' : '' })), h('span', {}, n >= ids.length ? 'All done for today! New quests tomorrow.' : `${n} of ${ids.length} done today`));
+  const x = h('button', { class: 'ghostbtn', type: 'button' }, 'Close');
+  x.addEventListener('click', () => { AU.sfx('tap'); Modal.close(null); });
+  const node = card('board' + (kind === 'art' ? ' art' : ''), h('div', { class: 'qkicker' }, kind === 'read' ? "Today's quests from the bookshelf" : "Today's quests from the easel"), row, dots, x);
+  AU.sfx('page');
+  return Modal.show(node, 'dim');
+}
 async function openQuestChooser(list) {
   const node = card('chooser', h('div', { class: 'ptitle' }, 'Which quest?'));
   const row = h('div', { class: 'chrow' });
@@ -202,7 +223,7 @@ async function openChapterCard() {
     h('div', { class: 'ckicker' }, 'Chapter One ', speakBtn(text)),
     h('h2', {}, 'The Library Wakes Up'),
     h('ul', { class: 'clist' }, items.map((t) => h('li', {}, h('i', { 'aria-hidden': 'true' }, '✦'), t))),
-    h('p', { class: 'cnext' }, 'The bookshelf has more quests whenever you want one. And something upstairs is rumbling...'),
+    h('p', { class: 'cnext' }, 'Every day, the bookshelf will have three new quests. And something upstairs is rumbling...'),
     btn);
   btn.addEventListener('click', () => { AU.sfx('tap'); Modal.close(); });
   Voice.say(text, 'n');
