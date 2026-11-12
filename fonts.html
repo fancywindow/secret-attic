@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pick a Font</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Lexend:wght@400;600&family=Atkinson+Hyperlegible:wght@400;700&family=DotGothic16&family=VT323&family=Pixelify+Sans:wght@400;600&display=swap">
+<style>
+  :root { --ink: #2C1A1E; --night: #1E0F14; --plum: #612C48; --pumpkin: #C97034; --parch: #F4EBD9; --cream: #FFF1C8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #140A0E; color: var(--cream); font-family: 'Andika', system-ui, sans-serif; padding: 24px 16px 60px; }
+  h1 { text-align: center; font-size: 28px; margin: 4px 0 6px; }
+  .sub { text-align: center; margin: 0 0 28px; color: #D8C2A7; font-size: 17px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 34px 26px; max-width: 1040px; margin: 0 auto; }
+  .opt { position: relative; }
+  .num { position: absolute; top: -18px; right: 10px; width: 46px; height: 46px; border-radius: 50%; background: var(--cream); color: var(--plum);
+    display: grid; place-items: center; font: 700 26px 'Andika', sans-serif; box-shadow: 0 0 0 3px var(--ink); z-index: 2; }
+  .dlg { position: relative; background: var(--night); border-radius: 10px; padding: 26px 26px 22px;
+    box-shadow: inset 0 0 0 4px var(--plum), 0 0 0 4px var(--parch), 0 0 0 8px var(--ink); }
+  .name { position: absolute; top: -16px; left: 22px; background: var(--pumpkin); color: var(--night); font-size: 17px; font-weight: 700;
+    padding: 3px 12px; border-radius: 6px; box-shadow: 0 0 0 3px var(--ink); }
+  .line { font-size: 25px; line-height: 1.35; margin: 0 0 12px; }
+  .abc { font-size: 25px; letter-spacing: 0.08em; color: #F2C94C; margin: 0; }
+  .label { margin: 12px 4px 0; font: 15px 'Andika', sans-serif; color: #B8A898; }
+  .now .num { background: #8A7A80; color: var(--cream); }
+</style>
+</head>
+<body>
+  <h1>Which words are easiest to read?</h1>
+  <p class="sub">Zoe, read each box out loud. Which number is your favorite?</p>
+  <div class="grid" id="grid"></div>
+<script>
+const FONTS = [
+  ['Andika', "'Andika'", 'Made for kids learning to read. Letters look like the ones you write.'],
+  ['Lexend', "'Lexend'", 'Round and roomy. Made to make reading easier.'],
+  ['Atkinson Hyperlegible', "'Atkinson Hyperlegible'", 'Every letter shaped so it can never be mixed up with another.'],
+  ['DotGothic16', "'DotGothic16'", 'A pixel font, like an old video game, but clearer.'],
+  ['VT323', "'VT323'", 'A pixel font from old computer screens.'],
+  ['Pixelify Sans (the one we have now)', "'Pixelify Sans'", 'For comparing. This is the font in the game today.'],
+];
+const grid = document.getElementById('grid');
+FONTS.forEach(([name, fam, note], i) => {
+  const opt = document.createElement('div');
+  opt.className = 'opt' + (i === FONTS.length - 1 ? ' now' : '');
+  opt.innerHTML = `<div class="num">${i + 1}</div>
+    <div class="dlg" style="font-family:${fam}, sans-serif">
+      <div class="name">Greg</div>
+      <p class="line">Zoe! Can you see the Sparkees? Cozy is Greg's favorite feeling. Second favorite: Tuesday.</p>
+      <p class="abc">S Z C O G Q &nbsp; a g y</p>
+    </div>
+    <p class="label">${name}. ${note}</p>`;
+  grid.append(opt);
+});
+</script>
+</body>
+</html>
