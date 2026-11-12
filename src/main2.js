@@ -136,3 +136,69 @@ async function travelTo(room) {
   busy = false;
   goScene(room, { map: true });
 }
+
+// ===================== Grown-ups: move a game to another device =====================
+// Save the game as a file on one device, send it over (AirDrop works), and load it on the other.
+function saveFileName() { return `secret-attic-${(save.name || 'game').toLowerCase()}-${todayKey()}.json`; }
+function downloadSave() {
+  const blob = new Blob([JSON.stringify({ secretAttic: 1, savedAt: new Date().toISOString(), save })], { type: 'application/json' });
+  const a = h('a', { href: URL.createObjectURL(blob), download: saveFileName() });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function readSaveFile(file) {
+  return new Promise((resolve) => {
+    const r = new FileReader();
+    r.onload = () => { try { const d = JSON.parse(r.result); const s = d && d.secretAttic ? d.save : d; resolve(s && typeof s === 'object' && s.stage ? s : null); } catch (e) { resolve(null); } };
+    r.onerror = () => resolve(null);
+    r.readAsText(file);
+  });
+}
+function describeSave(s) {
+  const n = (k) => (s.items && s.items[k] ? s.items[k].length : 0);
+  const presents = ['library', 'tower', 'studio', 'bath', 'kitchen'].reduce((t, k) => t + n(k), 0);
+  const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  return `${s.name || 'A game'}: ${pl((s.books || []).length, 'book')}, ${pl((s.arts || []).length, 'picture')}, ${pl(presents, 'present')}`;
+}
+async function openGrownups() {
+  $('#title').hidden = true;
+  const msg = h('p', { class: 'gmsg' });
+  const input = h('input', { type: 'file', accept: '.json,application/json,text/plain', class: 'hiddenfile' });
+  const bSave = h('button', { class: 'big', type: 'button' }, 'Save this game to a file');
+  const bLoad = h('button', { class: 'ghost2', type: 'button' }, 'Load a game from a file');
+  const close = h('button', { class: 'ghostbtn', type: 'button' }, 'Done');
+  const node = card('grownups',
+    h('div', { class: 'qkicker' }, 'For grown-ups'),
+    h('h2', {}, 'Move a game'),
+    h('p', { class: 'gnow' }, save.stage === 'new' ? 'This device has no game yet.' : 'On this device: ' + describeSave(save)),
+    h('ol', { class: 'gsteps' },
+      h('li', {}, 'On the old device, tap ', h('b', {}, 'Save this game to a file'), '.'),
+      h('li', {}, 'Send the file to the new device. AirDrop it, and choose "Save to Files."'),
+      h('li', {}, 'On the new device, open the Secret Attic from its home-screen icon, tap Grown-ups, then ', h('b', {}, 'Load a game from a file'), '.')),
+    h('div', { class: 'gbtns' }, bSave, bLoad), msg, input, close);
+  bSave.addEventListener('click', () => { AU.sfx('tap'); downloadSave(); msg.textContent = 'Saved! Look for it in your Downloads.'; });
+  bLoad.addEventListener('click', () => { AU.sfx('tap'); input.value = ''; input.click(); });
+  input.addEventListener('change', async () => {
+    const f = input.files && input.files[0]; if (!f) return;
+    const s = await readSaveFile(f);
+    if (!s) { msg.textContent = "Hmm, that file isn't a Secret Attic game."; return; }
+    msg.innerHTML = '';
+    const yes = h('button', { class: 'big', type: 'button' }, 'Yes, load it');
+    const no = h('button', { class: 'ghostbtn', type: 'button' }, 'Cancel');
+    msg.append(h('span', {}, `Load ${describeSave(s)}? This replaces the game on this device.`), yes, no);
+    no.addEventListener('click', () => { msg.textContent = ''; });
+    yes.addEventListener('click', () => {
+      for (const k of Object.keys(save)) delete save[k];
+      Object.assign(save, s);
+      migrateSave(); persist();
+      for (const k in BG) delete BG[k];
+      zoe.rebuild(); rebuildPeopleIcons();
+      for (const k in THUMB_CACHE) delete THUMB_CACHE[k];
+      AU.sfx('cheer');
+      msg.textContent = `Loaded! Welcome back, ${save.name || 'friend'}.`;
+    });
+  });
+  close.addEventListener('click', () => { AU.sfx('tap'); Modal.close(); });
+  await Modal.show(node, 'dim');
+  showTitle();
+}

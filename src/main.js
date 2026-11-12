@@ -427,6 +427,7 @@ function boot() {
   $('#bNew').addEventListener('click', (e) => { e.stopPropagation(); $('#confirm').hidden = false; $('#tbtns').hidden = true; });
   $('#bYes').addEventListener('click', (e) => { e.stopPropagation(); wipeSave(); migrateSave(); for (const k in BG) if (k.startsWith('forest')) delete BG[k]; $('#tbtns').hidden = false; begin(); });
   $('#bNo').addEventListener('click', (e) => { e.stopPropagation(); $('#confirm').hidden = true; $('#tbtns').hidden = false; });
+  $('#bGrown').addEventListener('click', (e) => { e.stopPropagation(); AU.init(); openGrownups(); });
   $('#bAnyway').addEventListener('click', () => { playAnyway = true; layout(); });
   document.addEventListener('visibilitychange', () => {
     if (!AU.ctx) return;

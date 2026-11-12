@@ -295,6 +295,16 @@ button[disabled] { opacity: 0.45; }
 .logo .l3 { display: block; margin-top: calc(var(--u) * 3); font-size: calc(var(--u) * 5.5); color: #E8B8C8; }
 #tbtns, #confirm { display: flex; gap: calc(var(--u) * 4); align-items: center; }
 #confirm span { font-size: calc(var(--u) * 6.5); font-weight: 600; }
+#bGrown { position: absolute; right: calc(var(--u) * 6); bottom: calc(var(--u) * 5); font-size: calc(var(--u) * 5); }
+.card.grownups { width: calc(var(--u) * 230); }
+.gnow { margin: 0 0 calc(var(--u) * 2); font-size: calc(var(--u) * 5.5); color: #6E5A62; }
+.gsteps { margin: 0 0 calc(var(--u) * 3); padding-left: calc(var(--u) * 8); font-size: calc(var(--u) * 5.5); line-height: 1.35; }
+.gsteps li { margin-bottom: calc(var(--u) * 1); }
+.gbtns { display: flex; align-items: center; gap: calc(var(--u) * 4); }
+.gbtns .big { font-size: calc(var(--u) * 6.5); padding: calc(var(--u) * 2) calc(var(--u) * 5); }
+.gmsg { min-height: calc(var(--u) * 7); margin: calc(var(--u) * 2) 0 0; font-size: calc(var(--u) * 5.5); display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--u) * 3); }
+.gmsg .big { font-size: calc(var(--u) * 6); padding: calc(var(--u) * 1.5) calc(var(--u) * 5); }
+.card.grownups > .ghostbtn { display: block; margin: calc(var(--u) * 1) 0 0 auto; }
 .tbtn-small { font-size: calc(var(--u) * 5.5); color: var(--cream); background: transparent; border: 0; text-decoration: underline; text-underline-offset: 0.2em; opacity: 0.8; }
 .tip { margin-top: calc(var(--u) * 4); font-size: calc(var(--u) * 5); color: #C9A8B8; }
 #bStart { animation: breathe 2.4s ease-in-out infinite; }
@@ -327,6 +337,7 @@ button[disabled] { opacity: 0.45; }
       <div id="tbtns"><button id="bStart" class="big" type="button">Tap to begin</button><button id="bNew" class="tbtn-small" type="button" hidden>Start over</button></div>
       <div id="confirm" hidden><span>Start over from the very beginning?</span><button id="bYes" class="big" type="button">Yes, start over</button><button id="bNo" class="tbtn-small" type="button">No, keep my game</button></div>
       <div class="tip">Turn the sound on for music.</div>
+      <button id="bGrown" class="tbtn-small" type="button">Grown-ups</button>
     </div>
   </div>
   <div id="rotate" hidden><div><div class="phone"></div><p>Turn me sideways!</p><button id="bAnyway" class="tbtn-small" type="button">Play this way anyway</button></div></div>
