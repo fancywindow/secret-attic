@@ -3,8 +3,15 @@ import pathlib
 
 root = pathlib.Path(__file__).parent
 src = root / 'src'
-js = '\n'.join((src / f).read_text() for f in ['sprites.js', 'engine.js', 'world.js', 'art.js', 'art2.js', 'quests.js', 'flow.js', 'scenes.js', 'scenes2.js', 'main.js'])
-page = (src / 'template.html').read_text().replace('/*__JS__*/', js)
+import base64
+FILES = ['sprites.js', 'engine.js', 'world.js', 'art.js', 'art2.js', 'art3.js', 'quests.js', 'flow.js', 'scenes.js', 'scenes2.js', 'scenes3.js', 'main.js', 'main2.js']
+js = '\n'.join((src / f).read_text() for f in FILES if (src / f).exists())
+# fonts are embedded so the game works offline and never waits on a font server
+def face(family, file, weight):
+    b64 = base64.b64encode((src / 'fonts' / file).read_bytes()).decode()
+    return f"@font-face {{ font-family: '{family}'; src: url(data:font/woff2;base64,{b64}) format('woff2'); font-weight: {weight}; font-display: block; }}"
+fonts = '\n'.join([face('Andika', 'Andika-Regular.woff2', 400), face('Andika', 'Andika-Bold.woff2', 700), face('Pixelify Sans', 'Pixelify.woff2', '400 700')])
+page = (src / 'template.html').read_text().replace('/*__JS__*/', js).replace('/*__FONTS__*/', fonts)
 icon = (src / 'icon.txt').read_text().strip()
 
 head = f'''<!doctype html>

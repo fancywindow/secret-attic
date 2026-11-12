@@ -19,6 +19,7 @@ SCENES.studio = {
     this.sps = makeSparkees([{ x: 92, y: 186, seed: 41 }, { x: 232, y: 186, seed: 48 }, { x: 160, y: 194, seed: 55 }]);
     this.sps.forEach((s, i) => { s.visible = awake; s.look = zoe; s.mode = 'wander'; s.speed = 20; s.area = [[70, 176, 120, 194], [200, 176, 250, 194], [140, 186, 190, 196]][i]; });
     this.actors = [zoe, this.dot, ...this.sps];
+    applyWearables(this);
     const self = this;
     const lineArts = () => save.arts.filter((a) => a.q !== 'family').slice(-CLOTHES.length);
     const famArt = () => save.arts.filter((a) => a.q === 'family').slice(-1)[0];
@@ -86,32 +87,24 @@ SCENES.studio = {
     const pick = await openQuestBoard('art');
     if (!pick) { if (dayDone('art')) await say('dot', 'All three art quests done today! My easel needs a rest. Three new ones tomorrow.'); return; }
     if (pick === save.active.art) {
-      const r = await openQuestPage(artQuest(pick), 'art', true);
+      const r = await openInProgress('art', artQuest(pick));
       if (r === 'done') await this.tellArt(true);
       return;
     }
     await this.giveArtQuest(artQuest(pick));
   },
   async giveArtQuest(q) {
-    const switching = !!save.active.art;
     AU.sfx('sparkle');
-    await tween(700, (k) => { this.canvasK = k * 0.9; });
-    await say('n', cycle(['The blank canvas is glowing.', 'The easel shimmers. It has an idea.', 'The canvas glows. It knows what it wants.'], 'canv', this.st));
-    const r = await openQuestPage(q, 'art', false);
+    await tween(500, (k) => { this.canvasK = k * 0.9; });
     tween(500, (k) => { this.canvasK = 0.9 * (1 - k); });
-    if (r !== 'ok') { await say('dot', 'Whenever you are ready. Art cannot be rushed.'); return; }
     AU.sfx('chime');
-    save.active.art = q.id; persist(); updateHud(true);
-    const D0 = this.dot; D0.expr = 'star';
     if (!(save.counts.art > 0)) {
-      await say('dot', 'Make it for real! Real paper. Real crayons. At your real table.');
-      D0.expr = 'happy';
-      await say('dot', 'Then come back and show me. Hold it up to the big glowing rectangle so I can see it.');
-      await say('n', '(That means you can take a picture of it. A grown-up can help.)');
-      await say('dot', 'When it is done, tap my easel.');
-    } else if (switching) await say('dot', 'Changed your mind? Artists do that. The other quest will wait for you today.');
-    else await say('dot', cycle(['Go make something wonderful!', 'Go! Create! Dot believes in you.', 'Dot cannot wait. Dot is already waiting.'], 'send', this.st));
-    D0.expr = 'norm';
+      startQuest('art', q.id);
+      const D0 = this.dot; D0.expr = 'star';
+      await say('dot', 'Make it for real! Real paper, real crayons, at your real table. Then come back and show me!');
+      D0.expr = 'norm';
+    }
+    await acceptAndGo('art', q);
   },
   async tellArt(skipAsk) {
     const q = artQuest(save.active.art), D0 = this.dot;
@@ -128,30 +121,35 @@ SCENES.studio = {
     }
     D0.expr = 'star'; D0.jump(100); AU.sfx('cheer');
     this.sps.forEach((s) => { if (s.visible) { s.mode = 'goto'; s.goto(s.x < 144 ? 104 : 224, 190, 40); s.look = zoe; } });
-    await say('dot', 'Show me! Show me!');
-    const art = { q: q.id, at: Date.now() };
+    const art = { q: q.id, at: Date.now(), size: q.size };
     for (const step of q.tell) await this.tellStep(step, art, q);
     if (q.after) for (const [who, t] of q.after) await say(who, t);
     D0.expr = 'wide';
-    await say('dot', 'Now watch this.');
     await this.paintMagic(art);
   },
   async tellStep(step, art, q) {
     const D0 = this.dot;
-    if (step === 'photo') {
+    if (typeof step === 'object') {
+      // a picture question with funny answers
+      const k = await openPicker(step.q, step.options);
+      art.picks = Object.assign({}, art.picks, { [step.key]: k });
+      AU.sfx('sparkle'); D0.expr = 'happy';
+      const lines = step.react[k] || ['Ooh!', 'Good answer.'];
+      await say('dot', lines[0]); await say('dot', lines[1]);
+    } else if (step === 'part') {
+      const k = await openPicker("What's your favorite part?", ART_PARTS);
+      art.part = k; AU.sfx('sparkle'); D0.expr = 'star';
+      await say('dot', { colors: 'The colors! Dot loves them too. Especially the ones that are colors.', details: 'The tiny details! Dot found three and a half of them.', idea: 'The idea! Ideas are the seeds of art. And of trees.', built: 'How you made it! Building is a kind of magic.', all: 'All of it! Dot agrees. Every single bit.' }[k] || 'Dot loves that part too.');
+    } else if (step === 'photo') {
       D0.expr = 'happy';
-      await say('dot', 'Hold it up and take a picture, so I can see it!');
       const ph = await openPhotoModal(q);
       if (ph) {
         art.pix = ph.pix; art.photo = ph.photo;
         D0.expr = 'star'; AU.sfx('sparkle');
-        await say('dot', cycle(['Oh!', 'Oh my.', 'OH.'], 'oh', this.st));
-        await say('dot', cycle(['It is magnificent.', 'Look at those colors!', 'Dot needs to sit down. That is how good it is.'], 'mag', this.st));
+        await say('dot', cycle(['Oh! It is magnificent.', 'Oh my. Look at those colors!', 'OH. Dot needs to sit down. That is how good it is.'], 'mag', this.st));
       } else {
         D0.expr = 'happy';
-        await say('dot', 'No picture? That is okay.');
-        await say('n', '(You describe it with your hands. Dot nods a lot.)');
-        await say('dot', 'I can see it perfectly. In my imagination.');
+        await say('dot', 'No picture? That is okay. Describe it with your hands. Dot will nod a lot.');
       }
     } else if (step === 'family') {
       D0.expr = 'happy';
@@ -165,7 +163,6 @@ SCENES.studio = {
       if (people.some((p) => ['dog', 'cat', 'fish'].includes(p))) await say('dot', 'And pets! Pets count. Pets are family with fur. Or fins.');
       if (people.includes('grandma') || people.includes('grandpa')) await say('dot', 'Grandparents are the roots. That is why the tree stands up so well.');
       D0.expr = 'happy';
-      await say('dot', 'Family trees are Dot\'s favorite kind of tree. They grow in every direction.');
     } else if (step === 'who') {
       await say('dot', 'Who is the card for?');
       const k = await openPicker('Who is the card for?', FAMILY.filter((f) => f[0] !== 'me'));
@@ -175,15 +172,13 @@ SCENES.studio = {
       await say('dot', k === 'other' ? 'For someone special! They are so lucky.' : `For ${lbl.toLowerCase().startsWith('mom') || lbl.toLowerCase().startsWith('dad') ? lbl : 'your ' + lbl.toLowerCase()}! They are so lucky.`);
       await say('dot', 'A card is a hug you can put on the fridge.');
     } else if (step === 'name') {
-      await say('dot', 'What is your Sparkee called? Say its name out loud!');
-      await ask('n', 'Say its name. Then tap the button.', ['I said it!']);
+      await ask('dot', 'What is its name? Say it out loud!', ['I said it!']);
       D0.expr = 'star';
-      await say('dot', 'What a perfect name.');
-      await say('dot', 'Greg is going to be so jealous. Greg only has one name, and it is Greg.');
+      await say('dot', cycle(['What a perfect name. Greg is going to be so jealous. Greg only has one name, and it is Greg.', 'A great name! Dot is going to name a crayon that. Sorry, Kevin.'], 'nm', this.st));
     } else if (step === 'feel') {
-      const f = await openFeelingPicker(ART_FEELS, 'How did making it feel?');
+      const f = await openFeelingPicker(ART_FEELS, 'How did you feel while making it?');
       art.feel = f;
-      D0.expr = { fun: 'laugh', proud: 'star', calm: 'cozy', tricky: 'wide' }[f] || 'happy';
+      D0.expr = { fun: 'laugh', proud: 'star', calm: 'cozy', tricky: 'happy' }[f] || 'happy';
       const [a, b] = ART_FEEL_REACT[f] || ['Wonderful.', 'Art is like that.'];
       if (f === 'fun') D0.hop(true);
       await say('dot', a); await say('dot', b);
@@ -207,6 +202,7 @@ SCENES.studio = {
       await sleep(900);
     }
     zoe.mode = 'front';
+    this.lastSize = art.size;
     save.arts.push(art); save.doneQ.art.push(art.q); markDayDone('art', art.q); save.active.art = null; save.counts.art = (save.counts.art || 0) + 1;
     persist(); updateHud();
     // the picture flies from the easel to its place
@@ -245,24 +241,25 @@ SCENES.studio = {
   async reward() {
     const D0 = this.dot;
     if (this.presents) return;
-    await say('dot', cycle(['The studio would like to say thank you.', 'A present! The studio insists.', 'Thank-you presents! Dot wrapped them herself. Badly.'], 'thx', this.st));
+    const project = this.lastSize === 'project';
     await D0.goto(214, 182, 45);
-    const ok = Presents.offer(this, 'studio', [[110, 192], [132, 196], [154, 192]]);
+    const ok = Presents.offer(this, 'studio', [[110, 192], [132, 196], [154, 192]], project ? { golden: true, keep: 2 } : {});
     if (!ok) { await say('dot', 'The studio already has every present I know how to make.'); await say('dot', 'So here is a very fancy invisible present instead. It is a painting of the wind.'); return this.afterPresent(); }
     await zoe.walkTo(86, 188); zoe.face(1);
-    await say('dot', this.presents.length > 1 ? 'Pick one for the studio! Tap a present to peek inside.' : 'Tap the present to peek inside!');
+    await say('dot', save.pending.golden ? 'A big project gets GOLDEN presents! You can keep two!' : cycle(['Thank-you presents! Dot wrapped them herself. Badly. Tap them!', 'Presents! Tap them to see inside.'], 'thx', this.st));
   },
-  async onPlaced(item) {
+  async onPlaced(item, last) {
     const D0 = this.dot;
+    if (!last) { AU.sfx('twinkle'); await Presents.admire(this, item, ['Ooh!', 'So fancy!']); return; }
     if (item === 'beret') {
-      AU.sfx('twinkle'); D0.acc = 'paint beret'; D0.expr = 'star'; D0.jump(140);
-      burst(D0.x, D0.y - 14, 14, { speed: 26, c: '#FFE38A', extra: { layer: 'front' } });
+      AU.sfx('twinkle'); D0.expr = 'star'; D0.jump(140);
+      for (const s of [D0, ...this.sps]) { s.jump(100); burst(s.x, s.y - 14, 8, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } }); }
       await sleep(600);
-      await say('dot', 'I have waited four hundred years for this hat.');
-      await say('dot', 'I am now officially fancy.');
+      await say('dot', 'Berets for everybody! I have waited four hundred years for this hat.');
+      await say('dot', 'We are now officially fancy. All of us.');
     } else if (item === 'sunflower') {
       await Presents.admire(this, item, ['It is so tall!', 'Hello, sunflower!']);
-      await say('dot', 'It is taller than me. I hate it. I love it.');
+      await say('dot', 'It is taller than me. I am naming it Kevin. Kevin the crayon will be confused.');
     } else {
       AU.sfx('twinkle');
       await Presents.admire(this, item, ['Ooh!', 'So colorful!', 'I love it!', 'Fancy!']);
@@ -272,7 +269,6 @@ SCENES.studio = {
   async afterPresent() {
     const D0 = this.dot;
     D0.expr = 'happy';
-    await say('dot', 'The studio looks wonderful.');
     for (const t of leftLines('art')) await say('dot', t);
     if (!save.flags.bathMet) {
       await say('dot', 'Oh! And the door over there, with the sign?');
@@ -332,11 +328,11 @@ SCENES.studio = {
         await say('dot', 'Tap my easel. It always knows what to make next.');
         save.flags.dotMet = true; persist();
       });
-    } else if (save.pending && save.pending.room === 'studio') {
-      cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await say('dot', 'Your present is still here! Pick one.'); await this.reward(); });
+    } else if (save.pending && save.pending.at === 'studio') {
+      cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await say('dot', 'Your present is still here!'); await this.reward(); });
     } else if (o.tell && save.active.art) {
       cut(async () => { FX.fade = 1; await fadeIn(500); await this.tellArt(true); });
-    } else if (!o.arrive) { FX.fade = 1; fadeIn(500); }
+    } else cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await maybeResumeQuest(); });
   },
 };
 function studioItemSpots(S) {
@@ -361,7 +357,7 @@ SCENES.bath = {
     this.st = {}; this.presents = null; this.preview = null; this.choosing = false; this.jarK = 0;
     zoe.visible = true;
     if (o.arrive) { zoe.x = 250; zoe.y = 188; zoe.face(-1); } else { zoe.x = 150; zoe.y = 186; zoe.face(1); }
-    this.bubbles = new Sparkee({ r: 5, seed: 63, x: 120, y: 184, name: 'bubbles', acc: 'cap' });
+    this.bubbles = new Sparkee({ r: 5, seed: 63, x: 120, y: 184, name: 'bubbles', acc: 'crown' });
     this.bubbles.glow = awake ? 1 : 0.22; this.bubbles.look = zoe;
     if (!save.flags.bathMet) { this.bubbles.visible = false; this.bubbles.x = 60; this.bubbles.y = 140; }
     this.sps = [this.bubbles];
@@ -380,7 +376,7 @@ SCENES.bath = {
       { rect: [112, 114, 26, 42], stand: [128, 186], act: line('loo', ['A very small toilet.', 'Bubbles is very proud of it. Do not ask why.', 'You decide not to ask.']) },
       { rect: [34, 28, 50, 46], stand: [60, 186], act: line('win', ['A frosty window. You can see the forest through it. Sort of.', 'Someone drew a smiley face in the frost. It was Bubbles.']) },
       { rect: [206, 116, 30, 26], stand: [220, 186], act: line('towel', ['A pink towel. Very fluffy.', 'It is folded perfectly. Bubbles did that with no hands. Somehow.']) },
-      { rect: [158, 58, 36, 46], stand: [176, 186], face: 'front', act: async () => { await say('n', cycle(["It's you! Your teeth look ready for anything.", 'You smile at the mirror. The mirror smiles back. Rude, copying you.'], 'mir', self.st)); await openMirror(); } },
+      { rect: [158, 58, 36, 46], stand: [176, 186], face: 'front', act: async () => { await say('n', cycle(["It's you! Your teeth look ready for anything.", 'You smile at the mirror. The mirror smiles back. It is very good at copying.'], 'mir', self.st)); await openMirror(); } },
       { rect: [160, 104, 34, 52], stand: [168, 186], face: 1, act: () => self.sink() },
       { rect: [210, 70, 24, 30], stand: [222, 186], face: 'front', act: () => self.jarTalk() },
       ...bathItemSpots(self),
@@ -418,10 +414,10 @@ SCENES.bath = {
     if (!r) return;
     if (r === 'along') {
       const finished = await this.brushAlong();
-      if (finished) await this.logRoutine('brush');
+      if (finished) await this.logRoutines(['brush']);
       return;
     }
-    await this.logRoutine(r === 'floss' ? 'floss' : 'brush');
+    await this.logRoutines(r);
   },
   async brushAlong() {
     const B = this.bubbles;
@@ -430,7 +426,7 @@ SCENES.bath = {
     const ok = await ask('bubbles', 'Bubbles will brush too. Ready?', ['Ready!', 'Not right now.']);
     if (ok === 1) { await say('bubbles', 'Okay! Bubbles will keep the toothbrush warm.'); return false; }
     await B.goto(196, 184, 50); B.look = zoe;
-    B.acc = 'cap brush foam';
+    B.acc = 'crown brush foam';
     const parts = [
       ['Top teeth, this side', ['Little circles!', 'Swish swish swish.']],
       ['Top teeth, that side', ['Do not forget the back teeth!', 'All the way in the back!']],
@@ -463,7 +459,7 @@ SCENES.bath = {
       requestAnimationFrame(step);
     });
     bar.root.remove();
-    B.acc = 'cap';
+    B.acc = 'crown';
     if (stopped) {
       const r = await ask('bubbles', 'Done already? Did you finish brushing?', ['Yes, all done!', 'Not really.']);
       return r === 0;
@@ -474,38 +470,42 @@ SCENES.bath = {
     await say('bubbles', 'Now spit! Into the sink, please. Not on Bubbles.');
     return true;
   },
-  async logRoutine(kind) {
-    const B = this.bubbles, key = kind === 'brush' ? slotNow() + '_brush' : 'floss', t = todayRoutines();
+  async logRoutines(kinds) {
+    const B = this.bubbles, t = todayRoutines(), slot = slotNow();
+    const keyOf = (k) => (k === 'brush' ? slot + '_brush' : 'floss');
+    const fresh = kinds.filter((k) => !t[keyOf(k)]), old = kinds.filter((k) => t[keyOf(k)]);
     B.expr = 'happy';
-    if (t[key]) {
-      if (kind === 'brush') await say('bubbles', slotNow() === 'am' ? 'You already brushed this morning! Super brusher!' : 'You already brushed tonight! Your teeth are SO clean.');
-      else await say('bubbles', 'You already flossed today! Your gums are cheering.');
-      await say('bubbles', kind === 'brush' ? (slotNow() === 'am' ? 'Come back tonight for another sparkle.' : 'Come back in the morning for another sparkle.') : 'Floss again tomorrow for another sparkle.');
+    if (!fresh.length) {
+      if (old.includes('brush')) await say('bubbles', slot === 'am' ? 'You already brushed this morning! Super brusher! Come back tonight for another sparkle.' : 'You already brushed tonight! Your teeth are SO clean. Come back in the morning for another sparkle.');
+      else await say('bubbles', 'You already flossed today! Your gums are cheering. Floss again tomorrow for another sparkle.');
       return;
     }
-    markRoutine(key); save.counts[kind] = (save.counts[kind] || 0) + 1; persist();
+    for (const k of fresh) { markRoutine(keyOf(k)); save.counts[k] = (save.counts[k] || 0) + 1; }
+    persist();
     B.expr = 'star'; B.jump(110);
-    if (kind === 'brush') await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
+    if (fresh.length === 2) await say('bubbles', cycle(['Brushing AND flossing! A double sparkle!', 'Both! Your teeth are throwing a party.', 'Brush and floss! Bubbles is doing a happy splash.'], 'both', this.st));
+    else if (fresh[0] === 'brush') await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
     else await say('bubbles', cycle(['Flossing! The secret hero of teeth.', 'Floss: the tiny string that does big work.', 'In between! Where the sneaky crumbs hide.'], 'fl', this.st));
-    // a sparkle flies into the jar
-    await streamMagic([zoe.x, zoe.y - 30], [BATH.jar[0], BATH.jar[1] - 10], 6, { colors: ['#FFD84A', '#FFF6C8'], gap: 60 });
-    save.jar = Math.min(JAR_SIZE, save.jar + 1); persist();
-    AU.sfx('chime'); this.jarK = 1; tween(900, (k) => { this.jarK = 1 - k; });
-    burst(BATH.jar[0], BATH.jar[1] - 10, 12, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
+    if (old.length) await say('bubbles', old[0] === 'brush' ? '(Brushing already counted this time. The floss sparkle goes in!)' : '(Flossing already counted today. The brushing sparkle goes in!)');
+    // sparkles fly into the jar, one per thing done
+    for (let i = 0; i < fresh.length; i++) {
+      await streamMagic([zoe.x, zoe.y - 30], [BATH.jar[0], BATH.jar[1] - 10], 6, { colors: ['#FFD84A', '#FFF6C8'], gap: 60 });
+      save.jar = save.jar + 1; persist();
+      AU.sfx('chime'); this.jarK = 1; tween(900, (k) => { this.jarK = 1 - k; });
+      burst(BATH.jar[0], BATH.jar[1] - 10, 12, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
+    }
     if (!save.flags.bathAwake) {
       await sleep(400);
       await wakeRoom(this, BATH.sink[0], BATH.sink[1], [B]);
       save.flags.bathAwake = true; persist();
       B.expr = 'star';
-      await say('bubbles', 'Whoa! The whole bathroom is sparkling!');
-      B.expr = 'happy';
-      await say('bubbles', 'Clean teeth are a kind of magic. Bubbles always knew it.');
+      await say('bubbles', 'Whoa! The whole bathroom is sparkling! Clean teeth are a kind of magic.');
     }
     const now = todayRoutines();
     if (now.am_brush && now.pm_brush && now.floss && !this.st.perfect) { this.st.perfect = true; await say('bubbles', 'Morning, night, AND floss! That is a perfect teeth day.'); }
     if (save.jar >= JAR_SIZE) return this.golden();
     const left = JAR_SIZE - save.jar;
-    await say('bubbles', left <= 3 ? `${left} more ${left === 1 ? 'sparkle' : 'sparkles'} until the jar is full!` : 'Another sparkle in the jar!');
+    await say('bubbles', left <= 3 ? `${left} more ${left === 1 ? 'sparkle' : 'sparkles'} until the jar is full!` : 'Into the Sparkle Jar!');
     B.expr = 'norm';
   },
   async golden() {
@@ -516,7 +516,7 @@ SCENES.bath = {
     B.hop(false); B.arms = 'down';
     AU.sfx('whoosh');
     await streamMagic([BATH.jar[0], BATH.jar[1] - 12], [132, 186], 24, { colors: ['#FFD84A', '#FFF6C8', '#F2B030'], gap: 50 });
-    save.jar = 0; persist();
+    save.jar = Math.max(0, save.jar - JAR_SIZE); persist();
     const ok = Presents.offer(this, 'bath', [[110, 192], [132, 196], [154, 192]], { golden: true });
     if (!ok) {
       await say('bubbles', 'The bathroom already has every present Bubbles can think of!');
@@ -575,9 +575,9 @@ SCENES.bath = {
         await say('bubbles', 'You can brush along with me, too. I count to two minutes. I am very good at counting. Mostly.');
         save.flags.bathMet = true; persist();
       });
-    } else if (save.pending && save.pending.room === 'bath') {
-      cut(async () => { FX.fade = 1; await fadeIn(500); await say('bubbles', 'Your golden present is still here! Pick one.'); Presents.offer(this, 'bath', [[110, 192], [132, 196], [154, 192]]); });
-    } else { FX.fade = 1; fadeIn(500); }
+    } else if (save.pending && save.pending.at === 'bath') {
+      cut(async () => { FX.fade = 1; await fadeIn(500); await say('bubbles', 'Your golden present is still here! Tap it!'); Presents.offer(this, 'bath', [[110, 192], [132, 196], [154, 192]]); });
+    } else cut(async () => { FX.fade = 1; await fadeIn(500); await maybeResumeQuest(); });
   },
 };
 function bathItemSpots(S) {

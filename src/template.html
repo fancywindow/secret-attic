@@ -1,14 +1,14 @@
 <title>The Secret Attic</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap">
 <style>
+/*__FONTS__*/
 /* Layout: one pixel stage (288x200 art pixels) scaled to fit; HTML overlays sized in art-pixel units (--u). */
 :root {
   --u: 4px;
   --ink: #2C1A1E; --night: #1E0F14; --plum: #612C48; --pumpkin: #C97034; --gold: #DCA438;
   --parch: #F4EBD9; --parch-edge: #D8C2A7; --cream: #FFF1C8; --moss: #5D6A3E;
-  --font: 'Pixelify Sans', ui-rounded, 'Trebuchet MS', system-ui, sans-serif;
+  /* reading text uses Andika (made for beginning readers); names and signs keep a pixel look */
+  --font: 'Andika', ui-rounded, 'Trebuchet MS', system-ui, sans-serif;
+  --pixel: 'Pixelify Sans', ui-rounded, system-ui, sans-serif;
   color-scheme: dark;
 }
 [hidden] { display: none !important; }
@@ -29,7 +29,7 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
   box-shadow: inset 0 0 0 calc(var(--u) * 1) var(--plum), 0 0 0 calc(var(--u) * 1) var(--parch), 0 0 0 calc(var(--u) * 2) var(--ink), 0 calc(var(--u) * 2) 0 calc(var(--u) * 2) rgba(0,0,0,.35);
   font-size: calc(var(--u) * 7.5); line-height: 1.32; letter-spacing: 0.01em; }
 #dlg.bottom { top: auto; bottom: calc(var(--u) * 6); }
-#dlgName { position: absolute; top: calc(var(--u) * -5); left: calc(var(--u) * 7); background: var(--pumpkin); color: var(--night);
+#dlgName { font-family: var(--pixel); position: absolute; top: calc(var(--u) * -5); left: calc(var(--u) * 7); background: var(--pumpkin); color: var(--night);
   font-size: calc(var(--u) * 5.5); font-weight: 700; padding: 0 calc(var(--u) * 3); border-radius: calc(var(--u) * 1.5);
   box-shadow: 0 0 0 calc(var(--u) * 1) var(--ink); letter-spacing: 0.04em; }
 #dlgText .ghost { color: transparent; }
@@ -67,6 +67,7 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
 .hbtn:active { transform: translateY(calc(var(--u) * 1)); }
 #hQuest { left: calc(var(--u) * 5); background: var(--plum); }
 #hMusic { right: calc(var(--u) * 5); }
+#hMap { right: calc(var(--u) * 5); top: calc(var(--u) * 29); background: #3E5A4A; }
 .hbtn.off .hicon { opacity: 0.35; }
 .hbtn.off::after { content: ''; position: absolute; width: calc(var(--u) * 16); height: calc(var(--u) * 1.5); background: var(--pumpkin); transform: rotate(-45deg); border-radius: 2px; }
 #hQuest.pulse { animation: questIn 1.2s ease-out 1, glowp 1.6s ease-in-out 1.2s 3; }
@@ -92,7 +93,7 @@ button:focus-visible { outline: calc(var(--u) * 1) solid var(--gold); outline-of
 
 /* quest page */
 .card.quest { width: calc(var(--u) * 200); background: linear-gradient(#F7F0E0, #EFE3C8); }
-.qkicker, .ckicker { font-size: calc(var(--u) * 5); text-transform: uppercase; letter-spacing: 0.08em; color: var(--pumpkin); font-weight: 700; display: flex; align-items: center; gap: calc(var(--u) * 1); margin-bottom: calc(var(--u) * 2); }
+.qkicker, .ckicker { font-family: var(--pixel); font-size: calc(var(--u) * 5); text-transform: uppercase; letter-spacing: 0.08em; color: var(--pumpkin); font-weight: 700; display: flex; align-items: center; gap: calc(var(--u) * 1); margin-bottom: calc(var(--u) * 2); }
 .qlead { font-size: calc(var(--u) * 7); margin: 0 0 calc(var(--u) * 3); line-height: 1.25; }
 .qsteps { list-style: none; padding: 0; margin: 0; display: grid; gap: calc(var(--u) * 2); counter-reset: s; }
 .qsteps li { display: flex; align-items: center; gap: calc(var(--u) * 4); font-size: calc(var(--u) * 7); font-weight: 600; counter-increment: s; }
@@ -176,6 +177,59 @@ button[disabled] { opacity: 0.45; }
 .bprog i { width: calc(var(--u) * 4); height: calc(var(--u) * 4); border-radius: 50%; background: #E2D6C0; box-shadow: 0 0 0 calc(var(--u) * 0.5) var(--ink); }
 .bprog i.on { background: #6F9A45; }
 .bprog span { margin-left: calc(var(--u) * 2); }
+/* quick doodle or big project */
+.bsize { display: flex; align-items: center; gap: calc(var(--u) * 1); font-size: calc(var(--u) * 4.5); font-weight: 700; color: #6E5A62; background: #EFE6D6; border-radius: calc(var(--u) * 2); padding: calc(var(--u) * 0.5) calc(var(--u) * 2); }
+.bsize.project { color: #fff; background: #B8862E; }
+.bcard.isproject { background: linear-gradient(#FFF6DC, #FBE7B0); }
+.card.quest.project { background: linear-gradient(#FFF8E4, #F8E2A8); }
+.card.quest.project .qkicker { color: #9A6A20; }
+.card.board.food, .card.quest.food { background: linear-gradient(#FFF4EA, #F8E4D4); }
+.card.board.food .qkicker, .card.quest.food .qkicker { color: #B4502A; }
+/* sink: tick what you did */
+.tickrow { display: flex; align-items: center; gap: calc(var(--u) * 4); width: 100%; text-align: left; color: var(--ink); background: #FFF9EC; border: 0; border-radius: calc(var(--u) * 3);
+  padding: calc(var(--u) * 3) calc(var(--u) * 4); margin: calc(var(--u) * 2.5) 0; box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--parch-edge); }
+.tickrow.on { background: #E6F4EC; box-shadow: 0 0 0 calc(var(--u) * 1.2) #5E8A3A; }
+.tbox { flex: none; display: grid; place-items: center; width: calc(var(--u) * 11); height: calc(var(--u) * 11); border-radius: calc(var(--u) * 2); background: #fff; color: transparent;
+  font-size: calc(var(--u) * 8); font-weight: 700; box-shadow: 0 0 0 calc(var(--u) * 0.8) var(--ink); }
+.tickrow.on .tbox { background: #5E8A3A; color: #fff; }
+.sfoot { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--u) * 4); margin: calc(var(--u) * 3) 0 calc(var(--u) * 1); }
+/* presents, all at once */
+.card.presents { display: grid; justify-items: center; gap: calc(var(--u) * 3); }
+.card.presents.golden { background: linear-gradient(#FFF6D8, #F6DC8C); }
+.prow { display: flex; gap: calc(var(--u) * 4); }
+.pcard { display: grid; justify-items: center; align-content: start; gap: calc(var(--u) * 1.5); width: calc(var(--u) * 70); min-height: calc(var(--u) * 92); padding: calc(var(--u) * 3);
+  background: #FFF9EC; border: 0; border-radius: calc(var(--u) * 3); color: var(--ink);
+  box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--parch-edge), 0 calc(var(--u) * 1.2) 0 calc(var(--u) * 0.75) var(--parch-edge); }
+.pcard:active { transform: translateY(calc(var(--u) * 1)); }
+.pthumb { height: calc(var(--u) * 46); display: grid; place-items: center; }
+.pname { font-size: calc(var(--u) * 6.5); font-weight: 700; color: var(--plum); text-align: center; line-height: 1.1; }
+.pline { font-size: calc(var(--u) * 4.8); color: #6E5A62; text-align: center; line-height: 1.2; }
+.ppick { margin-top: auto; font-size: calc(var(--u) * 5.5); font-weight: 700; color: #fff; background: var(--pumpkin); border-radius: calc(var(--u) * 2); padding: calc(var(--u) * 1) calc(var(--u) * 4); }
+/* quest in progress */
+.card.progress { width: calc(var(--u) * 220); display: grid; justify-items: center; text-align: center; gap: calc(var(--u) * 1.5); padding-top: calc(var(--u) * 6); padding-bottom: calc(var(--u) * 5); }
+.card.progress .qlead { margin: 0; font-size: calc(var(--u) * 6); }
+.card.progress .qsteps { margin: calc(var(--u) * 1) 0; }
+.card.progress .qsteps li { font-size: calc(var(--u) * 6); }
+.card.progress.art { background: linear-gradient(#F4F0F8, #E8E0F0); }
+.card.progress.food { background: linear-gradient(#FFF4EA, #F8E4D4); }
+.card.progress h2 { margin: 0; }
+.card.progress .pbig { font-size: calc(var(--u) * 10); padding: calc(var(--u) * 2.5) calc(var(--u) * 12); margin-top: calc(var(--u) * 1); }
+.card.progress .qsteps { text-align: left; }
+.goline { font-size: calc(var(--u) * 6.5); color: #6E5A62; margin: 0; }
+/* the map */
+.card.map { width: calc(var(--u) * 262); padding-top: calc(var(--u) * 5); }
+.mapgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 3); }
+.mroom { display: grid; justify-items: center; gap: calc(var(--u) * 1); padding: calc(var(--u) * 2); background: #FFF9EC; border: 0; border-radius: calc(var(--u) * 2.5); color: var(--ink);
+  box-shadow: 0 0 0 calc(var(--u) * 0.75) var(--parch-edge), 0 calc(var(--u) * 1) 0 calc(var(--u) * 0.75) var(--parch-edge); }
+.mroom:active:not([disabled]) { transform: translateY(calc(var(--u) * 1)); }
+.mroom.here { box-shadow: 0 0 0 calc(var(--u) * 1.2) var(--pumpkin); }
+.mroom[disabled] { opacity: 1; background: #E9E1D2; }
+.mthumb { position: relative; }
+.mthumb canvas { display: block; border-radius: calc(var(--u) * 1); box-shadow: 0 0 0 calc(var(--u) * 0.6) var(--ink); }
+.mlock { position: absolute; inset: 0; display: grid; place-items: center; }
+.mname { font-size: calc(var(--u) * 5.5); font-weight: 700; color: var(--plum); text-align: center; line-height: 1.1; }
+.mstat { font-size: calc(var(--u) * 4.2); color: #6E5A62; text-align: center; line-height: 1.15; min-height: calc(var(--u) * 5); }
+.mstat b { color: #B8862E; letter-spacing: 0.08em; }
 /* which quest */
 .card.chooser { display: grid; justify-items: center; gap: calc(var(--u) * 2); }
 .chrow { display: flex; gap: calc(var(--u) * 5); }
@@ -234,7 +288,7 @@ button[disabled] { opacity: 0.45; }
 
 /* ---------- title ---------- */
 #title { position: absolute; inset: 0; z-index: 30; display: grid; grid-template-rows: 1fr auto auto; justify-items: center; padding: calc(var(--u) * 9) 0 calc(var(--u) * 6); }
-.logo { text-align: center; line-height: 0.92; align-self: start; }
+.logo { font-family: var(--pixel); text-align: center; line-height: 0.92; align-self: start; }
 .logo .l1 { display: block; font-size: calc(var(--u) * 7); color: var(--gold); letter-spacing: 0.3em; font-weight: 600; margin-bottom: calc(var(--u) * 1); }
 .logo .l2 { display: block; font-size: calc(var(--u) * 19); font-weight: 700; color: var(--cream); letter-spacing: 0.02em;
   text-shadow: 0 calc(var(--u) * 1) 0 var(--plum), 0 calc(var(--u) * 2) 0 var(--plum), 0 calc(var(--u) * 3) 0 var(--ink), 0 0 calc(var(--u) * 10) rgba(255,200,80,.35); }
@@ -265,6 +319,7 @@ button[disabled] { opacity: 0.45; }
     <div id="hud" class="ui" hidden>
       <button id="hQuest" class="hbtn" type="button" hidden aria-label="Your quest"></button>
       <button id="hMusic" class="hbtn" type="button" aria-label="Music on or off"></button>
+      <button id="hMap" class="hbtn" type="button" hidden aria-label="Map of the treehouse"></button>
     </div>
     <div id="modal" class="modal ui" hidden></div>
     <div id="title" class="ui" hidden>

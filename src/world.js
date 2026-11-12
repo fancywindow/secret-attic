@@ -165,6 +165,56 @@ function sparkeeBodies(r, seed) {
   return SPK_CACHE[k];
 }
 
+// Greg's handlebar mustache: dark, two pixels thick, wider than his face, with curled tips
+function drawMustache(g, cx, y, bright) {
+  const m = bright ? '#3A1A0A' : '#3E3630', h = bright ? '#7A4220' : '#5E544C';
+  D.r(g, cx - 4, y, 4, 1, m); D.r(g, cx + 1, y, 4, 1, m);             // tops of the two lobes
+  D.r(g, cx - 7, y + 1, 15, 1, m);                                  // the bar
+  D.r(g, cx - 6, y + 2, 5, 1, m); D.r(g, cx + 2, y + 2, 5, 1, m);     // bottoms of the lobes
+  D.r(g, cx - 3, y, 2, 1, h); D.r(g, cx + 2, y, 2, 1, h);             // shine
+  // handlebar tips curl up past his face
+  D.p(g, cx - 8, y + 1, m); D.p(g, cx - 9, y, m); D.p(g, cx - 9, y - 1, m); D.p(g, cx - 8, y - 2, m);
+  D.p(g, cx + 8, y + 1, m); D.p(g, cx + 9, y, m); D.p(g, cx + 9, y - 1, m); D.p(g, cx + 8, y - 2, m);
+}
+// things Sparkees wear or hold (hx, hy = center of the head; R = radius)
+function drawAccessory(g, k, hx, hy, R, t, sp) {
+  const ink = '#2C1A1E';
+  switch (k) {
+    case 'paint': D.p(g, hx - R + 2, hy + 2, '#E8628A'); D.p(g, hx - R + 3, hy + 2, '#E8628A'); D.p(g, hx + R - 2, hy + 3, '#3E5AA8'); D.p(g, hx + 1, hy + R - 1, '#6F9A45'); D.p(g, hx + 2, hy + R - 1, '#6F9A45'); break;
+    case 'beret':
+      D.ell(g, hx + 1, hy - R + 1, R + 1, 3, ink); D.ell(g, hx + 1, hy - R + 1, R, 2, '#C8323C'); D.r(g, hx - 2, hy - R, 4, 1, '#E8584A'); D.r(g, hx + 1, hy - R - 3, 1, 2, ink); break;
+    case 'headphones':
+      D.r(g, hx - R + 1, hy - R - 2, 2 * R - 1, 2, ink); D.r(g, hx - R + 2, hy - R - 1, 2 * R - 3, 1, '#5A84C4');
+      D.r(g, hx - R - 1, hy - R, 2, R, ink); D.r(g, hx + R, hy - R, 2, R, ink);
+      for (const sx of [hx - R - 3, hx + R]) { D.r(g, sx, hy - 2, 4, 6, ink); D.r(g, sx + 1, hy - 1, 2, 4, '#E8628A'); D.p(g, sx + 1, hy - 1, '#FFB0C8'); }
+      if (Math.sin(t * 4) > 0) { D.p(g, hx + R + 5, hy - R - 2, '#9A6AB0'); D.p(g, hx + R + 5, hy - R - 3, '#9A6AB0'); D.p(g, hx + R + 6, hy - R - 3, '#9A6AB0'); }
+      break;
+    case 'glasses':
+      for (const ex of [hx - 3, hx + 2]) { D.ring(g, ex, hy - 1, 2, ink); D.p(g, ex - 1, hy - 2, '#E8F6FA'); }
+      D.r(g, hx - 1, hy - 2, 2, 1, ink); break;
+    case 'chef':
+      D.r(g, hx - R + 1, hy - R - 1, 2 * R - 1, 3, ink); D.r(g, hx - R + 2, hy - R, 2 * R - 3, 2, '#FFFFFF');
+      D.disc(g, hx - 3, hy - R - 4, 4, ink); D.disc(g, hx + 3, hy - R - 4, 4, ink); D.disc(g, hx, hy - R - 6, 4, ink);
+      D.disc(g, hx - 3, hy - R - 4, 3, '#FFFFFF'); D.disc(g, hx + 3, hy - R - 4, 3, '#FFFFFF'); D.disc(g, hx, hy - R - 6, 3, '#FFFFFF');
+      D.p(g, hx - 4, hy - R - 6, '#E8EEF0'); D.p(g, hx + 2, hy - R - 2, '#E0E6EA'); break;
+    case 'apron':
+      D.r(g, hx - 3, hy + 2, 7, R - 1, '#E8628A'); D.r(g, hx - 3, hy + 2, 7, 1, '#FFFFFF'); D.p(g, hx, hy + 4, '#FFFFFF'); D.line(g, hx - 3, hy + 2, hx - R + 1, hy - 1, '#FFFFFF'); D.line(g, hx + 3, hy + 2, hx + R - 1, hy - 1, '#FFFFFF'); break;
+    case 'hardhat':
+      D.ell(g, hx, hy - R, R + 1, 3, ink); D.ell(g, hx, hy - R, R, 2, '#F2B030'); D.r(g, hx - R - 1, hy - R + 1, 2 * R + 3, 2, ink); D.r(g, hx - R, hy - R + 1, 2 * R + 1, 1, '#E8A020'); D.r(g, hx - 1, hy - R - 3, 2, 3, '#FFD84A'); break;
+    case 'crown': {
+      // Bubbles' floating ring of soap bubbles
+      for (let i = 0; i < 5; i++) {
+        const a = t * 1.3 + i * (Math.PI * 2 / 5), bx = hx + Math.cos(a) * (R + 2), by = hy - R - 4 + Math.sin(a) * 2 - (i % 2);
+        const r = i % 2 ? 2 : 1.5;
+        D.ring(g, bx, by, r, '#9ACDE0'); D.p(g, Math.round(bx) - 1, Math.round(by) - 1, '#FFFFFF');
+      }
+      break;
+    }
+    case 'foam': for (const [dx, dy] of [[-2, 3], [0, 4], [2, 3], [-1, 5], [1, 5], [3, 4]]) D.p(g, hx + dx, hy + dy, '#FFFFFF'); break;
+    case 'brush': { const s = Math.round(Math.sin(t * 22) * 1.5); D.line(g, hx + R + 1, hy + 3 + s, hx + 2, hy + 3 + s, '#5ACDE0'); D.r(g, hx + 1, hy + 2 + s, 2, 2, '#FFFFFF'); break; }
+    case 'floss': { const s = Math.round(Math.sin(t * 10) * 2); D.line(g, hx - R - 2, hy + s, hx + R + 2, hy - s, '#FFFFFF'); break; }
+  }
+}
 class Sparkee {
   constructor(o) {
     Object.assign(this, {
@@ -241,27 +291,8 @@ class Sparkee {
       D.p(g, left + B.cx - this.r - 1, ay + 1, ac); D.p(g, left + B.cx + this.r + 1, ay + 1, ac);
     }
     this.drawFace(g, left + B.cx, top + B.cy);
-    const acc = (this.acc || '').split(' ');
-    const hx0 = left + B.cx, hy0 = top + B.cy, R = this.r;
-    if (acc.includes('paint')) { D.p(g, hx0 - R + 2, hy0 + 2, '#E8628A'); D.p(g, hx0 - R + 3, hy0 + 2, '#E8628A'); D.p(g, hx0 + R - 2, hy0 + 3, '#3E5AA8'); D.p(g, hx0 + 1, hy0 + R - 1, '#6F9A45'); D.p(g, hx0 + 2, hy0 + R - 1, '#6F9A45'); }
-    if (acc.includes('beret')) {
-      D.ell(g, hx0 + 1, hy0 - R + 1, R, 2, '#2C1A1E'); D.ell(g, hx0 + 1, hy0 - R + 1, R - 1, 1, '#C8323C'); D.r(g, hx0 + 1, hy0 - R - 2, 1, 2, '#2C1A1E');
-    }
-    if (acc.includes('cap')) {
-      D.ell(g, hx0, hy0 - R + 2, R + 1, 3, '#2C1A1E'); D.ell(g, hx0, hy0 - R + 2, R, 2, '#F2A0B0');
-      for (let k = -R + 1; k < R; k += 2) D.p(g, hx0 + k, hy0 - R + 4, '#FFFFFF');
-      D.p(g, hx0 - 2, hy0 - R + 1, '#FFFFFF'); D.p(g, hx0 + 2, hy0 - R, '#FFFFFF');
-    }
-    if (acc.includes('foam')) { for (const [dx, dy] of [[-2, 3], [0, 4], [2, 3], [-1, 5], [1, 5], [3, 4]]) D.p(g, hx0 + dx, hy0 + dy, '#FFFFFF'); }
-    if (acc.includes('brush')) { const s = Math.round(Math.sin(this.t * 22) * 1.5); D.line(g, hx0 + R + 1, hy0 + 3 + s, hx0 + 2, hy0 + 3 + s, '#5ACDE0'); D.r(g, hx0 + 1, hy0 + 2 + s, 2, 2, '#FFFFFF'); }
-    if (acc.includes('floss')) { const s = Math.round(Math.sin(this.t * 10) * 2); D.line(g, hx0 - R - 2, hy0 + s, hx0 + R + 2, hy0 - s, '#FFFFFF'); }
-    if (acc.includes('headphones')) {
-      const hx = left + B.cx, hy = top + B.cy;
-      D.line(g, hx - this.r, hy - 1, hx - this.r + 2, hy - this.r - 1, C.ink);
-      D.line(g, hx - this.r + 2, hy - this.r - 1, hx + this.r - 2, hy - this.r - 1, C.ink);
-      D.line(g, hx + this.r - 2, hy - this.r - 1, hx + this.r, hy - 1, C.ink);
-      D.r(g, hx - this.r - 1, hy - 1, 2, 4, '#E8628A'); D.r(g, hx + this.r, hy - 1, 2, 4, '#E8628A');
-    }
+    const acc = (this.acc || '').split(' ').filter(Boolean);
+    for (const k of acc) drawAccessory(g, k, left + B.cx, top + B.cy, this.r, this.t, this);
     if (this.emote > 0) {
       const ex = x - 2, ey = top - 10;
       D.r(g, ex - 1, ey - 1, 7, 10, C.ink); D.r(g, ex, ey, 5, 8, C.white);
@@ -295,13 +326,12 @@ class Sparkee {
     if (greg) {
       const mc = this.glow > 0.5 ? '#6E3B1A' : '#4E4236', mh = this.glow > 0.5 ? '#946030' : '#6A5E50';
       // mouth below mustache
-      const my = cy + 3;
+      const my = cy + 5;
       if (e === 'laugh' || e === 'wide') { D.r(g, cx - 1, my, 2, 2, mouthC); }
       else if (e === 'sad' || e === 'sadblink') { D.r(g, cx - 1, my + 1, 2, 1, mouthC); }
       else D.r(g, cx - 1, my, 2, 1, mouthC);
-      D.r(g, cx - 4, cy + 1, 3, 2, mc); D.r(g, cx, cy + 1, 3, 2, mc); D.r(g, cx - 1, cy + 1, 1, 1, mc);
-      D.p(g, cx - 5, cy + 1, mc); D.p(g, cx - 6, cy, mc); D.p(g, cx + 3, cy + 1, mc); D.p(g, cx + 4, cy, mc);
-      D.p(g, cx - 3, cy + 1, mh); D.p(g, cx + 1, cy + 1, mh);
+      const talk = Dlg.talker === this && Dlg.typing ? Math.round(Math.sin(this.t * 18)) : 0;
+      drawMustache(g, cx, cy + 2 + (talk > 0 ? 1 : 0), this.glow > 0.5);
     } else {
       const my = cy + 2;
       if (e === 'laugh') { D.r(g, cx - 1, my, 3, 2, mouthC); D.p(g, cx, my + 1, '#E86A6A'); }
@@ -370,7 +400,7 @@ function drawParticles(g, layer) {
 const SPEAKERS = {
   n: { name: '', v: 'n' }, greg: { name: 'Greg', v: 'greg' }, sp: { name: 'A Sparkee', v: 'sp' },
   sp2: { name: 'Another Sparkee', v: 'sp' }, sp3: { name: 'A small Sparkee', v: 'sp' }, all: { name: 'The Sparkees', v: 'all' },
-  dot: { name: 'Dot', v: 'sp' }, bubbles: { name: 'Bubbles', v: 'sp' },
+  dot: { name: 'Dot', v: 'sp' }, bubbles: { name: 'Bubbles', v: 'sp' }, noodle: { name: 'Chef Noodle', v: 'sp' }, pip: { name: 'Pip', v: 'sp' },
 };
 const Dlg = {
   active: false, typing: false, talker: null, res: null, full: '', shown: 0, acc: 0, opts: null, hold: 0, lineId: 0, readyAt: 0,
@@ -385,7 +415,7 @@ const Dlg = {
     this.nm.textContent = sp.name; this.nm.hidden = !sp.name;
     this.op.innerHTML = ''; this.op.hidden = true; this.next.hidden = true; this.lineId++;
     this.el.hidden = false; this.active = true;
-    this.talker = o.actor || (['greg', 'dot', 'bubbles'].includes(who) && scene ? scene[who] : null) || null;
+    this.talker = o.actor || (['greg', 'dot', 'bubbles', 'noodle', 'pip'].includes(who) && scene ? scene[who] : null) || null;
     this.render();
     Voice.say(text, sp.v);
   },

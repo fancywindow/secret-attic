@@ -36,7 +36,7 @@ SCENES.hall = {
     ];
     this.hotspots = [
       { rect: [12, 16, 36, 142], stand: [50, 182], act: async () => { await say('n', cycle(['Tick. Tock. Tick. Tock.', "It's a clock. It doesn't know any other words.", "It's almost midnight. Very spooky. Very exciting."], 'clock', self.st)); } },
-      { rect: [62, 26, 46, 68], stand: [86, 182], act: async () => { await say('n', cycle(['Great-Great-Aunt Agnes.', 'She looks like she has never had a snack in her life.', 'Her eyes follow you around the room. Rude.'], 'agnes', self.st)); } },
+      { rect: [62, 26, 46, 68], stand: [86, 182], act: async () => { await say('n', cycle(['Great-Great-Aunt Agnes.', 'She looks like she is thinking about soup. She is always thinking about soup.', 'Her eyes follow you around the room. She is very curious.'], 'agnes', self.st)); } },
       { rect: [116, 86, 34, 72], stand: [138, 184], act: async () => {
         self.lamp = !self.lamp; AU.sfx('click');
         await say('n', self.lamp ? "Click. The lamp's back on. It's doing a great job." : 'Click. Very dark. Very dramatic.');
@@ -399,8 +399,9 @@ SCENES.library = {
     this.hatchK = save.flags.hatch ? 1 : 0; this.shelfBookGone = false; this.dj = null; this.lounger = null; this.choosing = false;
     this.song = done ? 'warm' : 'drab';
     zoe.visible = true;
-    if (o.arrive) { zoe.x = 31; zoe.y = 190; } else { zoe.x = 96; zoe.y = 186; }
+    if (o.arrive) { zoe.x = 31; zoe.y = 190; } else if (o.from === 'kitchen') { zoe.x = 248; zoe.y = 188; } else if (o.from === 'tower') { zoe.x = 86; zoe.y = 182; } else if (o.fromStudio) { zoe.x = 114; zoe.y = 178; } else { zoe.x = 96; zoe.y = 186; }
     zoe.face(1);
+    this.doorK = save.flags.kitchenKey ? 1 : 0; this.caseK = 0;
     this.greg = new Sparkee({ r: 7, seed: 99, greg: true, x: 120, y: 184, name: 'greg' });
     this.sps = makeSparkees([{ x: 140, y: 178 }, { x: 206, y: 188 }, { x: 222, y: 174 }, { x: 246, y: 186 }, { x: 62, y: 174 }, { x: 160, y: 192 }]);
     const g0 = done ? 1 : 0.22;
@@ -409,6 +410,8 @@ SCENES.library = {
     if (save.items.library.includes('headphones')) { const s = this.sps[2]; s.x = 233; s.y = 136; s.acc = 'headphones'; s.mode = 'idle'; s.hop(true); this.dj = s; }
     if (save.items.library.includes('beanbag')) { const s = this.sps[0]; s.x = LIB.beanbag[0]; s.y = LIB.beanbag[1] - 10; s.mode = 'idle'; s.sitting = true; this.lounger = s; }
     this.actors = [zoe, this.greg, ...this.sps];
+    applyWearables(this);
+    if (this.building()) this.sps.forEach((s) => { if (s !== this.dj && s !== this.lounger) s.acc = ((s.acc || '') + ' hardhat').trim(); });
     const self = this;
     const isDone = () => save.stage === 'done';
     hints = [
@@ -418,6 +421,8 @@ SCENES.library = {
       { x: 98, y: 82, strong: true, when: () => isDone() && !save.active.read && !dayDone('read') && !self.presents && !save.pending && !self.shelfBookGone },
       { x: 180, y: 156, when: () => isDone() && !!save.active.read && !self.presents },
       { x: 118, y: 22, off: 0.6, when: () => isDone() && self.hatchK >= 1 && !save.flags.dotMet },
+      { x: 92, y: 118, strong: true, when: () => save.lib.level >= 2 && !save.flags.towerSeen },
+      { x: 268, y: 116, strong: true, when: () => save.flags.kitchenKey && !save.flags.chefMet },
     ];
     this.hotspots = [
       { rect: [12, 176, 38, 22], stand: [44, 188], act: () => self.leave() },
@@ -425,6 +430,8 @@ SCENES.library = {
       { rect: [28, 44, 28, 26], when: () => self.bookShown, stand: [56, 184], face: 'front', act: () => openBookCard(save.books[save.books.length - 1]) },
       { hit: (x, y) => self.spineAt(x, y) >= 0, stand: [70, 184], face: 'front', act: () => openBookCard(save.books[self.spineAt(self._tapX, self._tapY)] || save.books[0]) },
       { rect: [100, 4, 30, 150], when: () => self.hatchK >= 1, stand: [114, 178], face: 'front', act: () => self.climb() },
+      { rect: [68, 72, 32, 78], when: () => save.lib.level >= 2, stand: [86, 182], face: 'front', act: () => self.toTower() },
+      { rect: [60, 40, 52, 112], when: () => self.building(), stand: [86, 184], face: 'front', act: async () => { await say('n', cycle(['Scaffolding! The Sparkees are building something.', 'There is a blueprint. It says TOWER. The O is a drawing of Greg.'], 'scaf', self.st)); await say('greg', `${3 - save.lib.build} more ${3 - save.lib.build === 1 ? 'reading quest' : 'reading quests'} and the builders can finish!`); } },
       { rect: [142, 96, 72, 58], stand: [196, 178], act: async () => {
         if (self.fireK > 0) await say('n', cycle(['Crackle, crackle. The fire is showing off now.', 'Warm and cozy. Your story did that.'], 'fire', self.st));
         else await say('n', cycle(['The fireplace is cold. It looks bored.', 'A fire needs wood. This one also needs a story.'], 'fire0', self.st));
@@ -455,17 +462,43 @@ SCENES.library = {
     if (save.stage === 'library') await say('greg', 'The bookshelf! Give it a tap. It knows what to do.');
     else if (save.stage === 'quest') { await say('greg', "Back already? Did you read your animal book?"); await say('greg', 'Sit on the storytelling stool and tell us everything!'); }
     else if (save.active.read) { const q = readQuest(save.active.read); await say('greg', `Your quest is ${q.title}.`); await say('greg', 'When you are done, sit on the storytelling stool and tell us everything!'); }
-    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', 'Did you know that Greg means "Greg"?', dayDone('read') ? 'You did all three quests today! Greg is exhausted, and Greg did nothing.' : 'The bookshelf has quests for you today. Three of them!', save.flags.hatch ? 'Dot is up the ladder. Tell her Greg says hi. She will pretend not to care.' : 'Greg has a good feeling about today.', `We have ${save.books.length} ${save.books.length === 1 ? 'story' : 'stories'} on the shelf now. Greg counts them every night.`], 'greg', this.st));
+    else if (!save.flags.gregory) {
+      save.flags.gregory = true; persist();
+      await say('greg', '{name}, Greg would like to introduce you to someone.');
+      G.expr = 'star';
+      await say('greg', 'This is Gregory.');
+      await say('n', '(Greg points at his mustache.)');
+      await say('greg', 'Gregory is a mustache. He has been here the whole time.');
+      await say('greg', 'He is very shy. Say hi to Gregory.');
+      await ask('n', 'Say hi to Gregory?', ['Hi, Gregory!']);
+      G.expr = 'happy';
+      await say('greg', 'He says hi back. He is wiggling. That is how mustaches wave.');
+    }
+    else await say('greg', cycle(['Greg.', 'Greg is very proud of you.', "Greg's first favorite feeling is cozy. Greg's second favorite feeling is Tuesday.", 'Gregory the mustache says hello. Gregory is very polite.', 'Greg once had a staring contest with a door. The door won.', 'Greg can count to eleventy. Eleventy is a big number. Greg made it up.', 'Did you know that Greg means "Greg"?', dayDone('read') ? 'You did all three quests today! Greg is exhausted, and Greg did nothing.' : 'The bookshelf has quests for you today. Three of them!', save.flags.hatch ? 'Dot is up the ladder. Tell her Greg says hi. And Gregory says hi too.' : 'Greg has a good feeling about today.', `We have ${save.books.length} ${save.books.length === 1 ? 'story' : 'stories'} on the shelf now. Greg counts them every night.`], 'greg', this.st));
     G.expr = 'norm';
   },
   async kitchen() {
+    if (save.flags.kitchenKey) {
+      AU.sfx('creak');
+      await fadeOut(400);
+      goScene('kitchen', { arrive: true });
+      return;
+    }
     AU.sfx('rattle');
     await say('n', cycle(['A locked door. The sign says KITCHEN.', 'It smells like cookies in there. Locked cookies.'], 'kit', this.st));
-    if (!this.st.kitGreg) {
-      this.st.kitGreg = 1;
-      await say('greg', 'That is the kitchen. It got locked when the magic faded.');
-      await say('greg', 'Someday, maybe...');
-    }
+    if (save.stage !== 'done') return;
+    const p = roomProgress('library');
+    await say('greg', 'The kitchen got locked when the magic faded. Greg has looked everywhere for the key.');
+    if (p.have >= p.total) await say('greg', 'But the library is full of presents now. Greg has a feeling the NEXT present is the key!');
+    else await say('greg', `Greg has a theory: the key is the very last present in the library. ${p.total - p.have} more ${p.total - p.have === 1 ? 'present' : 'presents'} to go!`);
+  },
+  // the Sparkees are building the Reading Tower (after the kitchen key, before level 2)
+  building() { return !!save.flags.kitchenKey && save.lib.level < 2; },
+  async toTower() {
+    AU.sfx('creak');
+    await tween(700, (k) => { this.caseK = ease(k); });
+    await fadeOut(400);
+    goScene('tower', { arrive: true });
   },
   async leave() {
     if (!['done'].includes(save.stage)) { await say('greg', 'Wait! Not yet! The library needs you!'); return; }
@@ -481,7 +514,7 @@ SCENES.library = {
       const pick = await openQuestBoard('read');
       if (!pick) { if (dayDone('read')) await say('greg', 'All three quests done today! The bookshelf is napping. Three new quests tomorrow.'); return; }
       if (pick === save.active.read) {
-        const r = await openQuestPage(readQuest(pick), 'read', true);
+        const r = await openInProgress('read', readQuest(pick));
         if (r === 'done') await this.tellRead(true);
         return;
       }
@@ -586,10 +619,10 @@ SCENES.library = {
   },
   async reactFeeling(f) {
     const G = this.greg, S = this.sps;
-    if (f === 'funny') { S.forEach((s) => (s.expr = 'laugh')); bubble(S[0], 'Hee hee!', 1300, true); setTimeout(() => bubble(S[3], 'Ha!', 1100), 300); G.expr = 'laugh'; await sleep(900); await say('greg', 'Funny ones are the best. Greg is laughing on the inside.'); }
-    else if (f === 'exciting') { S.forEach((s) => (s.expr = 'star')); bubble(S[1], 'Ooooh!', 1300, true); G.expr = 'wide'; await sleep(900); await say('greg', "Exciting! Greg's heart is going thump-thump."); }
-    else if (f === 'cozy') { S.forEach((s) => (s.expr = 'cozy')); bubble(S[2], 'Awwww.', 1300, true); G.expr = 'happy'; await sleep(900); await say('greg', "Cozy is Greg's favorite feeling. Second favorite is Tuesday."); }
-    else { S.forEach((s) => { s.expr = 'sad'; s.tear = 1.2; }); G.expr = 'sad'; G.tear = 1.2; bubble(S[1], '*sniff*', 1300, true); await sleep(900); await say('greg', 'Sad stories count too.'); await say('greg', 'Look, Greg is already crying. In a good way.'); }
+    if (f === 'funny') { S.forEach((s) => (s.expr = 'laugh')); bubble(S[0], 'Hee hee!', 1300, true); setTimeout(() => bubble(S[3], 'Ha!', 1100), 300); G.expr = 'laugh'; await sleep(900); await say('greg', 'Giggly! Funny books are the best. Greg is giggling on the inside.'); }
+    else if (f === 'exciting') { S.forEach((s) => (s.expr = 'star')); bubble(S[1], 'Ooooh!', 1300, true); G.expr = 'wide'; await sleep(900); await say('greg', "Excited! Greg's heart is going thump-thump."); }
+    else if (f === 'cozy') { S.forEach((s) => (s.expr = 'cozy')); bubble(S[2], 'Awwww.', 1300, true); G.expr = 'happy'; await sleep(900); await say('greg', "Cozy! Cozy is Greg's first favorite feeling. Greg's second favorite feeling is Tuesday."); }
+    else { S.forEach((s) => { s.expr = 'sad'; s.tear = 1.2; }); G.expr = 'sad'; G.tear = 1.2; bubble(S[1], '*sniff*', 1300, true); await sleep(900); await say('greg', 'Sad stories count too.'); await say('greg', 'They make your heart a little bigger. Like a balloon. A heart balloon.'); }
   },
   async magic(animal, feel) {
     const G = this.greg, S = this.sps;
@@ -658,24 +691,29 @@ SCENES.library = {
     if (this.presents) return;
     const first = save.stage === 'reward';
     G.expr = 'happy';
-    await say('greg', first ? 'The library wants to say thank you.' : cycle(['The library has something for you.', 'A present! The library is a big fan of yours.', 'Thank-you presents! The library insists.'], 'thanks', this.st));
     const side = [[196, 184], [210, 192], [224, 182], [238, 192], [182, 194], [250, 180]];
     this.sps.forEach((s, i) => { if (s === this.dj || s === this.lounger) return; s.sitting = false; s.mode = 'goto'; s.goto(side[i][0], side[i][1], 55); });
-    await G.goto(176, 178, 45);
-    const ok = Presents.offer(this, 'library', [[120, 192], [142, 196], [164, 192]], first ? { items: ['beanbag', 'lights', 'headphones'] } : {});
+    G.goto(176, 178, 45);
+    const spots = [[120, 192], [142, 196], [164, 192]];
+    let ok;
+    if (save.pending && save.pending.at === 'library') ok = Presents.offer(this, save.pending.room, spots);
+    else if (first) ok = Presents.offer(this, 'library', spots, { items: ['beanbag', 'lights', 'headphones'] });
+    else if (!roomFull('library')) ok = Presents.offer(this, 'library', spots);
+    else if (!save.flags.kitchenKey) ok = Presents.offer(this, 'library', [[142, 194]], { items: ['kitchenkey'], golden: true });
+    else ok = Presents.offer(this, 'tower', spots);
     if (!ok) {
-      await say('greg', 'Hmm. The library already has every present it knows how to make.');
-      await say('greg', 'So instead, Greg will give you this: a very sincere thumbs up.');
-      await say('n', '(Greg does not have thumbs.)');
+      await say('greg', 'The Reading Tower is full of presents! Every last one.');
+      await say('greg', 'Greg hears the builders are dreaming up something even bigger. Someday.');
       return this.afterPresent();
     }
     await zoe.walkTo(96, 188); zoe.face(1);
     const n = this.presents.length;
-    await say('greg', n === 1 ? 'One present! Tap it to peek inside.' : `${n === 3 ? 'Three' : 'Two'} presents! Pick one for the library.`);
-    if (n > 1) await say('greg', 'Tap a present to peek inside.');
+    if (save.pending.items[0] === 'kitchenkey') await say('greg', 'A GOLDEN present! The very last one in the library!');
+    else await say('greg', first ? 'The library wants to say thank you! Tap the presents.' : n === 1 ? 'A present! Tap it!' : cycle(['Presents! Tap them to see what is inside.', 'The library has presents for you! Take a look.'], 'thanks', this.st));
   },
   async onPlaced(item) {
     const G = this.greg, S = this.sps;
+    if (item === 'kitchenkey') return this.keyFound();
     if (item === 'beanbag') {
       const s = S[0]; s.sitting = false; s.mode = 'goto';
       await s.goto(LIB.beanbag[0] - 22, 184, 60);
@@ -709,8 +747,12 @@ SCENES.library = {
   async afterPresent() {
     const G = this.greg, S = this.sps;
     G.expr = 'happy';
-    await say('greg', 'The library looks wonderful.');
+    if (save.stage !== 'reward' && roomFull('library') && !save.flags.kitchenKey) {
+      await say('greg', 'Look at this place! The library is FULL of presents.');
+      await say('greg', 'Greg has a feeling the next present will be very, very special.');
+    }
     if (save.stage === 'reward') {
+      await say('greg', 'The library looks wonderful.');
       await say('greg', 'And {name}, here is a secret: the bookshelf has more quests.');
       await say('greg', 'Every day it has three. Do one, or do all three! It is the bookshelf\'s job. It takes it very seriously.');
       G.expr = 'norm';
@@ -725,6 +767,75 @@ SCENES.library = {
       this.wanderAll();
     }
   },
+  async keyFound() {
+    const G = this.greg, S = this.sps;
+    AU.sfx('surprise');
+    [G, ...S].forEach((s) => { s.expr = 'wide'; s.look = { x: 270, y: 120 }; });
+    await say('greg', 'The KITCHEN KEY!');
+    // the key floats to the door
+    this.keyFly = { t: 0 };
+    AU.sfx('whoosh');
+    await tween(1200, (k) => { this.keyFly.t = k; });
+    this.keyFly = null;
+    AU.sfx('click'); await sleep(300); AU.sfx('creak');
+    burst(278, 128, 16, { speed: 30, c: '#F2D27A', extra: { layer: 'front' } });
+    save.flags.kitchenKey = true; persist();
+    await tween(900, (k) => { this.doorK = k; });
+    AU.sfx('cheer');
+    [G, ...S].forEach((s) => { s.expr = 'happy'; s.look = zoe; s.jump(100); });
+    await say('greg', 'The kitchen is open! It smells like cookies. Unlocked cookies!');
+    await say('greg', 'Somebody lives in there. A chef. Go say hi!');
+    // library level 1: complete. Time to build.
+    G.expr = 'star';
+    await say('greg', 'And {name}... the library is full. Library Level 1: complete!');
+    await say('greg', 'Do you know what happens when a library gets full?');
+    G.expr = 'happy';
+    await say('greg', 'CONSTRUCTION!');
+    AU.sfx('poof');
+    S.forEach((s) => { if (s !== this.dj && s !== this.lounger) { s.acc = ((s.acc || '') + ' hardhat').trim(); burst(s.x, s.y - 14, 6, { speed: 20, c: '#F2B030', extra: { layer: 'front' } }); } });
+    save.lib.build = 0; persist();
+    await sleep(500);
+    await say('sp', 'We have hard hats!', { actor: S[1] });
+    await say('greg', 'The builders need magic to build. And magic comes from stories.');
+    await say('greg', 'Three more reading quests, and they can build something amazing. Greg is not allowed to say what.');
+    await say('greg', 'It is a tower.');
+    await say('greg', 'Greg was not supposed to say that.');
+    G.expr = 'norm';
+    this.wanderAll();
+  },
+  // after a reading quest while building: the magic goes into the construction
+  async buildStep() {
+    const G = this.greg, S = this.sps;
+    save.lib.build++; persist();
+    AU.sfx('whoosh');
+    await streamMagic([LIB.fire[0], LIB.fire[1] - 10], [86, 100], 24, { colors: ['#FFE38A', '#F2B030'] });
+    const bang = async () => { for (let i = 0; i < 4; i++) { AU.sfx('knock'); burst(70 + Math.random() * 34, 60 + Math.random() * 80, 6, { speed: 20, c: '#E8DCCE', extra: { layer: 'front' } }); cam.x = (i % 2 ? 1 : -1); await sleep(220); } cam.x = 0; };
+    S.forEach((s, i) => { if (s !== this.dj && s !== this.lounger) { s.mode = 'goto'; s.sitting = false; s.goto(64 + (i % 3) * 18, 178 + (i % 2) * 10, 60); } });
+    await sleep(500);
+    await bang();
+    if (save.lib.build < 3) {
+      AU.sfx('sparkle');
+      await say('greg', save.lib.build === 1 ? 'The builders are building! Hear that? Bang bang bang.' : 'Look! You can see a door! A door in the BOOKSHELF!');
+      await say('greg', `${3 - save.lib.build} more ${3 - save.lib.build === 1 ? 'reading quest' : 'reading quests'} until it is finished.`);
+      for (const t of leftLines('read')) await say('greg', t);
+      this.wanderAll();
+      return;
+    }
+    // finished!
+    await bang();
+    AU.sfx('fwoomp');
+    FX.flashColor = '#FFF1C8'; tween(800, (k) => { FX.flash = 0.8 * (1 - k); });
+    save.lib.level = 2; persist();
+    S.forEach((s) => { s.acc = (s.acc || '').replace('hardhat', '').trim(); });
+    burst(86, 110, 40, { speed: 60, c: '#FFE38A', up: 20, extra: { layer: 'front' } });
+    await sleep(600);
+    AU.sfx('cheer');
+    S.forEach((s) => { s.arms = 'up'; s.hop(true); });
+    await say('greg', 'It is DONE!');
+    S.forEach((s) => { s.arms = 'down'; s.hop(false); });
+    await say('greg', 'Pull the red book, {name}. Go on. Pull it!');
+    this.wanderAll();
+  },
   wanderAll() {
     this.sps.forEach((s, i) => { if (s !== this.dj && s !== this.lounger) { s.sitting = false; s.expr = 'norm'; s.mode = 'wander'; s.area = [60 + i * 32, 170, 92 + i * 32, 194]; s.speed = 22; } });
   },
@@ -734,26 +845,18 @@ SCENES.library = {
     return -1;
   },
   async giveReadQuest(q) {
-    const switching = !!save.active.read;
     this.wiggle = true; AU.sfx('rattle');
-    await say('n', cycle(['A book is wiggling.', 'Another book is wiggling.', 'Wiggle, wiggle. A book wants out.'], 'wig', this.st));
-    AU.sfx('rattle'); this.wiggle = false;
+    await sleep(500);
+    this.wiggle = false;
     AU.sfx('pop');
     burst(98, 80, 10, { speed: 24, c: '#CBBCA3', ay: 40 });
     this.shelfBookGone = true;
     this.flyBook = { x: 96, y: 76, t: 0, to: [zoe.x, zoe.y - 34], quest: true };
-    await tween(700, (k) => { this.flyBook.t = k; });
+    await tween(600, (k) => { this.flyBook.t = k; });
     AU.sfx('page'); this.flyBook = null;
-    const r = await openQuestPage(q, 'read', false);
     this.shelfBookGone = false;
-    if (r !== 'ok') { await say('greg', 'No rush. The book will wait. Books are excellent at waiting.'); return; }
     AU.sfx('chime');
-    save.active.read = q.id; persist(); updateHud(true);
-    const G = this.greg; G.expr = 'happy';
-    await say('greg', switching ? 'A different quest? Good idea. The other one will still be on the bookshelf today.' : cycle(['A new quest!', 'Another quest! The bookshelf is on a roll.', 'Ooh, a good one.'], 'newq', this.st));
-    await say('greg', q.sendoff);
-    if ((save.counts.read || 0) < 3) await say('greg', 'When you are done, sit on the storytelling stool and tell us everything.');
-    G.expr = 'norm';
+    await acceptAndGo('read', q);
   },
   async tellRead(skipAsk) {
     const q = readQuest(save.active.read), G = this.greg, S = this.sps;
@@ -771,15 +874,15 @@ SCENES.library = {
     }
     AU.sfx('cheer');
     S.forEach((s) => { s.expr = 'happy'; s.jump(70 + Math.random() * 30); });
-    bubble(S[0], 'Story time!', 1500, true); setTimeout(() => bubble(S[3], 'Yay!', 1200), 300);
-    await sleep(1200);
-    await say('greg', 'Everybody sit!');
+    bubble(S[0], 'Story time!', 1500, true); setTimeout(() => bubble(S[3], 'Everybody sit!', 1200), 300);
+    await sleep(1100);
     S.forEach((s) => { s.sitting = true; s.expr = 'norm'; });
     const book = { q: q.id, picks: {}, at: Date.now() };
-    for (const step of q.tell) await this.tellStep(step, book);
+    // the out-loud part only happens now and then, so telling stays quick
+    const loud = Math.random() < 0.3;
+    for (const step of q.tell) { if (step.sometimes && !loud) continue; await this.tellStep(step, book); }
     this.storyIcon = this.storyIcon || ('e_' + (q.cover.emblem || 'book'));
     G.expr = 'wide';
-    await say('greg', 'Stand back, everyone...');
     await this.magicAgain(book);
   },
   async tellStep(step, book) {
@@ -787,7 +890,6 @@ SCENES.library = {
     if (step.type === 'animal') {
       const a = await openAnimalPicker(); book.animal = a; this.storyIcon = 'a_' + a; AU.sfx('sparkle'); await this.reactAnimal(a);
     } else if (step.type === 'pick') {
-      await say('greg', step.q);
       const k = await openPicker(step.q, step.options);
       const opt = step.options.find((o) => o[0] === k);
       book.picks[step.key] = k; this.storyIcon = opt[2]; AU.sfx('sparkle');
@@ -804,12 +906,9 @@ SCENES.library = {
       const f = await openFeelingPicker(); book.feel = f; await this.reactFeeling(f);
     } else if (step.type === 'outloud') {
       G.expr = 'norm'; S.forEach((s) => { s.expr = 'wide'; });
-      await say('greg', 'Now the best part.');
-      await say('greg', step.say);
-      const [l1, l2] = FEEL_REACT_LINES.outloud[Math.floor(Math.random() * FEEL_REACT_LINES.outloud.length)];
-      await say('sp', l1, { actor: S[1] });
-      await say('sp2', l2, { actor: S[2] });
-      await ask('n', 'Tell the Sparkees. Then tap the button.', ['I told them!']);
+      const [l1] = FEEL_REACT_LINES.outloud[Math.floor(Math.random() * FEEL_REACT_LINES.outloud.length)];
+      bubble(S[1], l1, 1600, true);
+      await ask('greg', step.say, ['I told them!']);
       S.forEach((s) => { s.expr = 'star'; });
       const wow = STORY_WOW[Math.floor(Math.random() * STORY_WOW.length)];
       bubble(S[0], wow[0], 1400, true); setTimeout(() => bubble(S[2], wow[1], 1400), 400); setTimeout(() => bubble(S[4], wow[2], 1500), 800);
@@ -850,9 +949,10 @@ SCENES.library = {
     await sleep(1800);
     S.forEach((s) => { s.arms = 'down'; s.hop(false); });
     G.expr = 'happy';
-    await say('greg', cycle(['Another story for the shelf!', 'The fire is so happy. Look at it showing off.', 'The library is getting cozier every time.'], 'shelfline', this.st));
     if (save.books.length === 5) await say('greg', 'Five stories! Greg had to learn a new number for this.');
-    if (save.books.length === 10) await say('greg', 'TEN stories! Greg ran out of fingers. Greg did not have fingers to begin with.');
+    else if (save.books.length === 10) await say('greg', 'TEN stories! Greg ran out of fingers. Greg did not have fingers to begin with.');
+    else if (save.books.length === 20) await say('greg', 'TWENTY stories! Gregory the mustache is doing a little dance.');
+    if (this.building()) return this.buildStep();
     await this.reward();
   },
   async hatchIntro() {
@@ -911,10 +1011,17 @@ SCENES.library = {
       g.globalAlpha = 0.05 + 0.02 * Math.sin(T * 7) + this.flare * 0.08; D.poly(g, [[222, 70], [246, 70], [196, 196], [150, 196]], '#FFE9A8');
       g.restore();
     }
+    if (this.doorK > 0) drawKitchenDoorOpen(g, this.doorK);
+    if (this.building()) drawConstruction(g, save.lib.build + 1, T);
+    else if (save.lib.level >= 2) drawBookcaseDoor(g, this.caseK, T);
     Presents.drawBg(this, g);
   },
   drawFg(g) {
     Presents.drawFg(this, g);
+    if (this.keyFly) {
+      const t = ease(this.keyFly.t), x = lerp(142, 278, t), y = lerp(180, 128, t) - Math.sin(t * Math.PI) * 40;
+      D.glow(g, x, y, 14, '#FFE38A', 0.4, 3); g.drawImage(ICONS.e_key, Math.round(x - 10), Math.round(y - 10));
+    }
     if (this.storyIcon) {
       const ic = ICONS[this.storyIcon] || ICONS['a_' + this.storyIcon];
       const y = Math.round(zoe.y - 56 + Math.sin(T * 2) * 1.5);
@@ -973,12 +1080,13 @@ SCENES.library = {
       });
     } else if (save.stage === 'reward') {
       cut(async () => { FX.fade = 1; await fadeIn(500); await this.reward(); });
-    } else if (save.stage === 'done' && (save.pending && save.pending.room === 'library' || !save.flags.hatch || o.tell)) {
+    } else if (save.stage === 'done') {
       cut(async () => {
         if (!o.arrive) { FX.fade = 1; await fadeIn(500); }
-        if (save.pending && save.pending.room === 'library') { await say('greg', 'Your present is still here! Pick one.'); return this.reward(); }
+        if (save.pending && save.pending.at === 'library') { await say('greg', 'Your present is still here!'); return this.reward(); }
         if (!save.flags.hatch) { await say('greg', '{name}! Welcome back!'); await this.hatchIntro(); }
-        if (o.tell && save.active.read) await this.tellRead(true);
+        if (o.tell && save.active.read) return this.tellRead(true);
+        await maybeResumeQuest();
       });
     } else if (!o.arrive) { FX.fade = 1; fadeIn(500); }
   },
@@ -990,9 +1098,9 @@ function libraryItemSpots(S) {
     { rect: [0, 128, 18, 26], when: has('plant'), stand: [44, 186], act: line('plant', ['A big leafy plant. It is listening. Slowly.', 'You water it with your eyes. It seems to help.']) },
     { rect: [86, 56, 16, 16], when: has('globe'), stand: [96, 184], face: 'front', act: async () => { AU.sfx('whoosh'); await say('n', cycle(['You spin the globe. Wheee.', 'You point at a random spot. Greg says that is where he is from. It is the ocean.'], 'globe', S.st)); } },
     { rect: [186, 34, 30, 30], when: has('mobile'), stand: [196, 180], act: async () => { AU.sfx('twinkle'); await say('n', cycle(['The star mobile spins. Indoor stars!', 'One of the stars is a moon. It is trying its best.'], 'mob', S.st)); } },
-    { rect: [254, 138, 24, 36], when: has('telescope'), stand: [246, 186], act: line('tele', ['You look through the telescope. You see... the kitchen door. Very close up.', 'Through the telescope, a Sparkee waves at you from very far away. It is right there.']) },
+    { rect: [210, 160, 30, 38], when: has('telescope'), stand: [208, 190], act: line('tele', ['You look through the telescope. You see a very far-away star. It waves.', 'Through the telescope, a Sparkee waves at you from very far away. It is right there.']) },
     { rect: [218, 84, 30, 32], when: has('portrait'), stand: [232, 184], face: 'front', act: line('port', ['A portrait of you! Very handsome. Very heroic.', 'The Sparkees say goodnight to it every night.']) },
-    { rect: [222, 176, 30, 18], when: has('cushions'), stand: [214, 190], act: async () => { AU.sfx('squish'); await say('n', cycle(['A pile of cushions. You sink in a little.', 'Somewhere in the cushions, a Sparkee is napping.'], 'cush', S.st)); } },
+    { rect: [56, 182, 30, 16], when: has('cushions'), stand: [92, 190], act: async () => { AU.sfx('squish'); await say('n', cycle(['A pile of cushions. You sink in a little.', 'Somewhere in the cushions, a Sparkee is napping.'], 'cush', S.st)); } },
   ];
 }
 // record tap x for present picking

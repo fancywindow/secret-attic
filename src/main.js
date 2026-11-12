@@ -6,10 +6,18 @@ function updateHud(newQuest) {
   q.hidden = !activeQuests().length;
   if (newQuest) { q.classList.remove('pulse'); void q.offsetWidth; q.classList.add('pulse'); }
   $('#hMusic').classList.toggle('off', !AU.musicOn);
+  $('#hMap').hidden = save.stage !== 'done';
 }
 function mountHud() {
   $('#hQuest').append(pixImg(ICONS.scroll, 1, 'hicon'));
   $('#hMusic').append(pixImg(ICONS.note, 1, 'hicon'));
+  $('#hMap').append(pixImg(ICONS.e_map, 1, 'hicon'));
+  $('#hMap').addEventListener('click', async () => {
+    if (isBusy() || Dlg.active || Modal.open || scene === SCENES.title) return;
+    AU.sfx('page');
+    const room = await openMap();
+    if (room) travelTo(room);
+  });
   $('#hQuest').addEventListener('click', async () => {
     if (isBusy() || Dlg.active || Modal.open || scene === SCENES.title) return;
     AU.sfx('page');
@@ -17,7 +25,7 @@ function mountHud() {
     if (!list.length) return;
     const pick = list.length === 1 ? list[0] : await openQuestChooser(list);
     if (!pick) return;
-    const r = await openQuestPage(pick.q, pick.kind, true);
+    const r = await openInProgress(pick.kind, pick.q);
     if (r === 'done') goTell(pick.kind);
   });
   $('#hMusic').addEventListener('click', () => { AU.init(); AU.setMusic(!AU.musicOn); save.musicOn = AU.musicOn; persist(); updateHud(); });
@@ -66,9 +74,11 @@ function activeQuests() {
   if (save.stage === 'quest') out.push({ kind: 'read', q: READ_QUESTS[0] });
   if (save.active && save.active.read) out.push({ kind: 'read', q: readQuest(save.active.read) });
   if (save.active && save.active.art) out.push({ kind: 'art', q: artQuest(save.active.art) });
+  if (save.active && save.active.food) out.push({ kind: 'food', q: foodQuest(save.active.food) });
   return out;
 }
 // "I did it!" from the quest scroll: go to the right room and start telling
+const TELL_SPOT = { read: [134, 186], art: [144, 186], food: [150, 186] };
 async function goTell(kind) {
   const room = ROOM_OF[kind];
   if (save.stage === 'quest') {
@@ -78,7 +88,8 @@ async function goTell(kind) {
     return;
   }
   if (scene === SCENES[room]) {
-    runHotspot({ stand: kind === 'read' ? [134, 186] : [144, 186], act: () => (kind === 'read' ? scene.tellRead(true) : scene.tellArt(true)) });
+    const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[kind];
+    runHotspot({ stand: TELL_SPOT[kind], act: () => scene[tell](true) });
     return;
   }
   await fadeOut(400);
@@ -90,9 +101,10 @@ async function openQuestBoard(kind) {
   const row = h('div', { class: 'brow' });
   for (const id of ids) {
     const q = questOf(kind, id), isDone = doneIds.includes(id), isAct = id === act;
-    const ic = kind === 'read' ? (ICONS['e_' + q.cover.emblem] || ICONS.openbook) : (ICONS[(q.icons || [])[1]] || ICONS.e_splash);
+    const ic = kind === 'art' ? (ICONS[q.icon] || ICONS[(q.icons || [])[1]] || ICONS.e_splash) : (ICONS['e_' + q.cover.emblem] || ICONS.openbook);
     const tag = isDone ? h('span', { class: 'btag done' }, 'Done ✓') : isAct ? h('span', { class: 'btag now' }, 'Your quest') : h('span', { class: 'btag' }, 'Pick me!');
-    const b = h('button', { class: 'bcard' + (isDone ? ' isdone' : '') + (isAct ? ' isact' : ''), type: 'button' }, pixImg(ic, 1.6), h('span', { class: 'bt' }, q.title), tag);
+    const size = q.size === 'project' ? h('span', { class: 'bsize project' }, pixImg(ICONS.e_brushbig, 0.6), 'Big project') : q.size === 'doodle' ? h('span', { class: 'bsize' }, pixImg(ICONS.e_pencil, 0.6), 'Quick doodle') : null;
+    const b = h('button', { class: 'bcard' + (isDone ? ' isdone' : '') + (isAct ? ' isact' : '') + (q.size === 'project' ? ' isproject' : ''), type: 'button' }, size, pixImg(ic, 1.6), h('span', { class: 'bt' }, q.title), tag);
     if (isDone) b.setAttribute('disabled', '');
     else b.addEventListener('click', () => { AU.sfx('page'); Modal.close(id); });
     row.append(b);
@@ -101,7 +113,7 @@ async function openQuestBoard(kind) {
   const dots = h('div', { class: 'bprog' }, ids.map((_, i) => h('i', { class: i < n ? 'on' : '' })), h('span', {}, n >= ids.length ? 'All done for today! New quests tomorrow.' : `${n} of ${ids.length} done today`));
   const x = h('button', { class: 'ghostbtn', type: 'button' }, 'Close');
   x.addEventListener('click', () => { AU.sfx('tap'); Modal.close(null); });
-  const node = card('board' + (kind === 'art' ? ' art' : ''), h('div', { class: 'qkicker' }, kind === 'read' ? "Today's quests from the bookshelf" : "Today's quests from the easel"), row, dots, x);
+  const node = card('board ' + kind, h('div', { class: 'qkicker' }, `Today's quests from the ${WHERE_OF[kind]}`), row, dots, x);
   AU.sfx('page');
   return Modal.show(node, 'dim');
 }
@@ -109,8 +121,8 @@ async function openQuestChooser(list) {
   const node = card('chooser', h('div', { class: 'ptitle' }, 'Which quest?'));
   const row = h('div', { class: 'chrow' });
   for (const it of list) {
-    const ic = it.kind === 'read' ? ICONS.openbook : ICONS.e_splash;
-    const b = h('button', { class: 'chbtn', type: 'button' }, pixImg(ic, 1.4), h('span', { class: 'chk' }, it.kind === 'read' ? 'From the bookshelf' : 'From the easel'), h('span', { class: 'cht' }, it.q.title));
+    const ic = { read: ICONS.openbook, art: ICONS.e_splash, food: ICONS.e_spoon }[it.kind];
+    const b = h('button', { class: 'chbtn', type: 'button' }, pixImg(ic, 1.4), h('span', { class: 'chk' }, `From the ${WHERE_OF[it.kind]}`), h('span', { class: 'cht' }, it.q.title));
     b.addEventListener('click', () => { AU.sfx('tap'); Modal.close(it); });
     row.append(b);
   }
@@ -123,24 +135,25 @@ async function openQuestPage(q, kind = 'read', fromHud = false) {
   const icons = q.icons ? q.icons.map((k) => ICONS[k]) : [ICONS.magnifier, ICONS.openbook, ICONS.talk];
   const steps = h('ol', { class: 'qsteps' }, q.steps.map((t, i) => h('li', {}, pixImg(icons[i] || ICONS.seal, i === 1 && kind === 'read' ? 1.1 : 1.2), h('span', {}, t))));
   const btns = h('div', { class: 'qbtns' });
-  const node = card('quest' + (kind === 'art' ? ' art' : ''),
-    h('div', { class: 'qkicker' }, kind === 'read' ? 'A quest from the bookshelf' : 'A quest from the easel'),
+  const kicker = q.size === 'project' ? 'A big project from the easel' : `A quest from the ${WHERE_OF[kind]}`;
+  const node = card('quest ' + kind + (q.size === 'project' ? ' project' : ''),
+    h('div', { class: 'qkicker' }, kicker),
     h('h2', {}, q.title),
     h('p', { class: 'qlead' }, q.lead),
     steps,
     h('p', { class: 'qaside' }, q.aside || '(Grown-ups can help with big words. That is what grown-ups are for.)'),
     btns);
   if (!fromHud) {
-    const b = h('button', { class: 'seal', type: 'button' }, pixImg(ICONS.seal, 1.4), h('span', {}, "I'll do it!"));
+    const b = h('button', { class: 'seal', type: 'button' }, pixImg(ICONS.seal, 1.4), h('span', {}, save.stage === 'done' ? "Let's go!" : "I'll do it!"));
     b.addEventListener('click', () => { AU.sfx('chime'); Modal.close('ok'); });
     btns.append(b);
     if (save.stage === 'done') {
-      const l = h('button', { class: 'ghostbtn', type: 'button' }, 'Maybe later');
+      const l = h('button', { class: 'ghostbtn', type: 'button' }, 'Pick a different one');
       l.addEventListener('click', () => { AU.sfx('tap'); Modal.close('later'); });
       btns.append(l);
     }
   } else {
-    const b1 = h('button', { class: 'big', type: 'button' }, kind === 'read' ? 'I did it!' : 'I made it!');
+    const b1 = h('button', { class: 'big', type: 'button' }, 'I did it!');
     const b2 = h('button', { class: 'ghostbtn', type: 'button' }, 'Not yet');
     b1.addEventListener('click', () => { AU.sfx('tap'); Modal.close('done'); });
     b2.addEventListener('click', () => { AU.sfx('tap'); Modal.close('later'); });
@@ -203,7 +216,7 @@ async function openAnimalPicker() {
 async function openFeelingPicker(list, title) {
   const q = title || 'How did the story make you feel?';
   const row = h('div', { class: 'frow' });
-  for (const [k, label, ex] of list || [['funny', 'Funny', 'laugh'], ['exciting', 'Exciting', 'star'], ['cozy', 'Cozy', 'cozy'], ['sad', 'Sad', 'sad']]) {
+  for (const [k, label, ex] of list || READ_FEELS) {
     const b = h('button', { class: 'fcell', type: 'button' }, pixImg(sparkeeFace(ex), 2.2), h('span', {}, label));
     b.addEventListener('click', () => { AU.sfx('tap'); Voice.say(label, 'sp'); Modal.close(k); });
     row.append(b);
@@ -327,23 +340,34 @@ function openPhotoModal(q) {
     Modal.show(node, 'dim').then(resolve);
   });
 }
+// tick everything you did (brushing and flossing usually happen together)
 async function openSinkCard() {
   const t = todayRoutines(), slot = slotNow();
   const mark = (ok) => h('b', { class: ok ? 'yes' : 'no' }, ok ? '✓' : '○');
-  const bBrush = h('button', { class: 'big', type: 'button' }, t[slot + '_brush'] ? 'I brushed again!' : 'I brushed!');
-  const bAlong = h('button', { class: 'ghost2', type: 'button' }, 'Brush along (2 minutes)');
-  const bFloss = h('button', { class: 'big', type: 'button' }, 'I flossed!');
+  const chosen = new Set();
+  const done = h('button', { class: 'big', type: 'button', disabled: '' }, 'Done!');
+  const tick = (key, label, icon, stat) => {
+    const b = h('button', { class: 'tickrow', type: 'button', 'aria-pressed': 'false' }, h('span', { class: 'tbox', 'aria-hidden': 'true' }, '✓'), pixImg(ICONS[icon], 1.5), h('span', { class: 'sinfo' }, h('span', { class: 'sname' }, label), stat));
+    b.addEventListener('click', () => {
+      if (chosen.has(key)) chosen.delete(key); else chosen.add(key);
+      AU.sfx(chosen.has(key) ? 'pop' : 'tap');
+      b.classList.toggle('on', chosen.has(key)); b.setAttribute('aria-pressed', String(chosen.has(key)));
+      if (chosen.size) done.removeAttribute('disabled'); else done.setAttribute('disabled', '');
+    });
+    return b;
+  };
+  const along = h('button', { class: 'ghost2', type: 'button' }, 'Brush along with Bubbles (2 minutes)');
+  const close = h('button', { class: 'ghostbtn', type: 'button' }, 'Not now');
   const node = card('sink',
     h('div', { class: 'qkicker' }, 'The sink'),
-    h('h2', {}, 'Teeth Time'),
-    h('div', { class: 'srow' }, pixImg(ICONS.e_brush, 1.5), h('div', { class: 'sinfo' }, h('div', { class: 'sname' }, 'Brush my teeth'), h('div', { class: 'sstat' }, h('span', { class: slot === 'am' ? 'now' : '' }, 'Morning ', mark(t.am_brush)), h('span', { class: slot === 'pm' ? 'now' : '' }, 'Night ', mark(t.pm_brush)))), h('div', { class: 'sbtns' }, bBrush, bAlong)),
-    h('div', { class: 'srow' }, pixImg(ICONS.e_floss, 1.5), h('div', { class: 'sinfo' }, h('div', { class: 'sname' }, 'Floss'), h('div', { class: 'sstat' }, h('span', {}, 'Today ', mark(t.floss)))), h('div', { class: 'sbtns' }, bFloss)),
-    h('p', { class: 'qaside' }, '(Morning lasts until 3 in the afternoon. After that, it counts as night.)'));
-  const close = h('button', { class: 'ghostbtn', type: 'button' }, 'Not now');
-  node.append(close);
-  bBrush.addEventListener('click', () => { AU.sfx('tap'); Modal.close('brushed'); });
-  bAlong.addEventListener('click', () => { AU.sfx('tap'); Modal.close('along'); });
-  bFloss.addEventListener('click', () => { AU.sfx('tap'); Modal.close('floss'); });
+    h('h2', {}, 'What did you do?'),
+    tick('brush', 'I brushed my teeth', 'e_brush', h('span', { class: 'sstat' }, h('span', { class: slot === 'am' ? 'now' : '' }, 'Morning ', mark(t.am_brush)), h('span', { class: slot === 'pm' ? 'now' : '' }, 'Night ', mark(t.pm_brush)))),
+    tick('floss', 'I flossed', 'e_floss', h('span', { class: 'sstat' }, h('span', {}, 'Today ', mark(t.floss)))),
+    h('div', { class: 'sfoot' }, done, along),
+    h('p', { class: 'qaside' }, '(Morning lasts until 3 in the afternoon. After that, it counts as night.)'),
+    close);
+  done.addEventListener('click', () => { if (!chosen.size) return; AU.sfx('sparkle'); Modal.close([...chosen]); });
+  along.addEventListener('click', () => { AU.sfx('tap'); Modal.close('along'); });
   close.addEventListener('click', () => { AU.sfx('tap'); Modal.close(null); });
   return Modal.show(node, 'dim');
 }
@@ -367,9 +391,8 @@ function routeByStage() {
   if (s === 'new' || s === 'hallway') return goScene('hall');
   if (s === 'stairs') return goScene('stairs', { arrive: false });
   if (s === 'forest' || s === 'met') return goScene('forest');
-  if (s === 'done' && save.lastRoom === 'studio' && save.flags.hatch) return goScene('studio');
-  if (s === 'done' && save.lastRoom === 'bath' && save.flags.hatch) return goScene('bath');
-  return goScene('library');
+  if (s === 'done' && save.lastRoom && ROOMS[save.lastRoom] && ROOMS[save.lastRoom].open() && SCENES[save.lastRoom]) return goScene(save.lastRoom, { resume: true });
+  return goScene('library', { resume: true });
 }
 function showTitle() {
   goScene('title');
@@ -385,6 +408,7 @@ function begin() {
   if (save.musicOn === false) AU.setMusic(false);
   $('#title').hidden = true;
   zoe.rebuild();
+  RESUME_CHECK = true;
   routeByStage();
 }
 function boot() {
@@ -394,6 +418,7 @@ function boot() {
   makeIcons();
   for (const [k] of ANIMALS) ICONS['a_' + k] = animalIcon(k);
   makeIcons2();
+  makeIcons3();
   zoe.rebuild();
   mountHud();
   layout();
@@ -409,6 +434,6 @@ function boot() {
   });
   showTitle();
   requestAnimationFrame(frame);
-  window.__dbg = { save, goScene, SCENES, zoe, persist, begin, get scene() { return scene; }, get busy() { return isBusy(); }, Dlg, Modal };
+  window.__dbg = { travelTo, openMap, save, goScene, SCENES, zoe, persist, begin, get scene() { return scene; }, get busy() { return isBusy(); }, Dlg, Modal };
 }
 boot();
