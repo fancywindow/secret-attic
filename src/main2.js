@@ -58,6 +58,14 @@ async function openInProgress(kind, q, fresh) {
     big, later);
   big.addEventListener('click', () => { AU.sfx('chime'); Modal.close('done'); });
   later.addEventListener('click', () => { AU.sfx('tap'); Modal.close('later'); });
+  // big projects take days: tell the Sparkees you started (or worked on it today)
+  if (kind === 'art' && q.size === 'project') {
+    const days = wipDays(q.id);
+    const work = h('button', { class: 'ghost2 working', type: 'button' }, days.includes(todayKey()) ? 'I worked on it again!' : days.length ? 'I worked on it today!' : "I'm working on it!");
+    work.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close('working'); });
+    big.after(work);
+    if (days.length) big.before(h('p', { class: 'wipline' }, `Worked on it ${days.length === 1 ? 'one day' : days.length + ' days'} so far. `, '★'.repeat(Math.min(days.length, 7))));
+  }
   return Modal.show(node, 'dim');
 }
 // accept a quest and go straight to the "in progress" card
@@ -67,7 +75,15 @@ async function acceptAndGo(kind, q) {
   if (r === 'done') {
     const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[kind];
     if (scene[tell]) await scene[tell](true);
-  }
+  } else if (r === 'working') await goWorking();
+}
+// the days Zoe told the studio she worked on a big project
+function wipDays(id) { return save.wip && save.wip.id === id ? save.wip.days : []; }
+// "I'm working on it!": the studio Sparkees cheer (travel there if we're somewhere else)
+async function goWorking() {
+  if (scene === SCENES.studio) return scene.working();
+  await fadeOut(400);
+  goScene('studio', { working: true });
 }
 // on opening the app (or arriving in a room) with a quest still going, show its card
 let RESUME_CHECK = false;
@@ -78,6 +94,7 @@ async function maybeResumeQuest() {
   if (!list.length || save.stage !== 'done') return;
   const here = list.find((x) => ROOM_OF[x.kind] === scene.room) || list.find((x) => x.kind === save.lastStarted) || list[0];
   const r = await openInProgress(here.kind, here.q);
+  if (r === 'working') return goWorking();
   if (r === 'done') {
     if (ROOM_OF[here.kind] === scene.room) { const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[here.kind]; zoe.walkTo(...TELL_SPOT[here.kind]); await scene[tell](true); }
     else goTell(here.kind);

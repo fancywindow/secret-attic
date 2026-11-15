@@ -317,3 +317,16 @@ LIB_ITEMS.mobile.thumb = (g) => drawMobile(g, 40, 10, 0);
 STU_ITEMS.stars.thumb = (g) => { for (let i = 0; i < 5; i++) { D.twinkle(g, 20 + i * 10, 20 + (i % 2) * 4, 2, ['#E98AA2', '#F2C94C', '#9ACDE0', '#A1AF7C', '#FE9B5B'][i]); D.line(g, 20 + i * 10, 10, 20 + i * 10, 17 + (i % 2) * 4, '#8A7A60'); } };
 TOWER_ITEMS.dragon.thumb = (g) => { g.save(); g.beginPath(); g.rect(55, 30, 30, 30); g.clip(); drawDragons(g, 0); g.restore(); };
 TOWER_ITEMS.constellations.thumb = (g) => { D.disc(g, 40, 30, 22, '#1E2A50'); const pts = [[28, 22], [36, 18], [46, 26], [52, 36], [34, 38]]; g.globalAlpha = 0.5; for (let i = 0; i < 4; i++) D.line(g, pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], '#FFE38A'); g.globalAlpha = 1; for (const [x, y] of pts) { D.twinkle(g, x, y, 2, '#FFE38A'); D.p(g, x, y, '#FFFFFF'); } };
+
+// the easel while a big project is underway: pencil sketch lines, a sign, and a star per day worked
+function drawWip(g, days, t) {
+  const pen = '#8A8478';
+  D.line(g, 160, 118, 168, 104, pen); D.line(g, 168, 104, 178, 112, pen); D.line(g, 178, 112, 176, 120, pen);
+  D.ell(g, 170, 110, 5, 4, 'rgba(0,0,0,0)'); D.ring(g, 168, 108, 3, pen); D.line(g, 158, 121, 182, 121, pen);
+  D.p(g, 164, 112, '#E98AA2'); D.p(g, 165, 112, '#E98AA2'); D.p(g, 174, 114, '#5A84C4');
+  // little sign hanging under the tray
+  D.r(g, 158, 129, 24, 9, C.wood1); D.r(g, 159, 130, 22, 7, '#F4EBD9');
+  text3(g, 'SOON', 159 + (22 - text3w('SOON')) / 2, 132, '#9A4AA0');
+  const k = Math.min(days, 7);
+  for (let i = 0; i < k; i++) { const x = 170 - (k - 1) * 3 + i * 6, y = 94 + (i % 2); D.twinkle(g, x, y, Math.sin(t * 3 + i) > 0.2 ? 2 : 1, '#F2C94C'); D.p(g, x, y, '#FFFFFF'); }
+}

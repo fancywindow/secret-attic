@@ -27,8 +27,9 @@ function mountHud() {
     if (!pick) return;
     const r = await openInProgress(pick.kind, pick.q);
     if (r === 'done') goTell(pick.kind);
+    else if (r === 'working') goWorking();
   });
-  $('#hMusic').addEventListener('click', () => { AU.init(); AU.setMusic(!AU.musicOn); save.musicOn = AU.musicOn; persist(); updateHud(); });
+  $('#hMusic').addEventListener('click', () => { AU.unlock(); AU.setMusic(!AU.musicOn); save.musicOn = AU.musicOn; persist(); updateHud(); });
 }
 
 // ===================== Overlays =====================
@@ -404,7 +405,7 @@ function showTitle() {
   $('#confirm').hidden = true;
 }
 function begin() {
-  AU.init(); Voice.unlock();
+  AU.unlock(); Voice.unlock();
   if (save.musicOn === false) AU.setMusic(false);
   $('#title').hidden = true;
   zoe.rebuild();

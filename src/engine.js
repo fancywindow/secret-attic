@@ -163,8 +163,35 @@ const callName = () => (save.name === 'Visitor' ? 'Visitor' : 'Zoe');
 const AU = {
   ctx: null, out: null, sfxBus: null, musBus: null, musGain: null, musicOn: true, noiseBuf: null,
   song: null, tracks: [], timer: null, songName: null,
+  // iPads only start sound from a finished tap (touchend/click, not touchstart), mute web audio when
+  // the iPad is on silent, and pause it when the app goes to the background. unlock() handles all three.
+  unlocked: false,
+  unlock() {
+    try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) { /* older iPadOS */ }
+    this.init();
+    const a = this.ctx; if (!a) return;
+    if (a.state !== 'running') { try { a.resume(); } catch (e) { /* try again next tap */ } }
+    if (this.unlocked && a.state === 'running') return;
+    // a one-sample silent sound, played inside the tap, wakes the audio up on older iPads
+    try { const b = a.createBuffer(1, 1, 22050), s = a.createBufferSource(); s.buffer = b; s.connect(a.destination); s.start(0); } catch (e) { /* ignore */ }
+    // without navigator.audioSession, a silent looping <audio> element moves the iPad into "playback"
+    // mode so the silent switch doesn't mute the music
+    if (!navigator.audioSession && !this.keepAlive) {
+      try {
+        const rate = 8000, n = rate / 2, buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+        const w = (o, str) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
+        w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+        v.setUint32(24, rate, true); v.setUint32(28, rate, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+        for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+        const el = (this.keepAlive = document.createElement('audio'));
+        el.src = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })); el.loop = true; el.setAttribute('playsinline', ''); el.setAttribute('x-webkit-airplay', 'deny');
+        el.play().catch(() => { this.keepAlive = null; });
+      } catch (e) { /* ignore */ }
+    }
+    this.unlocked = a.state === 'running';
+  },
   init() {
-    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    if (this.ctx) { if (this.ctx.state !== 'running') { try { this.ctx.resume(); } catch (e) { /* ignore */ } } return; }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     const a = (this.ctx = new AC());
@@ -356,3 +383,7 @@ const Voice = {
   stop() { if (this.supported) try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } },
   clean(t) { return t.replace(/[•*]/g, '').replace(/\.\.\./g, '... ').replace(/\bGREG\b/g, 'Greg'); },
 };
+
+// unlock sound on every finished tap until it is running, and wake it up when the app comes back
+for (const ev of ['touchend', 'click', 'keydown']) document.addEventListener(ev, () => { if (!AU.ctx || AU.ctx.state !== 'running' || !AU.unlocked) AU.unlock(); }, { capture: true, passive: true });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && AU.ctx && AU.ctx.state !== 'running') { try { AU.ctx.resume(); } catch (e) { /* the next tap will do it */ } } });

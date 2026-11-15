@@ -74,10 +74,45 @@ SCENES.studio = {
     await fadeOut(400);
     goScene('bath', { arrive: true });
   },
+  async working() {
+    const q = artQuest(save.active.art), D0 = this.dot, today = todayKey();
+    if (!save.wip || save.wip.id !== q.id) save.wip = { id: q.id, days: [] };
+    const again = save.wip.days.includes(today);
+    if (!again) save.wip.days.push(today);
+    persist();
+    const n = save.wip.days.length;
+    await D0.goto(196, 184, 50); D0.look = zoe;
+    if (Math.hypot(zoe.x - 144, zoe.y - 186) > 6) await zoe.walkTo(144, 186);
+    zoe.face(1);
+    if (again) {
+      D0.expr = 'happy';
+      await say('dot', 'More work on it today? Dot is cheering again. Quietly. In her heart. And also out loud. YAY!');
+      return;
+    }
+    AU.sfx('cheer'); D0.expr = 'star'; D0.jump(130);
+    burst(170, 104, 18, { speed: 30, c: '#FFE38A', extra: { layer: 'front' } });
+    const cheers = ['Go {name}!', 'You can do it!', 'Big project!', 'Ooh, exciting!'];
+    this.sps.forEach((s, i) => { if (s.visible) { s.expr = 'star'; s.jump(90 + i * 10); setTimeout(() => bubble(s, cheers[i % cheers.length].replace('{name}', save.name || 'friend'), 1800, true), i * 250); } });
+    await sleep(900);
+    if (n === 1) {
+      await say('dot', `You STARTED ${q.title}! Dot is so excited she might paint herself.`);
+      D0.expr = 'happy';
+      await say('dot', 'Every day you work on it, tell me, and Dot will put a star on the easel. Big projects can take lots of days.');
+      await say('dot', 'When it is all done, tap "I did it!" and show me.');
+    } else {
+      await say('dot', `Day ${n} of ${q.title}! Another star for the easel!`);
+      if (n >= 3) await say('dot', 'This is what real artists do. A little bit, every day.');
+    }
+    D0.expr = 'norm';
+  },
   async talkDot() {
     const D0 = this.dot;
     D0.expr = 'happy';
-    if (save.active.art) { const q = artQuest(save.active.art); await say('dot', `Your art quest is ${q.title}.`); await say('dot', 'When it is done, tap my easel and show me!'); }
+    if (save.active.art) {
+      const q = artQuest(save.active.art), n = wipDays(q.id).length;
+      await say('dot', n ? `How is ${q.title} going? ${n === 1 ? 'One star' : n + ' stars'} so far!` : `Your art quest is ${q.title}.`);
+      await say('dot', q.size === 'project' ? 'Tap my easel to tell me you worked on it, or show me when it is done!' : 'When it is done, tap my easel and show me!');
+    }
     else await say('dot', cycle(['Dot. Like a dot. The smallest kind of art.', 'Every artist starts with one dot. Then another dot. Then, a giraffe.', 'Greg asked me to paint him once. I painted a potato. He cried. Happy tears, I think.', dayDone('art') ? 'Three art quests in one day! Dot is speechless. Dot is still talking, but Dot is speechless inside.' : 'My easel has three art quests today. Pick any one!', save.flags.bathMet ? 'Have you brushed your teeth today? Bubbles will ask. Bubbles always asks.' : 'The door with the sign? That is the bathroom. Bubbles lives there.'], 'dot', this.st));
     D0.expr = 'norm';
   },
@@ -89,6 +124,7 @@ SCENES.studio = {
     if (pick === save.active.art) {
       const r = await openInProgress('art', artQuest(pick));
       if (r === 'done') await this.tellArt(true);
+      else if (r === 'working') await this.working();
       return;
     }
     await this.giveArtQuest(artQuest(pick));
@@ -203,6 +239,7 @@ SCENES.studio = {
     }
     zoe.mode = 'front';
     this.lastSize = art.size;
+    if (save.wip && save.wip.id === art.q) save.wip = null;
     save.arts.push(art); save.doneQ.art.push(art.q); markDayDone('art', art.q); save.active.art = null; save.counts.art = (save.counts.art || 0) + 1;
     persist(); updateHud();
     // the picture flies from the easel to its place
@@ -284,6 +321,8 @@ SCENES.studio = {
     if (fam && fam !== this.hideNew) drawArtPiece(g, artCanvas(fam), 26, 78, 48, 36, false);
     this.lineArts().forEach((a, i) => { if (a !== this.hideNew) { const [x, y] = CLOTHES[i]; drawArtPiece(g, artCanvas(a), x, y, 24, 18); } });
     if (this.easelArt) drawArtPiece(g, artCanvas(this.easelArt), 154, 98, 32, 27, false);
+    // a big project in progress: a sketch on the easel and a star for every day worked on it
+    if (!this.easelArt && save.wip && save.wip.id === save.active.art) drawWip(g, save.wip.days.length, T);
     drawCanvasGlow(g, this.canvasK);
     Presents.drawBg(this, g);
   },
@@ -332,6 +371,8 @@ SCENES.studio = {
       cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await say('dot', 'Your present is still here!'); await this.reward(); });
     } else if (o.tell && save.active.art) {
       cut(async () => { FX.fade = 1; await fadeIn(500); await this.tellArt(true); });
+    } else if (o.working && save.active.art) {
+      cut(async () => { FX.fade = 1; await fadeIn(500); await this.working(); });
     } else cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await maybeResumeQuest(); });
   },
 };

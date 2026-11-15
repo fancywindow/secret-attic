@@ -229,6 +229,8 @@ button[disabled] { opacity: 0.45; }
 .card.progress h2 { margin: 0; }
 .card.progress .pbig { font-size: calc(var(--u) * 10); padding: calc(var(--u) * 2.5) calc(var(--u) * 12); margin-top: calc(var(--u) * 1); }
 .card.progress .qsteps { text-align: left; }
+.card.progress .working { font-size: calc(var(--u) * 6); padding: calc(var(--u) * 2) calc(var(--u) * 6); }
+.wipline { margin: 0; font-size: calc(var(--u) * 5.5); font-weight: 700; color: #9A6A20; }
 .goline { font-size: calc(var(--u) * 6.5); color: #6E5A62; margin: 0; }
 /* the map */
 .card.map { width: calc(var(--u) * 262); padding-top: calc(var(--u) * 5); }
@@ -773,8 +775,35 @@ const callName = () => (save.name === 'Visitor' ? 'Visitor' : 'Zoe');
 const AU = {
   ctx: null, out: null, sfxBus: null, musBus: null, musGain: null, musicOn: true, noiseBuf: null,
   song: null, tracks: [], timer: null, songName: null,
+  // iPads only start sound from a finished tap (touchend/click, not touchstart), mute web audio when
+  // the iPad is on silent, and pause it when the app goes to the background. unlock() handles all three.
+  unlocked: false,
+  unlock() {
+    try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) { /* older iPadOS */ }
+    this.init();
+    const a = this.ctx; if (!a) return;
+    if (a.state !== 'running') { try { a.resume(); } catch (e) { /* try again next tap */ } }
+    if (this.unlocked && a.state === 'running') return;
+    // a one-sample silent sound, played inside the tap, wakes the audio up on older iPads
+    try { const b = a.createBuffer(1, 1, 22050), s = a.createBufferSource(); s.buffer = b; s.connect(a.destination); s.start(0); } catch (e) { /* ignore */ }
+    // without navigator.audioSession, a silent looping <audio> element moves the iPad into "playback"
+    // mode so the silent switch doesn't mute the music
+    if (!navigator.audioSession && !this.keepAlive) {
+      try {
+        const rate = 8000, n = rate / 2, buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+        const w = (o, str) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
+        w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+        v.setUint32(24, rate, true); v.setUint32(28, rate, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+        for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+        const el = (this.keepAlive = document.createElement('audio'));
+        el.src = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })); el.loop = true; el.setAttribute('playsinline', ''); el.setAttribute('x-webkit-airplay', 'deny');
+        el.play().catch(() => { this.keepAlive = null; });
+      } catch (e) { /* ignore */ }
+    }
+    this.unlocked = a.state === 'running';
+  },
   init() {
-    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    if (this.ctx) { if (this.ctx.state !== 'running') { try { this.ctx.resume(); } catch (e) { /* ignore */ } } return; }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     const a = (this.ctx = new AC());
@@ -966,6 +995,10 @@ const Voice = {
   stop() { if (this.supported) try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } },
   clean(t) { return t.replace(/[•*]/g, '').replace(/\.\.\./g, '... ').replace(/\bGREG\b/g, 'Greg'); },
 };
+
+// unlock sound on every finished tap until it is running, and wake it up when the app comes back
+for (const ev of ['touchend', 'click', 'keydown']) document.addEventListener(ev, () => { if (!AU.ctx || AU.ctx.state !== 'running' || !AU.unlocked) AU.unlock(); }, { capture: true, passive: true });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && AU.ctx && AU.ctx.state !== 'running') { try { AU.ctx.resume(); } catch (e) { /* the next tap will do it */ } } });
 
 // ===================== Stage & runtime =====================
 const stage = $('#stage');
@@ -3134,6 +3167,19 @@ STU_ITEMS.stars.thumb = (g) => { for (let i = 0; i < 5; i++) { D.twinkle(g, 20 +
 TOWER_ITEMS.dragon.thumb = (g) => { g.save(); g.beginPath(); g.rect(55, 30, 30, 30); g.clip(); drawDragons(g, 0); g.restore(); };
 TOWER_ITEMS.constellations.thumb = (g) => { D.disc(g, 40, 30, 22, '#1E2A50'); const pts = [[28, 22], [36, 18], [46, 26], [52, 36], [34, 38]]; g.globalAlpha = 0.5; for (let i = 0; i < 4; i++) D.line(g, pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], '#FFE38A'); g.globalAlpha = 1; for (const [x, y] of pts) { D.twinkle(g, x, y, 2, '#FFE38A'); D.p(g, x, y, '#FFFFFF'); } };
 
+// the easel while a big project is underway: pencil sketch lines, a sign, and a star per day worked
+function drawWip(g, days, t) {
+  const pen = '#8A8478';
+  D.line(g, 160, 118, 168, 104, pen); D.line(g, 168, 104, 178, 112, pen); D.line(g, 178, 112, 176, 120, pen);
+  D.ell(g, 170, 110, 5, 4, 'rgba(0,0,0,0)'); D.ring(g, 168, 108, 3, pen); D.line(g, 158, 121, 182, 121, pen);
+  D.p(g, 164, 112, '#E98AA2'); D.p(g, 165, 112, '#E98AA2'); D.p(g, 174, 114, '#5A84C4');
+  // little sign hanging under the tray
+  D.r(g, 158, 129, 24, 9, C.wood1); D.r(g, 159, 130, 22, 7, '#F4EBD9');
+  text3(g, 'SOON', 159 + (22 - text3w('SOON')) / 2, 132, '#9A4AA0');
+  const k = Math.min(days, 7);
+  for (let i = 0; i < k; i++) { const x = 170 - (k - 1) * 3 + i * 6, y = 94 + (i % 2); D.twinkle(g, x, y, Math.sin(t * 3 + i) > 0.2 ? 2 : 1, '#F2C94C'); D.p(g, x, y, '#FFFFFF'); }
+}
+
 // ===================== Quest content =====================
 // Tell steps:
 //   { type: 'animal' }                         animal grid (the first quest)
@@ -5086,10 +5132,45 @@ SCENES.studio = {
     await fadeOut(400);
     goScene('bath', { arrive: true });
   },
+  async working() {
+    const q = artQuest(save.active.art), D0 = this.dot, today = todayKey();
+    if (!save.wip || save.wip.id !== q.id) save.wip = { id: q.id, days: [] };
+    const again = save.wip.days.includes(today);
+    if (!again) save.wip.days.push(today);
+    persist();
+    const n = save.wip.days.length;
+    await D0.goto(196, 184, 50); D0.look = zoe;
+    if (Math.hypot(zoe.x - 144, zoe.y - 186) > 6) await zoe.walkTo(144, 186);
+    zoe.face(1);
+    if (again) {
+      D0.expr = 'happy';
+      await say('dot', 'More work on it today? Dot is cheering again. Quietly. In her heart. And also out loud. YAY!');
+      return;
+    }
+    AU.sfx('cheer'); D0.expr = 'star'; D0.jump(130);
+    burst(170, 104, 18, { speed: 30, c: '#FFE38A', extra: { layer: 'front' } });
+    const cheers = ['Go {name}!', 'You can do it!', 'Big project!', 'Ooh, exciting!'];
+    this.sps.forEach((s, i) => { if (s.visible) { s.expr = 'star'; s.jump(90 + i * 10); setTimeout(() => bubble(s, cheers[i % cheers.length].replace('{name}', save.name || 'friend'), 1800, true), i * 250); } });
+    await sleep(900);
+    if (n === 1) {
+      await say('dot', `You STARTED ${q.title}! Dot is so excited she might paint herself.`);
+      D0.expr = 'happy';
+      await say('dot', 'Every day you work on it, tell me, and Dot will put a star on the easel. Big projects can take lots of days.');
+      await say('dot', 'When it is all done, tap "I did it!" and show me.');
+    } else {
+      await say('dot', `Day ${n} of ${q.title}! Another star for the easel!`);
+      if (n >= 3) await say('dot', 'This is what real artists do. A little bit, every day.');
+    }
+    D0.expr = 'norm';
+  },
   async talkDot() {
     const D0 = this.dot;
     D0.expr = 'happy';
-    if (save.active.art) { const q = artQuest(save.active.art); await say('dot', `Your art quest is ${q.title}.`); await say('dot', 'When it is done, tap my easel and show me!'); }
+    if (save.active.art) {
+      const q = artQuest(save.active.art), n = wipDays(q.id).length;
+      await say('dot', n ? `How is ${q.title} going? ${n === 1 ? 'One star' : n + ' stars'} so far!` : `Your art quest is ${q.title}.`);
+      await say('dot', q.size === 'project' ? 'Tap my easel to tell me you worked on it, or show me when it is done!' : 'When it is done, tap my easel and show me!');
+    }
     else await say('dot', cycle(['Dot. Like a dot. The smallest kind of art.', 'Every artist starts with one dot. Then another dot. Then, a giraffe.', 'Greg asked me to paint him once. I painted a potato. He cried. Happy tears, I think.', dayDone('art') ? 'Three art quests in one day! Dot is speechless. Dot is still talking, but Dot is speechless inside.' : 'My easel has three art quests today. Pick any one!', save.flags.bathMet ? 'Have you brushed your teeth today? Bubbles will ask. Bubbles always asks.' : 'The door with the sign? That is the bathroom. Bubbles lives there.'], 'dot', this.st));
     D0.expr = 'norm';
   },
@@ -5101,6 +5182,7 @@ SCENES.studio = {
     if (pick === save.active.art) {
       const r = await openInProgress('art', artQuest(pick));
       if (r === 'done') await this.tellArt(true);
+      else if (r === 'working') await this.working();
       return;
     }
     await this.giveArtQuest(artQuest(pick));
@@ -5215,6 +5297,7 @@ SCENES.studio = {
     }
     zoe.mode = 'front';
     this.lastSize = art.size;
+    if (save.wip && save.wip.id === art.q) save.wip = null;
     save.arts.push(art); save.doneQ.art.push(art.q); markDayDone('art', art.q); save.active.art = null; save.counts.art = (save.counts.art || 0) + 1;
     persist(); updateHud();
     // the picture flies from the easel to its place
@@ -5296,6 +5379,8 @@ SCENES.studio = {
     if (fam && fam !== this.hideNew) drawArtPiece(g, artCanvas(fam), 26, 78, 48, 36, false);
     this.lineArts().forEach((a, i) => { if (a !== this.hideNew) { const [x, y] = CLOTHES[i]; drawArtPiece(g, artCanvas(a), x, y, 24, 18); } });
     if (this.easelArt) drawArtPiece(g, artCanvas(this.easelArt), 154, 98, 32, 27, false);
+    // a big project in progress: a sketch on the easel and a star for every day worked on it
+    if (!this.easelArt && save.wip && save.wip.id === save.active.art) drawWip(g, save.wip.days.length, T);
     drawCanvasGlow(g, this.canvasK);
     Presents.drawBg(this, g);
   },
@@ -5344,6 +5429,8 @@ SCENES.studio = {
       cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await say('dot', 'Your present is still here!'); await this.reward(); });
     } else if (o.tell && save.active.art) {
       cut(async () => { FX.fade = 1; await fadeIn(500); await this.tellArt(true); });
+    } else if (o.working && save.active.art) {
+      cut(async () => { FX.fade = 1; await fadeIn(500); await this.working(); });
     } else cut(async () => { if (!o.arrive) { FX.fade = 1; await fadeIn(500); } await maybeResumeQuest(); });
   },
 };
@@ -6098,8 +6185,9 @@ function mountHud() {
     if (!pick) return;
     const r = await openInProgress(pick.kind, pick.q);
     if (r === 'done') goTell(pick.kind);
+    else if (r === 'working') goWorking();
   });
-  $('#hMusic').addEventListener('click', () => { AU.init(); AU.setMusic(!AU.musicOn); save.musicOn = AU.musicOn; persist(); updateHud(); });
+  $('#hMusic').addEventListener('click', () => { AU.unlock(); AU.setMusic(!AU.musicOn); save.musicOn = AU.musicOn; persist(); updateHud(); });
 }
 
 // ===================== Overlays =====================
@@ -6475,7 +6563,7 @@ function showTitle() {
   $('#confirm').hidden = true;
 }
 function begin() {
-  AU.init(); Voice.unlock();
+  AU.unlock(); Voice.unlock();
   if (save.musicOn === false) AU.setMusic(false);
   $('#title').hidden = true;
   zoe.rebuild();
@@ -6570,6 +6658,14 @@ async function openInProgress(kind, q, fresh) {
     big, later);
   big.addEventListener('click', () => { AU.sfx('chime'); Modal.close('done'); });
   later.addEventListener('click', () => { AU.sfx('tap'); Modal.close('later'); });
+  // big projects take days: tell the Sparkees you started (or worked on it today)
+  if (kind === 'art' && q.size === 'project') {
+    const days = wipDays(q.id);
+    const work = h('button', { class: 'ghost2 working', type: 'button' }, days.includes(todayKey()) ? 'I worked on it again!' : days.length ? 'I worked on it today!' : "I'm working on it!");
+    work.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close('working'); });
+    big.after(work);
+    if (days.length) big.before(h('p', { class: 'wipline' }, `Worked on it ${days.length === 1 ? 'one day' : days.length + ' days'} so far. `, '★'.repeat(Math.min(days.length, 7))));
+  }
   return Modal.show(node, 'dim');
 }
 // accept a quest and go straight to the "in progress" card
@@ -6579,7 +6675,15 @@ async function acceptAndGo(kind, q) {
   if (r === 'done') {
     const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[kind];
     if (scene[tell]) await scene[tell](true);
-  }
+  } else if (r === 'working') await goWorking();
+}
+// the days Zoe told the studio she worked on a big project
+function wipDays(id) { return save.wip && save.wip.id === id ? save.wip.days : []; }
+// "I'm working on it!": the studio Sparkees cheer (travel there if we're somewhere else)
+async function goWorking() {
+  if (scene === SCENES.studio) return scene.working();
+  await fadeOut(400);
+  goScene('studio', { working: true });
 }
 // on opening the app (or arriving in a room) with a quest still going, show its card
 let RESUME_CHECK = false;
@@ -6590,6 +6694,7 @@ async function maybeResumeQuest() {
   if (!list.length || save.stage !== 'done') return;
   const here = list.find((x) => ROOM_OF[x.kind] === scene.room) || list.find((x) => x.kind === save.lastStarted) || list[0];
   const r = await openInProgress(here.kind, here.q);
+  if (r === 'working') return goWorking();
   if (r === 'done') {
     if (ROOM_OF[here.kind] === scene.room) { const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[here.kind]; zoe.walkTo(...TELL_SPOT[here.kind]); await scene[tell](true); }
     else goTell(here.kind);
