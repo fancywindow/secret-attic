@@ -4381,7 +4381,11 @@ SCENES.library = {
       { hit: (x, y) => self.spineAt(x, y) >= 0, stand: [70, 184], face: 'front', act: () => openBookCard(save.books[self.spineAt(self._tapX, self._tapY)] || save.books[0]) },
       { rect: [100, 4, 30, 150], when: () => self.hatchK >= 1, stand: [114, 178], face: 'front', act: () => self.climb() },
       { rect: [68, 72, 32, 78], when: () => save.lib.level >= 2, stand: [86, 182], face: 'front', act: () => self.toTower() },
-      { rect: [60, 40, 52, 112], when: () => self.building(), stand: [86, 184], face: 'front', act: async () => { await say('n', cycle(['Scaffolding! The Sparkees are building something.', 'There is a blueprint. It says TOWER. The O is a drawing of Greg.'], 'scaf', self.st)); await say('greg', `${3 - save.lib.build} more ${3 - save.lib.build === 1 ? 'reading quest' : 'reading quests'} and the builders can finish!`); } },
+      { rect: [60, 40, 52, 112], when: () => self.building(), stand: [86, 184], face: 'front', act: async () => {
+        // the scaffolding is in front of the bookshelf, so tapping it opens the quests too
+        if (!self.st.scafSaid) { self.st.scafSaid = 1; await say('greg', `The builders need ${3 - save.lib.build} more ${3 - save.lib.build === 1 ? 'reading quest' : 'reading quests'} to finish!`); }
+        await self.shelf();
+      } },
       { rect: [142, 96, 72, 58], stand: [196, 178], act: async () => {
         if (self.fireK > 0) await say('n', cycle(['Crackle, crackle. The fire is showing off now.', 'Warm and cozy. Your story did that.'], 'fire', self.st));
         else await say('n', cycle(['The fireplace is cold. It looks bored.', 'A fire needs wood. This one also needs a story.'], 'fire0', self.st));
@@ -4944,7 +4948,8 @@ SCENES.library = {
     if (this.hatchK > 0) drawHatch(g, this.hatchK, save.arts.length > 0);
     // the dusty quest book (chapter one) or a glowing new quest book
     if (!this.shelfBookGone && ['new', 'met', 'library'].includes(save.stage)) drawShelfBook(g, 96, 76, this.wiggle);
-    if (!this.shelfBookGone && save.stage === 'done' && !save.active.read && !dayDone('read') && !save.pending && !this.presents && !this.flyBook) {
+    const questBook = !this.shelfBookGone && save.stage === 'done' && !save.active.read && !dayDone('read') && !save.pending && !this.presents && !this.flyBook;
+    if (questBook && !this.building()) {
       D.glow(g, 98, 84, 10, '#FFE38A', 0.25 + 0.1 * Math.sin(T * 3), 3);
       drawShelfBook(g, 96, 76, this.wiggle || Math.sin(T * 1.7) > 0.86);
     }
@@ -4962,7 +4967,11 @@ SCENES.library = {
       g.restore();
     }
     if (this.doorK > 0) drawKitchenDoorOpen(g, this.doorK);
-    if (this.building()) drawConstruction(g, save.lib.build + 1, T);
+    if (this.building()) {
+      drawConstruction(g, save.lib.build + 1, T);
+      // keep the glowing quest book in front of the scaffolding so it's easy to see and tap
+      if (questBook) { D.glow(g, 98, 84, 10, '#FFE38A', 0.25 + 0.1 * Math.sin(T * 3), 3); drawShelfBook(g, 96, 76, this.wiggle || Math.sin(T * 1.7) > 0.86); }
+    }
     else if (save.lib.level >= 2) drawBookcaseDoor(g, this.caseK, T);
     Presents.drawBg(this, g);
   },
