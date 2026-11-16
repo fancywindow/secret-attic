@@ -368,6 +368,8 @@ SCENES.forest = {
     await tween(900, (k) => { zoe.y = 182 - k * 70; });
     await irisOut(154, 100, 600);
     zoe.y = 182;
+    // once the Reading Tower is built, the treehouse ladder brings you straight up to it
+    if (libraryRoom() === 'tower') { goScene('tower', { arrive: true }); await irisIn(44, 186, 600); return; }
     goScene('library', { arrive: true });
     await irisIn(31, 188, 600);
   },
@@ -515,6 +517,10 @@ SCENES.library = {
     if (save.stage === 'quest') { await say('n', 'The bookshelf is waiting for your story.'); await openQuestPage(READ_QUESTS[0], 'read', true); return; }
     if (save.stage === 'done') {
       if (this.presents || save.pending) { await say('n', 'Open your present first!'); return; }
+      if (save.lib.level >= 2 && !save.active.read) {
+        const c = await ask('greg', 'The quest book lives up in the Reading Tower now! Go up there?', ['Go up!', 'Show me here']);
+        if (c === 0) return this.toTower();
+      }
       const pick = await openQuestBoard('read');
       if (!pick) { if (dayDone('read')) await say('greg', 'All three quests done today! The bookshelf is napping. Three new quests tomorrow.'); return; }
       if (pick === save.active.read) {

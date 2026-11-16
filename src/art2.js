@@ -40,8 +40,8 @@ function personIcon(kind, skin) {
   }
   const [c, g] = mk(20, 20);
   const sk = skin.s, sh = skin.S;
-  const hair = { mom: '#5A3220', dad: '#3A2A22', brother: '#8C5A34', sister: '#5A3220', baby: '#B88A5A', grandma: '#C8C2CC', grandpa: '#C8C2CC', aunt: '#B4502A', uncle: '#2A2230', cousin: '#D9A848' }[kind];
-  const shirt = { mom: '#E98AA2', dad: '#5A84C4', brother: '#7D9A4C', sister: '#F0903E', baby: '#F2C94C', grandma: '#9A6AB0', grandpa: '#7A6E6E', aunt: '#DCA438', uncle: '#B4502A', cousin: '#5ACDE0' }[kind];
+  const hair = { friend: '#2A1A14', mom: '#5A3220', dad: '#3A2A22', brother: '#8C5A34', sister: '#5A3220', baby: '#B88A5A', grandma: '#C8C2CC', grandpa: '#C8C2CC', aunt: '#B4502A', uncle: '#2A2230', cousin: '#D9A848' }[kind];
+  const shirt = { friend: '#9A6AB0', mom: '#E98AA2', dad: '#5A84C4', brother: '#7D9A4C', sister: '#F0903E', baby: '#F2C94C', grandma: '#9A6AB0', grandpa: '#7A6E6E', aunt: '#DCA438', uncle: '#B4502A', cousin: '#5ACDE0' }[kind];
   const small = kind === 'baby';
   const r = small ? 5 : 6, cy = small ? 11 : 9;
   if (kind === 'mom' || kind === 'aunt') D.ell(g, 10, cy + 3, r + 2, r + 3, hair);
@@ -57,6 +57,7 @@ function personIcon(kind, skin) {
   if (kind === 'aunt') { for (let a = 0; a < 7; a++) D.disc(g, 4 + a * 2, cy - r + 1 + (a % 2), 2, hair); }
   if (kind === 'grandma') { D.disc(g, 10, cy - r - 1, 3, hair); D.ell(g, 10, cy - r + 2, r, 2, hair); }
   if (kind === 'grandpa') { D.r(g, 10 - r, cy - 2, 2, 4, hair); D.r(g, 10 + r - 1, cy - 2, 2, 4, hair); D.r(g, 8, cy + 3, 5, 1, hair); }
+  if (kind === 'friend') { for (let k = 0; k < 6; k++) D.disc(g, 5 + k * 2, cy - r + 2 + (k % 2), 2, hair); D.p(g, 10, 18, '#F7B6C8'); D.p(g, 9, 18, '#F7B6C8'); D.p(g, 11, 18, '#F7B6C8'); D.p(g, 10, 19, '#F7B6C8'); }
   if (kind === 'baby') { D.p(g, 10, cy - r - 1, hair); D.p(g, 11, cy - r - 2, hair); D.p(g, 9, cy - r, hair); }
   if (kind === 'uncle') { D.ell(g, 10, cy + 4, 4, 2, hair); }
   // face
@@ -67,7 +68,7 @@ function personIcon(kind, skin) {
   return outlined(c, C.ink);
 }
 const EMBLEMS = ['tree', 'heart', 'tent', 'bed', 'pillow', 'table', 'sun', 'star', 'splash', 'yes', 'maybe', 'no', 'shield', 'bulb', 'smile', 'laugh', 'floor', 'friends', 'robot', 'moon', 'dark', 'cloud', 'note', 'book', 'eyes', 'brush', 'floss', 'camera'];
-const PEOPLE = ['me', 'mom', 'dad', 'brother', 'sister', 'baby', 'grandma', 'grandpa', 'aunt', 'uncle', 'cousin'];
+const PEOPLE = ['me', 'mom', 'dad', 'brother', 'sister', 'baby', 'grandma', 'grandpa', 'aunt', 'uncle', 'cousin', 'friend'];
 function makeIcons2() {
   for (const e of EMBLEMS) ICONS['e_' + e] = emblemIcon(e);
   rebuildPeopleIcons();

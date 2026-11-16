@@ -92,11 +92,11 @@ async function maybeResumeQuest() {
   RESUME_CHECK = false;
   const list = activeQuests();
   if (!list.length || save.stage !== 'done') return;
-  const here = list.find((x) => ROOM_OF[x.kind] === scene.room) || list.find((x) => x.kind === save.lastStarted) || list[0];
+  const here = list.find((x) => roomOf(x.kind) === scene.room) || list.find((x) => x.kind === save.lastStarted) || list[0];
   const r = await openInProgress(here.kind, here.q);
   if (r === 'working') return goWorking();
   if (r === 'done') {
-    if (ROOM_OF[here.kind] === scene.room) { const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[here.kind]; zoe.walkTo(...TELL_SPOT[here.kind]); await scene[tell](true); }
+    if (roomOf(here.kind) === scene.room) { const tell = { read: 'tellRead', art: 'tellArt', food: 'tellFood' }[here.kind]; zoe.walkTo(...TELL_SPOT[here.kind]); await scene[tell](true); }
     else goTell(here.kind);
   }
 }
@@ -127,14 +127,18 @@ async function openMap() {
   const grid = h('div', { class: 'mapgrid' });
   const cur = scene && scene.room ? scene.room : Object.keys(SCENES).find((k) => SCENES[k] === scene);
   for (const room of MAP_ORDER) {
+    if (room === 'tower') continue; // the tower is the library's level 2: the Library tile goes there
     const R = ROOMS[room], open = R.open();
-    // keep the surprise: rooms you can't know about yet stay hidden
-    if (!open && room === 'tower' && !save.flags.kitchenKey) continue;
-    const th = h('div', { class: 'mthumb' }, pixImg(roomThumb(room, !open), 0.75));
+    const dest = room === 'library' ? libraryRoom() : room;
+    const isHere = dest === cur || (room === 'library' && (cur === 'library' || cur === 'tower'));
+    let status = open ? (isHere ? 'You are here' : roomStatus(room)) : unlockHint(room);
+    if (room === 'library' && save.flags.kitchenKey && save.lib.level < 2 && !isHere) status = `Building Level 2: ${save.lib.build} of 3`;
+    if (room === 'library' && save.lib.level >= 2 && !isHere) { const p = roomProgress('tower'); status = `Level 2 ★★ · ${p.have} of ${p.total} presents`; }
+    const th = h('div', { class: 'mthumb' }, pixImg(roomThumb(dest, !open), 0.75));
     if (!open) th.append(h('div', { class: 'mlock' }, pixImg(ICONS.e_lock, 1.2)));
-    const b = h('button', { class: 'mroom' + (room === cur ? ' here' : ''), type: 'button' }, th, h('span', { class: 'mname' }, R.name), h('span', { class: 'mstat' }, open ? (room === cur ? 'You are here' : roomStatus(room)) : unlockHint(room)));
-    if (!open || room === cur) b.setAttribute('disabled', '');
-    else b.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close(room); });
+    const b = h('button', { class: 'mroom' + (isHere ? ' here' : ''), type: 'button' }, th, h('span', { class: 'mname' }, R.name), h('span', { class: 'mstat' }, status));
+    if (!open || dest === cur) b.setAttribute('disabled', '');
+    else b.addEventListener('click', () => { AU.sfx('sparkle'); Modal.close(dest); });
     grid.append(b);
   }
   const x = h('button', { class: 'ghostbtn', type: 'button' }, 'Close');

@@ -481,6 +481,7 @@ async function narrate(...lines) { for (const l of lines) await say('n', l); }
 // ===================== Bubbles =====================
 const BUBS = [];
 function bubble(actor, text, ms = 1600, speak = false) {
+  if (!actor) return;
   const el = document.createElement('div');
   el.className = 'bub'; el.textContent = text;
   $('#bubs').appendChild(el);

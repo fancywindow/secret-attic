@@ -205,7 +205,7 @@ SCENES.studio = {
       art.who = k;
       const lbl = (FAMILY.find((f) => f[0] === k) || [0, 'them'])[1];
       D0.expr = 'cozy';
-      await say('dot', k === 'other' ? 'For someone special! They are so lucky.' : `For ${lbl.toLowerCase().startsWith('mom') || lbl.toLowerCase().startsWith('dad') ? lbl : 'your ' + lbl.toLowerCase()}! They are so lucky.`);
+      await say('dot', k === 'other' ? 'For someone special! They are so lucky.' : k === 'friend' ? 'For your friend! Friends are the family you pick.' : `For ${lbl.toLowerCase().startsWith('mom') || lbl.toLowerCase().startsWith('dad') ? lbl : 'your ' + lbl.toLowerCase()}! They are so lucky.`);
       await say('dot', 'A card is a hug you can put on the fridge.');
     } else if (step === 'name') {
       await ask('dot', 'What is its name? Say it out loud!', ['I said it!']);

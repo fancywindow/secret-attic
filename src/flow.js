@@ -37,6 +37,9 @@ function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { co
 // ---------------- Quest kinds ----------------
 const QUEST_LISTS = { read: () => READ_QUESTS, art: () => ART_QUESTS, food: () => FOOD_QUESTS };
 const ROOM_OF = { read: 'library', art: 'studio', food: 'kitchen' };
+function roomOf(kind) { return kind === 'read' && save.lib && save.lib.level >= 2 ? 'tower' : ROOM_OF[kind]; }
+// arriving in "the library" means the newest level once it is built
+function libraryRoom() { return save.lib && save.lib.level >= 2 ? 'tower' : 'library'; }
 const WHERE_OF = { read: 'bookshelf', art: 'easel', food: 'stove' };
 const HOST_OF = { library: 'greg', studio: 'dot', kitchen: 'noodle', bath: 'bubbles', tower: 'pip' };
 function artQuest(id) { return ART_QUESTS.find((q) => q.id === id) || ART_QUESTS[0]; }

@@ -233,7 +233,7 @@ SCENES.tower = {
     this.st = {}; this.presents = null; this.choosing = false;
     zoe.visible = true;
     if (o.arrive) { zoe.x = 44; zoe.y = 186; zoe.face(1); } else { zoe.x = 140; zoe.y = 186; zoe.face(1); }
-    this.pip = new Sparkee({ r: 5, seed: 12, x: 150, y: 172, name: 'pip', acc: 'glasses' });
+    this.pip = new Sparkee({ r: 5, seed: 12, x: 84, y: 178, name: 'pip', acc: 'glasses' });
     this.sps = makeSparkees([{ x: 110, y: 186, seed: 71 }, { x: 196, y: 188, seed: 74 }]);
     this.sps.forEach((s, i) => { s.look = zoe; s.mode = 'wander'; s.speed = 18; s.area = [[90, 176, 130, 194], [170, 178, 220, 196]][i]; });
     this.actors = [zoe, this.pip, ...this.sps];
@@ -455,3 +455,139 @@ function patchWalkHome() {
   };
 }
 patchWalkHome();
+
+// ===================== Reading quests in the Reading Tower =====================
+// Once the tower is built it is where reading quests live: Greg moves up, and a big quest book sits on a stand.
+const TOWER_BOOK = [170, 188];
+(function towerQuests() {
+  const T0 = SCENES.tower, L = SCENES.library;
+  const enter0 = T0.enter, start0 = T0.start, drawBg0 = T0.drawBg, drawFg0 = T0.drawFg;
+  // borrow the library's telling (it only needs Greg, the Sparkees, and a magic step)
+  T0.tellRead = L.tellRead; T0.tellStep = L.tellStep; T0.reactAnimal = L.reactAnimal; T0.reactFeeling = L.reactFeeling;
+  T0.wanderAll = function () { this.sps.forEach((s, i) => { s.sitting = false; s.mode = 'wander'; s.area = [[90, 176, 130, 194], [170, 178, 220, 196]][i] || [100, 176, 200, 196]; }); };
+  T0.enter = function (o = {}) {
+    enter0.call(this, o);
+    const self = this;
+    this.storyIcon = null; this.flyBook = null; this.flare = 0;
+    this.greg = new Sparkee({ r: 7, seed: 99, greg: true, x: 112, y: 182, name: 'greg' });
+    if (this.sps[1]) { this.sps[1].x = 226; this.sps[1].area = [216, 178, 236, 196]; }
+    this.greg.look = zoe;
+    this.actors.push(this.greg);
+    const open = () => save.stage === 'done' && !save.active.read && !dayDone('read') && !self.presents && !save.pending;
+    this.questOpen = open;
+    hints.push({ x: TOWER_BOOK[0], y: TOWER_BOOK[1] - 36, strong: true, when: open });
+    hints.push({ x: TOWER_BOOK[0], y: TOWER_BOOK[1] - 36, when: () => !!save.active.read && !self.presents });
+    // the quest book stand, and Greg, take taps before anything behind them
+    const pi = this.hotspots.length - 1;
+    this.hotspots.splice(pi, 0,
+      { rect: [TOWER_BOOK[0] - 20, TOWER_BOOK[1] - 40, 40, 44], stand: [TOWER_BOOK[0] - 24, 190], face: 1, act: () => self.questBook() },
+      { hit: (x, y) => Math.hypot(self.greg.x - x, self.greg.y - 6 - y) < 11, when: () => !self.presents, stand: () => [clamp(self.greg.x - 22, 40, 230), clamp(self.greg.y, 172, 194)], act: () => self.talkGreg() });
+  };
+  T0.questBook = async function () {
+    if (this.presents || save.pending) { await say('pip', '(whispering) Open your present first!'); return; }
+    const pick = await openQuestBoard('read');
+    if (!pick) { if (dayDone('read')) await say('greg', 'All three reading quests done today! The quest book is napping. Three new ones tomorrow.'); return; }
+    if (pick === save.active.read) {
+      const r = await openInProgress('read', readQuest(pick));
+      if (r === 'done') await this.tellRead(true);
+      return;
+    }
+    AU.sfx('page'); this.bookGlow = 1; tween(600, (k) => { this.bookGlow = 1 - k; });
+    await acceptAndGo('read', readQuest(pick));
+  };
+  T0.talkGreg = async function () {
+    const G = this.greg; G.expr = 'happy';
+    if (save.active.read) await say('greg', `Your quest is ${readQuest(save.active.read).title}. Tap the big book when you are done!`);
+    else await say('greg', cycle(['Greg moved up here. The view is better. Also, Pip makes tea.', "Greg's first favorite feeling is cozy. Greg's second favorite feeling is Tuesday.", 'The big book on the stand has your reading quests. Greg dusts it every morning.', 'Gregory the mustache loves it up here. He says the air is very fancy.'], 'gt', this.st));
+    G.expr = 'norm';
+  };
+  // a finished story: the magic goes up to the skylight, the book joins the shelves, and the tower gives presents
+  T0.magicAgain = async function (book) {
+    const G = this.greg, S = this.sps;
+    zoe.mode = 'cheer';
+    AU.sfx('whoosh');
+    await streamMagic([zoe.x, zoe.y - 24], [144, 24], 32);
+    AU.sfx('fwoomp');
+    FX.flashColor = '#E8ECFF'; tween(600, (k) => { FX.flash = 0.45 * (1 - k); });
+    for (let i = 0; i < 24; i++) emit({ kind: 'star', x: 144 + (Math.random() - 0.5) * 40, y: 24 + Math.random() * 10, vy: 30 + Math.random() * 30, vx: (Math.random() - 0.5) * 50, life: 1.6, c: '#FFE38A', layer: 'front' });
+    S.forEach((s) => { s.sitting = false; s.expr = 'happy'; s.jump(90 + Math.random() * 30); });
+    await sleep(700);
+    zoe.mode = 'front';
+    save.books.push(book);
+    this.flyBook = { x: zoe.x - 12, y: zoe.y - 56, t: 0, book };
+    AU.sfx('sparkle');
+    await tween(1100, (k) => { this.flyBook.t = k; });
+    this.flyBook = null; this.storyIcon = null;
+    AU.sfx('pop'); burst(TOWER_BOOK[0], TOWER_BOOK[1] - 30, 14, { speed: 22, c: '#FFE38A', extra: { layer: 'front' } });
+    save.doneQ.read.push(book.q); markDayDone('read', book.q); save.active.read = null; save.counts.read = (save.counts.read || 0) + 1;
+    persist(); updateHud();
+    AU.sfx('cheer'); G.expr = 'happy';
+    if (save.books.length % 10 === 0) await say('greg', `${save.books.length} stories! Gregory the mustache is doing a little dance.`);
+    else await say('greg', cycle(['Another story for the tower!', 'The skylight is twinkling. It loved that one.', 'Pip is writing it in the big book. In very quiet letters.'], 'tw', this.st));
+    await this.reward();
+  };
+  T0.reward = async function () {
+    if (this.presents) return;
+    const ok = Presents.offer(this, 'tower', [[110, 192], [132, 196], [154, 192]]);
+    if (!ok) { await say('greg', 'The tower has every present! Greg hears the builders are dreaming up something even bigger. Someday.'); for (const t of leftLines('read')) await say('greg', t); this.wanderAll(); return; }
+    await zoe.walkTo(86, 190); zoe.face(1);
+    await say('pip', '(whispering) Presents! Tap them!');
+  };
+  const placed0 = T0.onPlaced;
+  T0.onPlaced = async function (item, last) {
+    await placed0.call(this, item, last);
+    this.wanderAll();
+  };
+  T0.start = function (o = {}) {
+    if (o.tell && save.active.read) { cut(async () => { FX.fade = 1; await fadeIn(500); await this.tellRead(true); }); return; }
+    // the first visit after quests moved up here: Greg shows the quest book
+    if (save.flags.towerSeen && !save.flags.towerBook && !o.placing) {
+      cut(async () => {
+        FX.fade = 1; await fadeIn(500);
+        save.flags.towerBook = true; persist();
+        const G = this.greg; G.expr = 'star';
+        await say('greg', '{name}! Greg moved up to the Reading Tower!');
+        G.expr = 'happy';
+        AU.sfx('sparkle'); this.bookGlow = 1; tween(1500, (k) => { this.bookGlow = 1 - k; });
+        await say('greg', 'And look: the quest book lives on that big stand now. Tap it for your reading quests!');
+        await maybeResumeQuest();
+      });
+      return;
+    }
+    if (!save.flags.towerSeen) save.flags.towerBook = true;
+    return start0.call(this, o);
+  };
+  T0.drawBg = function (g) {
+    drawBg0.call(this, g);
+    // the quest book stand: a tall wooden pedestal with a big open book on top
+    const [x, y] = TOWER_BOOK, on = this.questOpen && this.questOpen();
+    const k = Math.max(on ? 0.6 + 0.4 * Math.sin(T * 3) : 0, this.bookGlow || 0);
+    if (k > 0) D.glow(g, x, y - 30, 26, '#FFE38A', 0.35 * k, 4);
+    D.ell(g, x, y + 1, 12, 3, 'rgba(0,0,0,0.25)');
+    D.r(g, x - 10, y - 3, 20, 4, C.wood1); D.r(g, x - 9, y - 3, 18, 1, C.wood4);
+    D.r(g, x - 3, y - 22, 6, 19, C.wood2); D.r(g, x - 3, y - 22, 2, 19, C.wood4);
+    D.poly(g, [[x - 15, y - 26], [x + 15, y - 26], [x + 12, y - 20], [x - 12, y - 20]], C.wood3); D.r(g, x - 15, y - 26, 30, 1, C.wood5);
+    // the book: purple cover, two pages, a red ribbon
+    D.poly(g, [[x - 17, y - 33], [x, y - 29], [x + 17, y - 33], [x + 17, y - 26], [x, y - 23], [x - 17, y - 26]], '#612C48');
+    D.poly(g, [[x - 15, y - 35], [x, y - 31], [x, y - 25], [x - 15, y - 28]], '#F6EEDC');
+    D.poly(g, [[x + 15, y - 35], [x, y - 31], [x, y - 25], [x + 15, y - 28]], '#FFF9EC');
+    D.line(g, x, y - 31, x, y - 25, '#B0A090');
+    for (let i = 0; i < 3; i++) { D.line(g, x - 12, y - 31 + i * 2, x - 3, y - 29 + i * 2, '#B0A090'); D.line(g, x + 3, y - 29 + i * 2, x + 12, y - 31 + i * 2, '#B0A090'); }
+    D.r(g, x + 5, y - 26, 2, 6, '#C8323C');
+    if (k > 0 && Math.random() < 0.12) emit({ kind: 'spark', x: x + (Math.random() - 0.5) * 26, y: y - 34, vy: -14, life: 0.9, c: '#FFF6B8', layer: 'front' });
+  };
+  T0.drawFg = function (g) {
+    drawFg0.call(this, g);
+    if (this.storyIcon) {
+      const ic = ICONS[this.storyIcon] || ICONS['a_' + this.storyIcon];
+      const y = Math.round(zoe.y - 56 + Math.sin(T * 2) * 1.5);
+      D.glow(g, zoe.x, y + 11, 18, '#FFE38A', 0.3, 3);
+      if (ic) g.drawImage(ic, Math.round(zoe.x - ic.width / 2), y);
+    }
+    if (this.flyBook) {
+      const f = this.flyBook, t = ease(f.t);
+      const x = lerp(f.x, TOWER_BOOK[0] - 12, t), y = lerp(f.y, TOWER_BOOK[1] - 52, t) - Math.sin(t * Math.PI) * 30;
+      D.glow(g, x + 12, y + 12, 22, '#FFE38A', 0.35, 3); drawBookCover(g, Math.round(x), Math.round(y), f.book);
+    }
+  };
+})();

@@ -25,10 +25,11 @@ const READ_QUESTS = [
     cover: { color: '#C76580', emblem: 'heart' },
     tell: [
       { type: 'pick', key: 'who', q: 'Who was listening?', options: [
-        ['mom', 'Mom', 'p_mom'], ['dad', 'Dad', 'p_dad'], ['kid', 'A kid', 'p_sister'], ['grown', 'A grown-up', 'p_grandma'], ['stuffy', 'A stuffed animal', 'a_bear'], ['pet', 'A pet', 'a_dog']],
+        ['mom', 'Mom', 'p_mom'], ['dad', 'Dad', 'p_dad'], ['friend', 'A friend', 'p_friend'], ['kid', 'A kid', 'p_sister'], ['grown', 'A grown-up', 'p_grandma'], ['stuffy', 'A stuffed animal', 'a_bear'], ['pet', 'A pet', 'a_dog']],
         react: {
           mom: ['Mom! Did she clap?', 'Greg would have clapped.'],
           dad: ['Dad! Excellent choice.', 'Dads have very big ears for listening.'],
+          friend: ['A friend! Reading together is the best.', 'Greg reads to Pip sometimes. Pip says shhh a lot.'],
           kid: ['A kid! You are basically a teacher now.', 'Professor {name}.'],
           grown: ['A grown-up! Grown-ups love being read to.', 'It makes their ears very happy.'],
           stuffy: ['A stuffed animal!', 'Did it clap? Stuffed animals are terrible at clapping.'],
@@ -100,9 +101,10 @@ const READ_QUESTS = [
     cover: { color: '#B4502A', emblem: 'shield' },
     tell: [
       { type: 'pick', key: 'hero', q: 'Who was the hero?', options: [
-        ['kid', 'A kid', 'p_sister'], ['animal', 'An animal', 'a_fox'], ['grown', 'A grown-up', 'p_dad'], ['creature', 'A creature', 'a_dragon'], ['robot', 'A robot', 'e_robot'], ['other', 'Someone else', 'a_other']],
+        ['kid', 'A kid', 'p_sister'], ['friend', 'Friends', 'p_friend'], ['animal', 'An animal', 'a_fox'], ['grown', 'A grown-up', 'p_dad'], ['creature', 'A creature', 'a_dragon'], ['robot', 'A robot', 'e_robot'], ['other', 'Someone else', 'a_other']],
         react: {
           kid: ['A kid hero!', 'Kids are the bravest. Greg has seen it.'],
+          friend: ['A team of friends!', 'Friends are a kind of superpower. Greg and Gregory are a team.'],
           animal: ['An animal hero!', 'Paws can be very brave.'],
           grown: ['A grown-up hero!', 'Grown-ups can be very brave. Especially about spiders.'],
           creature: ['A creature hero!', 'Creatures are underrated. Greg is technically a creature.'],
@@ -350,7 +352,7 @@ const ART_QUESTS = [
 const FAMILY = [
   ['me', 'Me', 'p_me'], ['mom', 'Mom', 'p_mom'], ['dad', 'Dad', 'p_dad'], ['brother', 'Brother', 'p_brother'], ['sister', 'Sister', 'p_sister'],
   ['baby', 'Baby', 'p_baby'], ['grandma', 'Grandma', 'p_grandma'], ['grandpa', 'Grandpa', 'p_grandpa'], ['aunt', 'Aunt', 'p_aunt'], ['uncle', 'Uncle', 'p_uncle'],
-  ['cousin', 'Cousin', 'p_cousin'], ['dog', 'Dog', 'a_dog'], ['cat', 'Cat', 'a_cat'], ['fish', 'Fish', 'a_fish'], ['other', 'Someone else', 'a_other'],
+  ['cousin', 'Cousin', 'p_cousin'], ['friend', 'A friend', 'p_friend'], ['dog', 'Dog', 'a_dog'], ['cat', 'Cat', 'a_cat'], ['fish', 'Fish', 'a_fish'], ['other', 'Someone else', 'a_other'],
 ];
 const READ_FEELS = [['funny', 'Giggly', 'laugh'], ['exciting', 'Excited', 'star'], ['cozy', 'Cozy', 'cozy'], ['sad', 'Sad', 'sad']];
 const ART_FEELS = [['fun', 'Happy', 'laugh'], ['proud', 'Proud', 'star'], ['calm', 'Calm', 'cozy'], ['tricky', 'Frustrated', 'sad']];

@@ -81,7 +81,7 @@ function activeQuests() {
 // "I did it!" from the quest scroll: go to the right room and start telling
 const TELL_SPOT = { read: [134, 186], art: [144, 186], food: [150, 186] };
 async function goTell(kind) {
-  const room = ROOM_OF[kind];
+  const room = roomOf(kind);
   if (save.stage === 'quest') {
     if (scene !== SCENES.library) { await fadeOut(400); goScene('library'); return; }
     const hs = SCENES.library.hotspots.find((x) => x.when && x.rect && x.rect[0] === 170 && x.when());
@@ -392,8 +392,10 @@ function routeByStage() {
   if (s === 'new' || s === 'hallway') return goScene('hall');
   if (s === 'stairs') return goScene('stairs', { arrive: false });
   if (s === 'forest' || s === 'met') return goScene('forest');
-  if (s === 'done' && save.lastRoom && ROOMS[save.lastRoom] && ROOMS[save.lastRoom].open() && SCENES[save.lastRoom]) return goScene(save.lastRoom, { resume: true });
-  return goScene('library', { resume: true });
+  let last = save.lastRoom;
+  if (last === 'library') last = libraryRoom();
+  if (s === 'done' && last && ROOMS[last] && ROOMS[last].open() && SCENES[last]) return goScene(last, { resume: true });
+  return goScene(s === 'done' ? libraryRoom() : 'library', { resume: true });
 }
 function showTitle() {
   goScene('title');
