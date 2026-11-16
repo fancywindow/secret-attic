@@ -3267,11 +3267,11 @@ const READ_QUESTS = [
     cover: { color: '#3E5AA8', emblem: 'star' },
     tell: [
       { type: 'feel' },
-      { type: 'pick', key: 'again', q: 'Would you read it again?', options: [['yes', 'Yes!', 'e_yes'], ['maybe', 'Maybe', 'e_maybe'], ['no', 'Nope', 'e_no']],
+      { type: 'pick', key: 'again', q: 'Did you like it?', options: [['yes', 'Yes!', 'e_yes'], ['maybe', 'Kind of', 'e_maybe'], ['no', 'Not really', 'e_no']],
         react: {
-          yes: ['Yes! A new favorite!', 'Greg will make room on the shelf.'],
-          maybe: ['Maybe! That is fair.', 'Some books need a second try.'],
-          no: ['Nope! That is allowed.', 'Not every book is your book. Greg does not like books about soup.'],
+          yes: ['You liked it! A new favorite!', 'Greg will make room on the shelf.'],
+          maybe: ['Kind of! That is fair.', 'Some books are a little bit good and a little bit hmm.'],
+          no: ['Not really? That is allowed.', 'Not every book is your book. Greg does not like books about soup.'],
         } },
       { type: 'outloud', sometimes: true, say: 'Tell us what happened in it!' },
     ],
