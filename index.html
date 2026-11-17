@@ -206,6 +206,10 @@ button[disabled] { opacity: 0.45; }
 .tbox { flex: none; display: grid; place-items: center; width: calc(var(--u) * 11); height: calc(var(--u) * 11); border-radius: calc(var(--u) * 2); background: #fff; color: transparent;
   font-size: calc(var(--u) * 8); font-weight: 700; box-shadow: 0 0 0 calc(var(--u) * 0.8) var(--ink); }
 .tickrow.on .tbox { background: #5E8A3A; color: #fff; }
+.tickrow[disabled] { opacity: 1; }
+.tickrow.counted { background: #EEF4EC; box-shadow: 0 0 0 calc(var(--u) * 0.75) #A8C898; }
+.tickrow[disabled]:not(.counted) { background: #EEE8DE; color: #8A7E78; }
+.card.sink .tickrow { margin: calc(var(--u) * 1.8) 0; padding: calc(var(--u) * 2.2) calc(var(--u) * 4); }
 .sfoot { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--u) * 4); margin: calc(var(--u) * 3) 0 calc(var(--u) * 1); }
 /* presents, all at once */
 .card.presents { display: grid; justify-items: center; gap: calc(var(--u) * 3); }
@@ -5484,7 +5488,7 @@ SCENES.bath = {
     this.sps = [this.bubbles];
     this.actors = [zoe, this.bubbles];
     const self = this;
-    const slotDone = () => !!todayRoutines()[slotNow() + '_brush'];
+    const slotDone = () => { const r = todayRoutines(); return slotNow() === 'am' ? !!r.am_brush : !!(r.am_brush && r.pm_brush); };
     hints = [
       { x: 176, y: 114, strong: true, when: () => save.flags.bathMet && !slotDone() && !self.presents },
       { x: 222, y: 72, off: 0.7, when: () => save.flags.bathMet && save.jar >= JAR_SIZE - 2 && !self.presents },
@@ -5535,7 +5539,7 @@ SCENES.bath = {
     if (!r) return;
     if (r === 'along') {
       const finished = await this.brushAlong();
-      if (finished) await this.logRoutines(['brush']);
+      if (finished) await this.logRoutines([slotNow()]);
       return;
     }
     await this.logRoutines(r);
@@ -5592,22 +5596,22 @@ SCENES.bath = {
     return true;
   },
   async logRoutines(kinds) {
-    const B = this.bubbles, t = todayRoutines(), slot = slotNow();
-    const keyOf = (k) => (k === 'brush' ? slot + '_brush' : 'floss');
-    const fresh = kinds.filter((k) => !t[keyOf(k)]), old = kinds.filter((k) => t[keyOf(k)]);
+    const B = this.bubbles, t = todayRoutines();
+    const keyOf = (k) => (k === 'floss' ? 'floss' : k + '_brush');
+    const fresh = kinds.filter((k) => !t[keyOf(k)]);
     B.expr = 'happy';
     if (!fresh.length) {
-      if (old.includes('brush')) await say('bubbles', slot === 'am' ? 'You already brushed this morning! Super brusher! Come back tonight for another sparkle.' : 'You already brushed tonight! Your teeth are SO clean. Come back in the morning for another sparkle.');
-      else await say('bubbles', 'You already flossed today! Your gums are cheering. Floss again tomorrow for another sparkle.');
+      await say('bubbles', kinds.includes('floss') ? 'You already flossed today! Your gums are cheering.' : 'That brushing already counted today! Your teeth are SO clean.');
       return;
     }
-    for (const k of fresh) { markRoutine(keyOf(k)); save.counts[k] = (save.counts[k] || 0) + 1; }
+    for (const k of fresh) { markRoutine(keyOf(k)); const c = k === 'floss' ? 'floss' : 'brush'; save.counts[c] = (save.counts[c] || 0) + 1; }
     persist();
     B.expr = 'star'; B.jump(110);
-    if (fresh.length === 2) await say('bubbles', cycle(['Brushing AND flossing! A double sparkle!', 'Both! Your teeth are throwing a party.', 'Brush and floss! Bubbles is doing a happy splash.'], 'both', this.st));
-    else if (fresh[0] === 'brush') await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
-    else await say('bubbles', cycle(['Flossing! The secret hero of teeth.', 'Floss: the tiny string that does big work.', 'In between! Where the sneaky crumbs hide.'], 'fl', this.st));
-    if (old.length) await say('bubbles', old[0] === 'brush' ? '(Brushing already counted this time. The floss sparkle goes in!)' : '(Flossing already counted today. The brushing sparkle goes in!)');
+    if (fresh.length === 3) await say('bubbles', 'Morning, night, AND floss! A TRIPLE sparkle! Bubbles has to sit down. In the bathtub.');
+    else if (fresh.length === 2) await say('bubbles', cycle(['A double sparkle! Your teeth are throwing a party.', 'Two at once! Bubbles is doing a happy splash.', 'Double sparkle! Minty AND fresh.'], 'both', this.st));
+    else if (fresh[0] === 'floss') await say('bubbles', cycle(['Flossing! The secret hero of teeth.', 'Floss: the tiny string that does big work.', 'In between! Where the sneaky crumbs hide.'], 'fl', this.st));
+    else if (fresh[0] === 'am' && slotNow() === 'pm') await say('bubbles', 'This morning\'s brushing! Bubbles remembers mornings. Sparkle!');
+    else await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
     // sparkles fly into the jar, one per thing done
     for (let i = 0; i < fresh.length; i++) {
       await streamMagic([zoe.x, zoe.y - 30], [BATH.jar[0], BATH.jar[1] - 10], 6, { colors: ['#FFD84A', '#FFF6C8'], gap: 60 });
@@ -5623,7 +5627,7 @@ SCENES.bath = {
       await say('bubbles', 'Whoa! The whole bathroom is sparkling! Clean teeth are a kind of magic.');
     }
     const now = todayRoutines();
-    if (now.am_brush && now.pm_brush && now.floss && !this.st.perfect) { this.st.perfect = true; await say('bubbles', 'Morning, night, AND floss! That is a perfect teeth day.'); }
+    if (now.am_brush && now.pm_brush && now.floss && !this.st.perfect && fresh.length < 3) { this.st.perfect = true; await say('bubbles', 'Morning, night, AND floss! That is a perfect teeth day.'); }
     if (save.jar >= JAR_SIZE) return this.golden();
     const left = JAR_SIZE - save.jar;
     await say('bubbles', left <= 3 ? `${left} more ${left === 1 ? 'sparkle' : 'sparkles'} until the jar is full!` : 'Into the Sparkle Jar!');
@@ -6658,13 +6662,16 @@ function openPhotoModal(q) {
   });
 }
 // tick everything you did (brushing and flossing usually happen together)
+// tick everything you did today: morning and night brushing are separate, so a morning brush
+// can still be ticked at night (most days the app only opens at bedtime)
 async function openSinkCard() {
-  const t = todayRoutines(), slot = slotNow();
-  const mark = (ok) => h('b', { class: ok ? 'yes' : 'no' }, ok ? '✓' : '○');
+  const t = todayRoutines(), night = slotNow() === 'pm';
   const chosen = new Set();
   const done = h('button', { class: 'big', type: 'button', disabled: '' }, 'Done!');
-  const tick = (key, label, icon, stat) => {
-    const b = h('button', { class: 'tickrow', type: 'button', 'aria-pressed': 'false' }, h('span', { class: 'tbox', 'aria-hidden': 'true' }, '✓'), pixImg(ICONS[icon], 1.5), h('span', { class: 'sinfo' }, h('span', { class: 'sname' }, label), stat));
+  const tick = (key, label, icon, already, notYet) => {
+    const stat = already ? h('span', { class: 'sstat' }, h('b', { class: 'yes' }, '✓'), ' Counted today') : notYet ? h('span', { class: 'sstat' }, notYet) : null;
+    const b = h('button', { class: 'tickrow' + (already ? ' on counted' : ''), type: 'button', 'aria-pressed': already ? 'true' : 'false' }, h('span', { class: 'tbox', 'aria-hidden': 'true' }, '✓'), pixImg(ICONS[icon], 1.5), h('span', { class: 'sinfo' }, h('span', { class: 'sname' }, label), stat));
+    if (already || notYet) { b.setAttribute('disabled', ''); return b; }
     b.addEventListener('click', () => {
       if (chosen.has(key)) chosen.delete(key); else chosen.add(key);
       AU.sfx(chosen.has(key) ? 'pop' : 'tap');
@@ -6677,11 +6684,11 @@ async function openSinkCard() {
   const close = h('button', { class: 'ghostbtn', type: 'button' }, 'Not now');
   const node = card('sink',
     h('div', { class: 'qkicker' }, 'The sink'),
-    h('h2', {}, 'What did you do?'),
-    tick('brush', 'I brushed my teeth', 'e_brush', h('span', { class: 'sstat' }, h('span', { class: slot === 'am' ? 'now' : '' }, 'Morning ', mark(t.am_brush)), h('span', { class: slot === 'pm' ? 'now' : '' }, 'Night ', mark(t.pm_brush)))),
-    tick('floss', 'I flossed', 'e_floss', h('span', { class: 'sstat' }, h('span', {}, 'Today ', mark(t.floss)))),
+    h('h2', {}, 'What did you do today?'),
+    tick('am', 'I brushed this morning', 'e_sun', t.am_brush),
+    tick('pm', 'I brushed tonight', 'e_moon', t.pm_brush, night ? null : 'After 3 o\'clock'),
+    tick('floss', 'I flossed', 'e_floss', t.floss),
     h('div', { class: 'sfoot' }, done, along),
-    h('p', { class: 'qaside' }, '(Morning lasts until 3 in the afternoon. After that, it counts as night.)'),
     close);
   done.addEventListener('click', () => { if (!chosen.size) return; AU.sfx('sparkle'); Modal.close([...chosen]); });
   along.addEventListener('click', () => { AU.sfx('tap'); Modal.close('along'); });

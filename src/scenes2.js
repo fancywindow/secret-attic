@@ -404,7 +404,7 @@ SCENES.bath = {
     this.sps = [this.bubbles];
     this.actors = [zoe, this.bubbles];
     const self = this;
-    const slotDone = () => !!todayRoutines()[slotNow() + '_brush'];
+    const slotDone = () => { const r = todayRoutines(); return slotNow() === 'am' ? !!r.am_brush : !!(r.am_brush && r.pm_brush); };
     hints = [
       { x: 176, y: 114, strong: true, when: () => save.flags.bathMet && !slotDone() && !self.presents },
       { x: 222, y: 72, off: 0.7, when: () => save.flags.bathMet && save.jar >= JAR_SIZE - 2 && !self.presents },
@@ -455,7 +455,7 @@ SCENES.bath = {
     if (!r) return;
     if (r === 'along') {
       const finished = await this.brushAlong();
-      if (finished) await this.logRoutines(['brush']);
+      if (finished) await this.logRoutines([slotNow()]);
       return;
     }
     await this.logRoutines(r);
@@ -512,22 +512,22 @@ SCENES.bath = {
     return true;
   },
   async logRoutines(kinds) {
-    const B = this.bubbles, t = todayRoutines(), slot = slotNow();
-    const keyOf = (k) => (k === 'brush' ? slot + '_brush' : 'floss');
-    const fresh = kinds.filter((k) => !t[keyOf(k)]), old = kinds.filter((k) => t[keyOf(k)]);
+    const B = this.bubbles, t = todayRoutines();
+    const keyOf = (k) => (k === 'floss' ? 'floss' : k + '_brush');
+    const fresh = kinds.filter((k) => !t[keyOf(k)]);
     B.expr = 'happy';
     if (!fresh.length) {
-      if (old.includes('brush')) await say('bubbles', slot === 'am' ? 'You already brushed this morning! Super brusher! Come back tonight for another sparkle.' : 'You already brushed tonight! Your teeth are SO clean. Come back in the morning for another sparkle.');
-      else await say('bubbles', 'You already flossed today! Your gums are cheering. Floss again tomorrow for another sparkle.');
+      await say('bubbles', kinds.includes('floss') ? 'You already flossed today! Your gums are cheering.' : 'That brushing already counted today! Your teeth are SO clean.');
       return;
     }
-    for (const k of fresh) { markRoutine(keyOf(k)); save.counts[k] = (save.counts[k] || 0) + 1; }
+    for (const k of fresh) { markRoutine(keyOf(k)); const c = k === 'floss' ? 'floss' : 'brush'; save.counts[c] = (save.counts[c] || 0) + 1; }
     persist();
     B.expr = 'star'; B.jump(110);
-    if (fresh.length === 2) await say('bubbles', cycle(['Brushing AND flossing! A double sparkle!', 'Both! Your teeth are throwing a party.', 'Brush and floss! Bubbles is doing a happy splash.'], 'both', this.st));
-    else if (fresh[0] === 'brush') await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
-    else await say('bubbles', cycle(['Flossing! The secret hero of teeth.', 'Floss: the tiny string that does big work.', 'In between! Where the sneaky crumbs hide.'], 'fl', this.st));
-    if (old.length) await say('bubbles', old[0] === 'brush' ? '(Brushing already counted this time. The floss sparkle goes in!)' : '(Flossing already counted today. The brushing sparkle goes in!)');
+    if (fresh.length === 3) await say('bubbles', 'Morning, night, AND floss! A TRIPLE sparkle! Bubbles has to sit down. In the bathtub.');
+    else if (fresh.length === 2) await say('bubbles', cycle(['A double sparkle! Your teeth are throwing a party.', 'Two at once! Bubbles is doing a happy splash.', 'Double sparkle! Minty AND fresh.'], 'both', this.st));
+    else if (fresh[0] === 'floss') await say('bubbles', cycle(['Flossing! The secret hero of teeth.', 'Floss: the tiny string that does big work.', 'In between! Where the sneaky crumbs hide.'], 'fl', this.st));
+    else if (fresh[0] === 'am' && slotNow() === 'pm') await say('bubbles', 'This morning\'s brushing! Bubbles remembers mornings. Sparkle!');
+    else await say('bubbles', cycle(['Sparkly teeth! Show me!', 'Look at those teeth. Bubbles is blinded!', 'Minty fresh! Bubbles can smell it from here.'], 'br', this.st));
     // sparkles fly into the jar, one per thing done
     for (let i = 0; i < fresh.length; i++) {
       await streamMagic([zoe.x, zoe.y - 30], [BATH.jar[0], BATH.jar[1] - 10], 6, { colors: ['#FFD84A', '#FFF6C8'], gap: 60 });
@@ -543,7 +543,7 @@ SCENES.bath = {
       await say('bubbles', 'Whoa! The whole bathroom is sparkling! Clean teeth are a kind of magic.');
     }
     const now = todayRoutines();
-    if (now.am_brush && now.pm_brush && now.floss && !this.st.perfect) { this.st.perfect = true; await say('bubbles', 'Morning, night, AND floss! That is a perfect teeth day.'); }
+    if (now.am_brush && now.pm_brush && now.floss && !this.st.perfect && fresh.length < 3) { this.st.perfect = true; await say('bubbles', 'Morning, night, AND floss! That is a perfect teeth day.'); }
     if (save.jar >= JAR_SIZE) return this.golden();
     const left = JAR_SIZE - save.jar;
     await say('bubbles', left <= 3 ? `${left} more ${left === 1 ? 'sparkle' : 'sparkles'} until the jar is full!` : 'Into the Sparkle Jar!');

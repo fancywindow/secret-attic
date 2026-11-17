@@ -192,6 +192,10 @@ button[disabled] { opacity: 0.45; }
 .tbox { flex: none; display: grid; place-items: center; width: calc(var(--u) * 11); height: calc(var(--u) * 11); border-radius: calc(var(--u) * 2); background: #fff; color: transparent;
   font-size: calc(var(--u) * 8); font-weight: 700; box-shadow: 0 0 0 calc(var(--u) * 0.8) var(--ink); }
 .tickrow.on .tbox { background: #5E8A3A; color: #fff; }
+.tickrow[disabled] { opacity: 1; }
+.tickrow.counted { background: #EEF4EC; box-shadow: 0 0 0 calc(var(--u) * 0.75) #A8C898; }
+.tickrow[disabled]:not(.counted) { background: #EEE8DE; color: #8A7E78; }
+.card.sink .tickrow { margin: calc(var(--u) * 1.8) 0; padding: calc(var(--u) * 2.2) calc(var(--u) * 4); }
 .sfoot { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--u) * 4); margin: calc(var(--u) * 3) 0 calc(var(--u) * 1); }
 /* presents, all at once */
 .card.presents { display: grid; justify-items: center; gap: calc(var(--u) * 3); }

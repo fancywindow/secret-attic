@@ -342,13 +342,16 @@ function openPhotoModal(q) {
   });
 }
 // tick everything you did (brushing and flossing usually happen together)
+// tick everything you did today: morning and night brushing are separate, so a morning brush
+// can still be ticked at night (most days the app only opens at bedtime)
 async function openSinkCard() {
-  const t = todayRoutines(), slot = slotNow();
-  const mark = (ok) => h('b', { class: ok ? 'yes' : 'no' }, ok ? '✓' : '○');
+  const t = todayRoutines(), night = slotNow() === 'pm';
   const chosen = new Set();
   const done = h('button', { class: 'big', type: 'button', disabled: '' }, 'Done!');
-  const tick = (key, label, icon, stat) => {
-    const b = h('button', { class: 'tickrow', type: 'button', 'aria-pressed': 'false' }, h('span', { class: 'tbox', 'aria-hidden': 'true' }, '✓'), pixImg(ICONS[icon], 1.5), h('span', { class: 'sinfo' }, h('span', { class: 'sname' }, label), stat));
+  const tick = (key, label, icon, already, notYet) => {
+    const stat = already ? h('span', { class: 'sstat' }, h('b', { class: 'yes' }, '✓'), ' Counted today') : notYet ? h('span', { class: 'sstat' }, notYet) : null;
+    const b = h('button', { class: 'tickrow' + (already ? ' on counted' : ''), type: 'button', 'aria-pressed': already ? 'true' : 'false' }, h('span', { class: 'tbox', 'aria-hidden': 'true' }, '✓'), pixImg(ICONS[icon], 1.5), h('span', { class: 'sinfo' }, h('span', { class: 'sname' }, label), stat));
+    if (already || notYet) { b.setAttribute('disabled', ''); return b; }
     b.addEventListener('click', () => {
       if (chosen.has(key)) chosen.delete(key); else chosen.add(key);
       AU.sfx(chosen.has(key) ? 'pop' : 'tap');
@@ -361,11 +364,11 @@ async function openSinkCard() {
   const close = h('button', { class: 'ghostbtn', type: 'button' }, 'Not now');
   const node = card('sink',
     h('div', { class: 'qkicker' }, 'The sink'),
-    h('h2', {}, 'What did you do?'),
-    tick('brush', 'I brushed my teeth', 'e_brush', h('span', { class: 'sstat' }, h('span', { class: slot === 'am' ? 'now' : '' }, 'Morning ', mark(t.am_brush)), h('span', { class: slot === 'pm' ? 'now' : '' }, 'Night ', mark(t.pm_brush)))),
-    tick('floss', 'I flossed', 'e_floss', h('span', { class: 'sstat' }, h('span', {}, 'Today ', mark(t.floss)))),
+    h('h2', {}, 'What did you do today?'),
+    tick('am', 'I brushed this morning', 'e_sun', t.am_brush),
+    tick('pm', 'I brushed tonight', 'e_moon', t.pm_brush, night ? null : 'After 3 o\'clock'),
+    tick('floss', 'I flossed', 'e_floss', t.floss),
     h('div', { class: 'sfoot' }, done, along),
-    h('p', { class: 'qaside' }, '(Morning lasts until 3 in the afternoon. After that, it counts as night.)'),
     close);
   done.addEventListener('click', () => { if (!chosen.size) return; AU.sfx('sparkle'); Modal.close([...chosen]); });
   along.addEventListener('click', () => { AU.sfx('tap'); Modal.close('along'); });
